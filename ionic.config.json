@@ -1,0 +1,7 @@
+{
+  "name": "hofladen",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
