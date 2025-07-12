@@ -11,6 +11,9 @@ export default defineConfig({
     vue(),
     legacy()
   ],
+  base: process.env.NODE_ENV === 'production'
+    ? (process.env.VUE_APP_BRANCH === 'dev' ? '/hofladen/dev/' : '/hofladen/')
+    : '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
