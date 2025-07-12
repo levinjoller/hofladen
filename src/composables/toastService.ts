@@ -28,7 +28,5 @@ export function useToast() {
         showToast.value = true
     }
 
-    // Das Composable gibt die Funktion 'presentToast' und die Toast-States zurück,
-    // die in den Komponenten verwendet werden können.
     return { presentToast, showToast, toastMessage, toastColor, toastDuration }
 }
