@@ -3,6 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 import HomePage from '../views/HomePage.vue'
 import ProductsOverviewPage from '@/views/ProductsOverviewPage.vue';
 import LoginPage from '@/views/LoginPage.vue';
+import SuppliersOverviewPage from '@/views/SuppliersOverviewPage.vue';
 import { supabase } from '@/supabase'; // Adjust the path if your supabase client is defined elsewhere
 
 const routes: Array<RouteRecordRaw> = [
@@ -26,7 +27,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'Login',
     component: LoginPage
-  }
+  },
+  {
+    path: '/suppliers-overview',
+    name: 'SuppliersOverview',
+    component: SuppliersOverviewPage,
+    meta: { requiresAuth: true } // Schütze diese Seite ebenfalls
+  },
 ]
 
 const router = createRouter({

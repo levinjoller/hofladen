@@ -44,7 +44,7 @@ import {
 
 import { supabase } from '@/supabase';
 import { useRouter } from 'vue-router';
-import { useToast } from '@/composables/toastService';
+import { useToast } from '@/services/toastService';
 
 const router = useRouter();
 

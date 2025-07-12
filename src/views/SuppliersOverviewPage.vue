@@ -5,38 +5,39 @@
         <ion-buttons slot="start">
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Produkt Übersicht</ion-title>
+        <ion-title>Lieferanten Übersicht</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">Produkt Übersicht</ion-title>
+          <ion-title size="large">Lieferanten Übersicht</ion-title>
         </ion-toolbar>
       </ion-header>
 
       <div class="ion-padding">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Produkte Übersicht</ion-card-title>
+            <ion-card-title>Lieferanten</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-list v-if="!productsLoading && products.length > 0">
-              <ion-item v-for="product in products" :key="product.id">
+            <ion-list v-if="!suppliersLoading && suppliers.length > 0">
+              <ion-item v-for="supplier in suppliers" :key="supplier.id">
                 <ion-label>
-                  <h2>{{ product.display_name }}</h2>
-                  <p>Erstellt am: {{ new Date(product.created_at).toLocaleDateString() }}</p>
+                  <h2>{{ supplier.display_name }}</h2>
+                  <p>Erstellt am: {{ new Date(supplier.created_at).toLocaleDateString('de-DE') }}</p>
                 </ion-label>
               </ion-item>
             </ion-list>
-            <p v-else-if="!productsLoading && products.length === 0" class="ion-text-center">Keine Produkte gefunden.</p>
-            <p v-else class="ion-text-center">Lade Produkte...</p>
+            <p v-else-if="!suppliersLoading && suppliers.length === 0" class="ion-text-center">Keine Lieferanten gefunden.</p>
+            <p v-else-if="suppliersError" class="ion-text-center ion-text-danger">{{ suppliersError }}</p>
+            <p v-else class="ion-text-center">Lade Lieferanten...</p>
           </ion-card-content>
         </ion-card>
       </div>
     </ion-content>
-    
+
     <ion-toast
       :is-open="showToast"
       :message="toastMessage"
@@ -44,7 +45,7 @@
       :color="toastColor"
       @didDismiss="showToast = false"
     ></ion-toast>
-  
+
   </ion-page>
 </template>
 
@@ -64,27 +65,34 @@ import {
   IonItem,
   IonLabel,
   IonMenuButton,
-  IonToast
+  IonToast,
 } from '@ionic/vue';
-import { onMounted, onActivated } from 'vue';
+import { onMounted, onActivated, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useToast } from '@/services/toastService';
-import { products, productsLoading, productsError, initializeProductData, unsubscribeFromProductChanges } from '@/services/productService';
-import { onUnmounted } from 'vue';
+import {
+  suppliers,
+  suppliersLoading,
+  suppliersError,
+  initializeSupplierData,
+  unsubscribeFromSupplierChanges
+} from '@/services/supplierService';
 
+const router = useRouter();
 const { presentToast, showToast, toastMessage, toastColor, toastDuration } = useToast();
 
 onMounted(() => {
-  initializeProductData(presentToast);
+  initializeSupplierData(presentToast);
 });
 
 onUnmounted(() => {
-  unsubscribeFromProductChanges();
+  unsubscribeFromSupplierChanges();
 });
 
 onActivated(() => {
-  console.log('ProductsOverview activated.');
-  if (productsError.value) {
-      presentToast(productsError.value, 'danger');
+  console.log('SuppliersOverviewPage activated.');
+  if (suppliersError.value) {
+    presentToast(suppliersError.value, 'danger');
   }
 });
 </script>

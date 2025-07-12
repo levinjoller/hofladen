@@ -36,9 +36,10 @@ import {
   IonTitle,
   IonContent,
 } from '@ionic/vue';
-import { home, nutrition } from 'ionicons/icons';
+import { home, nutrition, people } from 'ionicons/icons';
 const appPages = [
   { title: 'Home', url: '/home', icon: home },
-  { title: 'Produkte', url: '/products-overview', icon: nutrition }
+  { title: 'Produkte', url: '/products-overview', icon: nutrition },
+  { title: 'Lieferanten', url: '/suppliers-overview', icon: people },
 ];
 </script>

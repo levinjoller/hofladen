@@ -54,7 +54,7 @@ export async function initializeProductData(presentToast: PresentToastFunction) 
  * @param presentToast Funktion zum Anzeigen eines Toasts.
  */
 function subscribeToProductChanges(presentToast: PresentToastFunction) {
-    const channel = supabase
+    supabase
         .channel('product_changes')
         .on(
             'postgres_changes',
