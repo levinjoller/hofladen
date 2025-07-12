@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { supabase } from '@/views/supabase'; // Importieren des zentralisierten Supabase-Clients
+import { supabase } from '@/supabase'; // Importieren des zentralisierten Supabase-Clients
 import { useToast } from './useToast'; // Importieren des Toast-Composables
 
 /**
