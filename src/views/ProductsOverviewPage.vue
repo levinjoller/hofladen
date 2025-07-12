@@ -3,8 +3,7 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <!-- Optional: Ein Zurück-Button, wenn diese Seite von einer anderen aus erreichbar ist -->
-          <ion-back-button></ion-back-button>
+          <ion-menu-button></ion-menu-button>
         </ion-buttons>
         <ion-title>Produkt Übersicht</ion-title>
       </ion-toolbar>
@@ -18,7 +17,6 @@
       </ion-header>
 
       <div class="ion-padding">
-        <p>Willkommen zur Produkt Übersicht</p>
         <ion-card>
           <ion-card-header>
             <ion-card-title>Produkte Übersicht</ion-card-title>
@@ -56,10 +54,11 @@ import {
   IonCardContent,
   IonList,
   IonItem,
-  IonLabel
+  IonLabel,
+  IonMenuButton
 } from '@ionic/vue';
 import { useProducts } from '@/composables/useProducts';
-const { products, loading, error, fetchProducts } = useProducts();
+const { products, loading, fetchProducts } = useProducts();
 import { onMounted } from 'vue';
 
 onMounted(async () => {
