@@ -20,7 +20,7 @@
   </ion-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/vue';
 import { supabase } from '@/supabase';
@@ -47,7 +47,7 @@ const handleLogin = async () => {
       console.log('User logged in:', data.user);
       router.push('/home');
     }
-  } catch (err) {
+  } catch (err: any) {
     errorMessage.value = 'An unexpected error occurred.';
     console.error('Unexpected login error:', err);
   }
