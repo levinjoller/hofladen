@@ -51,13 +51,14 @@ import {
   IonToast
 } from '@ionic/vue';
 import { useToast } from '@/services/toastService';
-import { home, nutrition, people, logOut } from 'ionicons/icons';
+import { home, nutrition, people, logOut, personCircle } from 'ionicons/icons';
 import { logout } from '@/services/authService';
 import { useRouter } from 'vue-router';
 const appPages = [
   { title: 'Home', url: '/home', icon: home },
   { title: 'Produkte', url: '/products-overview', icon: nutrition },
   { title: 'Lieferanten', url: '/suppliers-overview', icon: people },
+  { title: 'Kunden', url: '/customers', icon: personCircle },
 ];
 
 const { presentToast, showToast, toastMessage, toastColor, toastDuration } = useToast();

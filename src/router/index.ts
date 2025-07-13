@@ -32,8 +32,14 @@ const routes: Array<RouteRecordRaw> = [
     path: '/suppliers-overview',
     name: 'SuppliersOverview',
     component: SuppliersOverviewPage,
-    meta: { requiresAuth: true } // Schütze diese Seite ebenfalls
+    meta: { requiresAuth: true }
   },
+  {
+    path: '/customers',
+    name: 'CustomersOverview',
+    component: () => import('@/views/CustomersOverviewPage.vue'),
+    meta: { requiresAuth: true }
+  }
 ]
 
 const router = createRouter({
