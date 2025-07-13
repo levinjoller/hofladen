@@ -134,8 +134,27 @@ async function fetchAllSuppliersOnce(presentToast: PresentToastFunction) {
  * Unsubscribes from supplier Realtime changes.
  */
 export function unsubscribeFromSupplierChanges() {
-    const channel = supabase.channel('supplier_changes');
-    supabase.removeChannel(channel);
-    isSupplierSubscribed = false;
-    console.log('Unsubscribed from supplier changes.');
+    if (isSupplierSubscribed) {
+        const channel = supabase.channel('supplier_changes');
+        supabase.removeChannel(channel);
+        isSupplierSubscribed = false;
+        console.log('Unsubscribed from supplier changes.');
+    } else {
+        console.log('No active supplier subscription to unsubscribe from.');
+    }
+}
+
+/**
+ * Reinitializes supplier data and subscription (useful for refresh or app resume).
+ * This function is called when the app comes back into foreground.
+ * It ensures data is fresh and Realtime connection is active.
+ * @param presentToast Function to display toasts.
+ */
+export async function reinitializeSupplierData(presentToast: PresentToastFunction) {
+    unsubscribeFromSupplierChanges();
+    suppliers.value = [];
+    suppliersLoading.value = true;
+    suppliersError.value = null;
+    await initializeSupplierData(presentToast);
+    console.log('Reinitialized supplier data and subscription.');
 }

@@ -1,20 +1,17 @@
-// src/services/customerService.ts
 import { supabase } from '@/supabase';
 import { ref } from 'vue';
 
-// Definiere das Interface für die Person, falls noch nicht global definiert
 export interface Person {
     id: number;
     created_at: string;
     display_name: string;
 }
 
-// Definiere das Customer-Interface - 'person' ist jetzt nicht mehr optional/nullable
 export interface Customer {
     id: number;
     created_at: string;
-    fk_person: number; // Nicht mehr nullable
-    person: Person; // Nicht mehr optional/nullable
+    fk_person: number;
+    person: Person;
 }
 
 export const customers = ref<Customer[]>([]);
@@ -42,12 +39,11 @@ export async function initializeCustomerData(presentToast: PresentToastFunction)
                 throw new Error(error.message);
             }
 
-            // ANPASSUNG: Keine Null-Prüfung für 'customer.person'
             customers.value = (data as any[]).map(customer => ({
                 id: customer.id,
                 created_at: customer.created_at,
                 fk_person: customer.fk_person,
-                person: { // Direktes Zuweisen, da 'person' zwingend ist
+                person: {
                     id: customer.person.id,
                     created_at: customer.person.created_at,
                     display_name: customer.person.display_name
@@ -128,12 +124,11 @@ async function fetchAllCustomersOnce(presentToast: PresentToastFunction) {
             throw new Error(error.message);
         }
 
-        // ANPASSUNG: Keine Null-Prüfung für 'customer.person'
         customers.value = (data as any[]).map(customer => ({
             id: customer.id,
             created_at: customer.created_at,
             fk_person: customer.fk_person,
-            person: { // Direktes Zuweisen, da 'person' zwingend ist
+            person: {
                 id: customer.person.id,
                 created_at: customer.person.created_at,
                 display_name: customer.person.display_name
@@ -152,8 +147,12 @@ async function fetchAllCustomersOnce(presentToast: PresentToastFunction) {
  * Unsubscribes from customer Realtime changes.
  */
 export function unsubscribeFromCustomerChanges() {
-    const channel = supabase.channel('customer_changes');
-    supabase.removeChannel(channel);
-    isCustomerSubscribed = false;
-    console.log('Unsubscribed from customer changes.');
+    if (isCustomerSubscribed) {
+        const channel = supabase.channel('customer_changes');
+        supabase.removeChannel(channel);
+        isCustomerSubscribed = false;
+        console.log('Unsubscribed from customer changes.');
+    } else {
+        console.log('No active customer subscription to unsubscribe from.');
+    }
 }

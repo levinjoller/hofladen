@@ -11,7 +11,7 @@ export const products = ref<Product[]>([]);
 export const productsLoading = ref(true);
 export const productsError = ref<string | null>(null);
 
-let isSubscribed = false;
+let isProductSubscribed = false;
 
 type PresentToastFunction = (message: string, color?: 'success' | 'danger' | 'warning' | 'primary' | string, duration?: number) => void;
 
@@ -42,9 +42,9 @@ export async function initializeProductData(presentToast: PresentToastFunction) 
         }
     }
 
-    if (!isSubscribed) {
+    if (!isProductSubscribed) {
         subscribeToProductChanges(presentToast);
-        isSubscribed = true;
+        isProductSubscribed = true;
     }
 }
 
@@ -107,7 +107,26 @@ async function fetchAllProductsOnce(presentToast: PresentToastFunction) {
  * Entfernt den Channel und setzt das Flag isSubscribed zurück.
  */
 export function unsubscribeFromProductChanges() {
-    supabase.removeChannel(supabase.channel('product_changes'));
-    isSubscribed = false;
-    console.log('Unsubscribed from product changes.');
+    if (isProductSubscribed) {
+        supabase.removeChannel(supabase.channel('product_changes'));
+        isProductSubscribed = false;
+        console.log('Unsubscribed from product changes.');
+    } else {
+        console.log('No active product subscription to unsubscribe from.');
+    }
+}
+
+/**
+ * Initialisiert die Produktdaten und das Abonnement neu (nützlich für Aktualisierung oder App-Wiederaufnahme).
+ * Diese Funktion wird aufgerufen, wenn die App wieder in den Vordergrund kommt.
+ * Sie stellt sicher, dass die Daten aktuell sind und die Realtime-Verbindung aktiv ist.
+ * @param presentToast Funktion zum Anzeigen von Toasts.
+ */
+export async function reinitializeProductData(presentToast: PresentToastFunction) {
+    unsubscribeFromProductChanges();
+    products.value = [];
+    productsLoading.value = true;
+    productsError.value = null;
+    await initializeProductData(presentToast);
+    console.log('Reinitialized product data and subscription.');
 }

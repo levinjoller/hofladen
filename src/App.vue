@@ -54,6 +54,12 @@ import { useToast } from '@/services/toastService';
 import { home, nutrition, people, logOut, personCircle } from 'ionicons/icons';
 import { logout } from '@/services/authService';
 import { useRouter } from 'vue-router';
+import { App } from '@capacitor/app';
+import { onMounted, onUnmounted } from 'vue';
+import { unsubscribeFromCustomerChanges, reinitializeCustomerData } from './services/customerService';
+import { unsubscribeFromSupplierChanges, reinitializeSupplierData } from './services/supplierService';
+import { supabase } from './supabase';
+import { unsubscribeFromProductChanges, reinitializeProductData } from './services/productService';
 const appPages = [
   { title: 'Home', url: '/home', icon: home },
   { title: 'Produkte', url: '/products-overview', icon: nutrition },
@@ -67,4 +73,54 @@ const router = useRouter();
 const handleLogout = async () => {
   await logout(presentToast, router);
 };
+let authListenerRef: { subscription: { unsubscribe: () => void; }; } | null = null;
+const handleAppStateChange = async ({ isActive }: { isActive: boolean }) => {
+  console.log('App state changed. isActive:', isActive);
+  if (isActive) {
+    reinitializeCustomerData(presentToast);
+    reinitializeSupplierData(presentToast);
+    reinitializeProductData(presentToast);
+  } else {
+    unsubscribeFromCustomerChanges();
+    unsubscribeFromSupplierChanges();
+    unsubscribeFromProductChanges();
+    console.log('App put in background, subscriptions unsubscribed.');
+  }
+};
+
+let appStateListenerHandle: { remove: () => void; } | null = null;
+
+onMounted(async () => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    (event, session) => {
+      console.log('Auth event:', event, 'Session:', session);
+      if (event === 'SIGNED_OUT') {
+        console.log('User has been signed out by Supabase.');
+        presentToast('Sie wurden erfolgreich abgemeldet.', 'success', 2000);
+      } else if (event === 'SIGNED_IN' && session) {
+        console.log('User has been signed in by Supabase.');
+      }
+    }
+  );
+  authListenerRef = { subscription };
+
+  appStateListenerHandle = await App.addListener('appStateChange', handleAppStateChange);
+  console.log('Capacitor App State Listener added.');
+});
+
+onUnmounted(() => {
+  if (authListenerRef && authListenerRef.subscription && typeof authListenerRef.subscription.unsubscribe === 'function') {
+    authListenerRef.subscription.unsubscribe();
+    console.log('Auth state change listener unsubscribed.');
+  }
+
+  if (appStateListenerHandle && typeof appStateListenerHandle.remove === 'function') {
+    appStateListenerHandle.remove();
+    console.log('Capacitor App State Listener removed.');
+  }
+
+  unsubscribeFromCustomerChanges();
+  unsubscribeFromSupplierChanges();
+  unsubscribeFromProductChanges();
+});
 </script>

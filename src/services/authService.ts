@@ -11,8 +11,6 @@ export async function logout(presentToast: PresentToastFunction, router: any) {
             throw new Error(error.message);
         }
 
-        localStorage.removeItem('user_session');
-
         presentToast('Erfolgreich abgemeldet!', 'success', 2000);
         router.replace('/login');
 
