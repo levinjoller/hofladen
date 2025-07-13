@@ -1,11 +1,17 @@
-// src/services/supplierService.ts
 import { supabase } from '@/supabase';
 import { ref } from 'vue';
+
+export interface Person {
+    id: number;
+    created_at: string;
+    display_name: string;
+}
 
 export interface Supplier {
     id: number;
     created_at: string;
-    display_name: string;
+    fk_person: number;
+    person?: Person;
 }
 
 export const suppliers = ref<Supplier[]>([]);
@@ -27,12 +33,23 @@ export async function initializeSupplierData(presentToast: PresentToastFunction)
         try {
             const { data, error } = await supabase
                 .from('suppliers')
-                .select('*');
+                .select('*, person:fk_person(display_name)');
 
             if (error) {
                 throw new Error(error.message);
             }
-            suppliers.value = (data as Supplier[]) || [];
+
+            suppliers.value = (data as any[]).map(supplier => ({
+                id: supplier.id,
+                created_at: supplier.created_at,
+                fk_person: supplier.fk_person,
+                person: {
+                    display_name: supplier.person.display_name,
+                    id: supplier.fk_person,
+                    created_at: ''
+                }
+            })) || [];
+
         } catch (err: any) {
             suppliersError.value = `Fehler beim Laden der Lieferanten: ${err.message}`;
             console.error('Error loading suppliers:', err);
@@ -70,7 +87,7 @@ function subscribeToSupplierChanges(presentToast: PresentToastFunction) {
         )
         .subscribe((status, err) => {
             if (status === 'CHANNEL_ERROR') {
-                const msg = `Realtime-Verbindungsfehler für Lieferanten: ${err?.message || 'Unbekannter Fehler'}`;
+                const errorMessage = err ? (err.message || 'Ein unbekannter Fehler ist aufgetreten.') : 'Verbindung fehlgeschlagen, keine Fehlerdetails verfügbar.'; const msg = `Realtime-Verbindungsfehler für Lieferanten: ${errorMessage}`;
                 suppliersError.value = msg;
                 console.error('Realtime supplier subscription initial error:', err);
                 presentToast(msg, 'danger');
@@ -88,12 +105,23 @@ async function fetchAllSuppliersOnce(presentToast: PresentToastFunction) {
     try {
         const { data, error } = await supabase
             .from('suppliers')
-            .select('*');
+            .select('*, person:fk_person(display_name)');
 
         if (error) {
             throw new Error(error.message);
         }
-        suppliers.value = (data as Supplier[]) || [];
+
+        suppliers.value = (data as any[]).map(supplier => ({
+            id: supplier.id,
+            created_at: supplier.created_at,
+            fk_person: supplier.fk_person,
+            person: {
+                display_name: supplier.person.display_name,
+                id: supplier.fk_person,
+                created_at: ''
+            }
+        })) || [];
+
     } catch (err: any) {
         const msg = `Fehler beim Realtime-Update der Lieferanten: ${err.message}`;
         suppliersError.value = msg;

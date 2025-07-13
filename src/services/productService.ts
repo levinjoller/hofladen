@@ -70,9 +70,9 @@ function subscribeToProductChanges(presentToast: PresentToastFunction) {
         )
         .subscribe((status, err) => {
             if (status === 'CHANNEL_ERROR') {
-                const msg = `Realtime-Verbindungsfehler: ${err?.message || 'Unbekannter Fehler'}`;
+                const errorMessage = err ? (err.message || 'Ein unbekannter Fehler ist aufgetreten.') : 'Verbindung fehlgeschlagen, keine Fehlerdetails verfügbar.'; const msg = `Realtime-Verbindungsfehler für Produkte: ${errorMessage}`;
                 productsError.value = msg;
-                console.error('Realtime subscription initial error:', err);
+                console.error('Realtime product subscription initial error:', err);
                 presentToast(msg, 'danger');
             }
         });

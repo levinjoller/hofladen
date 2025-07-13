@@ -25,7 +25,7 @@
             <ion-list v-if="!suppliersLoading && suppliers.length > 0">
               <ion-item v-for="supplier in suppliers" :key="supplier.id">
                 <ion-label>
-                  <h2>{{ supplier.display_name }}</h2>
+                  <h2>{{ supplier.person?.display_name }}</h2>
                   <p>Erstellt am: {{ new Date(supplier.created_at).toLocaleDateString('de-DE') }}</p>
                 </ion-label>
               </ion-item>
