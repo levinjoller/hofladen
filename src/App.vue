@@ -1,6 +1,6 @@
 <template>
   <ion-app>
-    <ion-menu content-id="main-content" type="overlay">
+    <ion-menu content-id="main-content" type="overlay" :swipe-gesture="!!user">
       <ion-header>
         <ion-toolbar>
           <ion-title>Navigation</ion-title>
@@ -52,7 +52,7 @@ import {
 } from '@ionic/vue';
 import { useToast } from '@/services/toastService';
 import { home, nutrition, people, logOut, personCircle } from 'ionicons/icons';
-import { logout } from '@/services/authService';
+import { user, getCurrentUser, logout } from '@/services/authService';
 import { useRouter } from 'vue-router';
 import { App } from '@capacitor/app';
 import { onMounted, onUnmounted } from 'vue';
@@ -91,9 +91,11 @@ const handleAppStateChange = async ({ isActive }: { isActive: boolean }) => {
 let appStateListenerHandle: { remove: () => void; } | null = null;
 
 onMounted(async () => {
+  await getCurrentUser();
   const { data: { subscription } } = supabase.auth.onAuthStateChange(
     (event, session) => {
       console.log('Auth event:', event, 'Session:', session);
+      user.value = session ? session.user : null;
       if (event === 'SIGNED_OUT') {
         console.log('User has been signed out by Supabase.');
         presentToast('Sie wurden erfolgreich abgemeldet.', 'success', 2000);

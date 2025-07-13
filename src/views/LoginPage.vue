@@ -42,9 +42,9 @@ import {
   IonToast
 } from '@ionic/vue';
 
-import { supabase } from '@/supabase';
 import { useRouter } from 'vue-router';
 import { useToast } from '@/services/toastService';
+import { login } from '@/services/authService';
 
 const router = useRouter();
 
@@ -53,23 +53,10 @@ const password = ref('');
 const { presentToast, showToast, toastMessage, toastColor, toastDuration } = useToast();
 
 const handleLogin = async () => {
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.value,
-      password: password.value,
-    });
+  const success = await login(email.value, password.value, presentToast);
 
-    if (error) {
-      console.error('Login error:', error.message);
-      presentToast(error.message, 'danger');
-    } else {
-      console.log('User logged in:', data.user);
-      presentToast('Login erfolgreich!', 'success');
-      router.push('/home');
-    }
-  } catch (err: any) {
-    console.error('Unexpected login error:', err);
-    presentToast('Ein unerwarteter Fehler ist aufgetreten.', 'danger');
+  if (success) {
+    router.push('/home');
   }
 };
 </script>
