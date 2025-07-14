@@ -35,16 +35,7 @@
           </ion-card-content>
         </ion-card>
       </div>
-    </ion-content>
-    
-    <ion-toast
-      :is-open="showToast"
-      :message="toastMessage"
-      :duration="toastDuration"
-      :color="toastColor"
-      @didDismiss="showToast = false"
-    ></ion-toast>
-  
+    </ion-content>  
   </ion-page>
 </template>
 
@@ -64,27 +55,28 @@ import {
   IonItem,
   IonLabel,
   IonMenuButton,
-  IonToast
+  onIonViewWillEnter,
 } from '@ionic/vue';
-import { onMounted, onActivated } from 'vue';
-import { useToast } from '@/services/toastService';
-import { products, productsLoading, productsError, initializeProductData, unsubscribeFromProductChanges } from '@/services/productService';
-import { onUnmounted } from 'vue';
 
-const { presentToast, showToast, toastMessage, toastColor, toastDuration } = useToast();
+import {
+  products,
+  productsLoading,
+  loadProductData,
+} from '@/services/productService';
 
-onMounted(() => {
-  initializeProductData(presentToast);
-});
+const loadProducts = async () => {
+  await loadProductData(true);
+};
 
-onUnmounted(() => {
-  unsubscribeFromProductChanges();
-});
-
-onActivated(() => {
-  console.log('ProductsOverview activated.');
-  if (productsError.value) {
-      presentToast(productsError.value, 'danger');
-  }
+onIonViewWillEnter(() => {
+  loadProducts();
 });
 </script>
+
+<style scoped>
+.loading-spinner,
+.error-message {
+  text-align: center;
+  padding: 20px;
+}
+</style>

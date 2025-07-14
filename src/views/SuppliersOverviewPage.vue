@@ -37,15 +37,6 @@
         </ion-card>
       </div>
     </ion-content>
-
-    <ion-toast
-      :is-open="showToast"
-      :message="toastMessage"
-      :duration="toastDuration"
-      :color="toastColor"
-      @didDismiss="showToast = false"
-    ></ion-toast>
-
   </ion-page>
 </template>
 
@@ -65,32 +56,21 @@ import {
   IonItem,
   IonLabel,
   IonMenuButton,
-  IonToast,
+  onIonViewWillEnter,
 } from '@ionic/vue';
-import { onMounted, onActivated, onUnmounted } from 'vue';
-import { useToast } from '@/services/toastService';
+
 import {
   suppliers,
   suppliersLoading,
   suppliersError,
-  initializeSupplierData,
-  unsubscribeFromSupplierChanges
+  loadSupplierData,
 } from '@/services/supplierService';
 
-const { presentToast, showToast, toastMessage, toastColor, toastDuration } = useToast();
+const loadSuppliers = async () => {
+  await loadSupplierData(true);
+};
 
-onMounted(() => {
-  initializeSupplierData(presentToast);
-});
-
-onUnmounted(() => {
-  unsubscribeFromSupplierChanges();
-});
-
-onActivated(() => {
-  console.log('SuppliersOverviewPage activated.');
-  if (suppliersError.value) {
-    presentToast(suppliersError.value, 'danger');
-  }
+onIonViewWillEnter(() => {
+  loadSuppliers();
 });
 </script>

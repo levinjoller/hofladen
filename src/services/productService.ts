@@ -1,27 +1,23 @@
 import { supabase } from '@/supabase';
 import { ref } from 'vue';
+import { presentToast } from '@/services/toastService';
 
 export interface Product {
     id: number;
-    display_name: string;
     created_at: string;
+    display_name: string;
 }
 
 export const products = ref<Product[]>([]);
-export const productsLoading = ref(true);
+export const productsLoading = ref(false);
 export const productsError = ref<string | null>(null);
 
-let isProductSubscribed = false;
-
-type PresentToastFunction = (message: string, color?: 'success' | 'danger' | 'warning' | 'primary' | string, duration?: number) => void;
-
 /**
- * Ruft alle Produkte initial aus der 'products'-Tabelle ab und initialisiert die Realtime-Subscription.
- * @param presentToast Funktion zum Anzeigen eines Toasts.
- * @throws {Error} Wenn ein Fehler beim Abrufen oder Abonnieren auftritt.
+ * Fetches product data once.
+ * @param forceReload If true, data will be reloaded even if products.value.length > 0.
  */
-export async function initializeProductData(presentToast: PresentToastFunction) {
-    if (products.value.length === 0 && productsLoading.value) {
+export async function loadProductData(forceReload: boolean = false) {
+    if ((products.value.length === 0 && !productsLoading.value) || forceReload) {
         productsLoading.value = true;
         productsError.value = null;
         try {
@@ -32,101 +28,28 @@ export async function initializeProductData(presentToast: PresentToastFunction) 
             if (error) {
                 throw new Error(error.message);
             }
-            products.value = (data as Product[]) || [];
+
+            products.value = data || [];
+
         } catch (err: any) {
             productsError.value = `Fehler beim Laden der Produkte: ${err.message}`;
-            console.error('Fehler beim Laden der Produkte:', err);
+            console.error('Error loading products:', err);
             presentToast(productsError.value, 'danger');
         } finally {
             productsLoading.value = false;
         }
     }
-
-    if (!isProductSubscribed) {
-        subscribeToProductChanges(presentToast);
-        isProductSubscribed = true;
-    }
 }
 
 /**
- * Richtet eine Supabase Realtime Subscription für Änderungen in der 'products'-Tabelle ein.
- * Aktualisiert die globale 'products'-Ref bei Änderungen.
- * @param presentToast Funktion zum Anzeigen eines Toasts.
+ * Reinitializes product data (useful for app resume or forced refresh).
+ * This function is called when the app comes back into foreground or on a pull-to-refresh.
+ * It ensures data is fresh.
  */
-function subscribeToProductChanges(presentToast: PresentToastFunction) {
-    supabase
-        .channel('product_changes')
-        .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'products' },
-            async (payload) => {
-                console.log('Realtime change received for products:', payload);
-                try {
-                    await fetchAllProductsOnce(presentToast);
-                } catch (err: any) {
-                    // Fehler wird bereits in fetchAllProductsOnce behandelt
-                }
-            }
-        )
-        .subscribe((status, err) => {
-            if (status === 'CHANNEL_ERROR') {
-                const errorMessage = err ? (err.message || 'Ein unbekannter Fehler ist aufgetreten.') : 'Verbindung fehlgeschlagen, keine Fehlerdetails verfügbar.'; const msg = `Realtime-Verbindungsfehler für Produkte: ${errorMessage}`;
-                productsError.value = msg;
-                console.error('Realtime product subscription initial error:', err);
-                presentToast(msg, 'danger');
-            }
-        });
-}
-
-/**
- * Hilfsfunktion zum einmaligen Abrufen aller Produkte (für Realtime-Updates).
- * Aktualisiert die globale 'products'-Ref.
- * @param presentToast Funktion zum Anzeigen eines Toasts.
- */
-async function fetchAllProductsOnce(presentToast: PresentToastFunction) {
-    productsError.value = null;
-    try {
-        const { data, error } = await supabase
-            .from('products')
-            .select('*');
-
-        if (error) {
-            throw new Error(error.message);
-        }
-        products.value = (data as Product[]) || [];
-    } catch (err: any) {
-        const msg = `Fehler beim Realtime-Update der Produkte: ${err.message}`;
-        productsError.value = msg;
-        console.error('Fehler beim Realtime-Abruf:', err);
-        presentToast(msg, 'danger');
-    }
-}
-
-/**
- * Beendet die Realtime-Subscription für Produktänderungen.
- * Entfernt den Channel und setzt das Flag isSubscribed zurück.
- */
-export function unsubscribeFromProductChanges() {
-    if (isProductSubscribed) {
-        supabase.removeChannel(supabase.channel('product_changes'));
-        isProductSubscribed = false;
-        console.log('Unsubscribed from product changes.');
-    } else {
-        console.log('No active product subscription to unsubscribe from.');
-    }
-}
-
-/**
- * Initialisiert die Produktdaten und das Abonnement neu (nützlich für Aktualisierung oder App-Wiederaufnahme).
- * Diese Funktion wird aufgerufen, wenn die App wieder in den Vordergrund kommt.
- * Sie stellt sicher, dass die Daten aktuell sind und die Realtime-Verbindung aktiv ist.
- * @param presentToast Funktion zum Anzeigen von Toasts.
- */
-export async function reinitializeProductData(presentToast: PresentToastFunction) {
-    unsubscribeFromProductChanges();
+export async function reinitializeProductData() {
     products.value = [];
     productsLoading.value = true;
     productsError.value = null;
-    await initializeProductData(presentToast);
-    console.log('Reinitialized product data and subscription.');
+    await loadProductData(true);
+    console.log('Reinitialized product data (no Realtime subscription).');
 }

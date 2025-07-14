@@ -16,14 +16,6 @@
       </ion-item>
       <ion-button expand="block" @click="handleLogin">Login</ion-button>
     </ion-content>
-
-    <ion-toast
-      :is-open="showToast"
-      :message="toastMessage"
-      :duration="toastDuration"
-      :color="toastColor"
-      @didDismiss="showToast = false"
-    ></ion-toast>
   </ion-page>
 </template>
 
@@ -39,21 +31,18 @@ import {
   IonLabel,
   IonInput,
   IonButton,
-  IonToast
 } from '@ionic/vue';
 
 import { useRouter } from 'vue-router';
-import { useToast } from '@/services/toastService';
 import { login } from '@/services/authService';
 
 const router = useRouter();
 
 const email = ref('');
 const password = ref('');
-const { presentToast, showToast, toastMessage, toastColor, toastDuration } = useToast();
 
 const handleLogin = async () => {
-  const success = await login(email.value, password.value, presentToast);
+  const success = await login(email.value, password.value);
 
   if (success) {
     router.push('/home');

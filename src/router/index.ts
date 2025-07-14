@@ -4,7 +4,7 @@ import HomePage from '../views/HomePage.vue'
 import ProductsOverviewPage from '@/views/ProductsOverviewPage.vue';
 import LoginPage from '@/views/LoginPage.vue';
 import SuppliersOverviewPage from '@/views/SuppliersOverviewPage.vue';
-import { supabase } from '@/supabase'; // Adjust the path if your supabase client is defined elsewhere
+import { supabase } from '@/supabase';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -48,17 +48,13 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const { data: { session } } = await supabase.auth.getSession(); // Get current session
+  const { data: { session } } = await supabase.auth.getSession();
 
-  // Check if the route requires authentication AND the user is NOT logged in
   if (to.meta.requiresAuth && !session) {
-    // If not logged in and trying to access a protected route, redirect to login
     next('/login');
   } else if (to.path === '/login' && session) {
-    // If logged in and trying to access the login page, redirect to dashboard
     next('/home');
   } else {
-    // Otherwise, allow navigation
     next();
   }
 });

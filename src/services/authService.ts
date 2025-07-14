@@ -1,7 +1,7 @@
 import { supabase } from '@/supabase';
 import { ref } from 'vue';
+import { presentToast } from '@/services/toastService';
 
-type PresentToastFunction = (message: string, color?: 'success' | 'danger' | 'warning' | 'primary' | string, duration?: number) => void;
 
 export const user = ref<any | null>(null);
 
@@ -10,10 +10,9 @@ export const user = ref<any | null>(null);
  * Zeigt Toasts direkt aus dem Service an.
  * @param email Die E-Mail des Benutzers.
  * @param password Das Passwort des Benutzers.
- * @param presentToast Die Funktion zum Anzeigen von Toasts.
  * @returns Ein Promise, das 'true' bei Erfolg oder 'false' bei Misserfolg auflöst.
  */
-export async function login(email: string, password: string, presentToast: PresentToastFunction): Promise<boolean> {
+export async function login(email: string, password: string): Promise<boolean> {
     try {
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
@@ -37,7 +36,11 @@ export async function login(email: string, password: string, presentToast: Prese
     }
 }
 
-export async function logout(presentToast: PresentToastFunction, router: any) {
+/**
+ * Meldet den Benutzer ab.
+ * Zeigt Toasts direkt aus dem Service an.
+ */
+export async function logout() {
     try {
         const { error } = await supabase.auth.signOut();
 
@@ -48,8 +51,6 @@ export async function logout(presentToast: PresentToastFunction, router: any) {
         user.value = null;
 
         presentToast('Sie wurden erfolgreich abgemeldet.', 'success', 2000);
-        router.replace('/login');
-
     } catch (err: any) {
         console.error('Logout-Fehler:', err.message);
         presentToast(`Fehler beim Abmelden: ${err.message}`, 'danger', 3000);

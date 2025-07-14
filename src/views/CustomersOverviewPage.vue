@@ -37,60 +37,42 @@
         </ion-card>
       </div>
     </ion-content>
-
-    <ion-toast
-      :is-open="showToast"
-      :message="toastMessage"
-      :duration="toastDuration"
-      :color="toastColor"
-      @didDismiss="showToast = false"
-    ></ion-toast>
-
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import {
-  IonContent,
-  IonHeader,
   IonPage,
-  IonTitle,
+  IonHeader,
   IonToolbar,
+  IonTitle,
+  IonContent,
   IonButtons,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
+  IonMenuButton,
   IonList,
   IonItem,
   IonLabel,
-  IonMenuButton,
-  IonToast,
+  onIonViewWillEnter,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent
 } from '@ionic/vue';
-import { onMounted, onActivated, onUnmounted } from 'vue';
-import { useToast } from '@/services/toastService';
-import { 
-    customers,
-    customersLoading,
-    customersError,
-    initializeCustomerData,
-    unsubscribeFromCustomerChanges
-} from '@/services/customerService';
+import { customers, customersLoading, customersError, loadCustomerData } from '@/services/customerService';
 
-const { presentToast, showToast, toastMessage, toastColor, toastDuration } = useToast();
+const loadCustomers = async () => {
+  await loadCustomerData(true);
+};
 
-onMounted(() => {
-  initializeCustomerData(presentToast);
-});
-
-onUnmounted(() => {
-  unsubscribeFromCustomerChanges();
-});
-
-onActivated(() => {
-  console.log('CustomerOverviewPage activated.');
-  if (customersError.value) {
-    presentToast(customersError.value, 'danger');
-  }
+onIonViewWillEnter(() => {
+  loadCustomers();
 });
 </script>
+
+<style scoped>
+.loading-spinner,
+.error-message {
+  text-align: center;
+  padding: 20px;
+}
+</style>
