@@ -58,6 +58,7 @@ const defaultColDef = {
   filter: true,
   resizable: true,
   flex: 1,
+  minWidth: 100,
 };
 
 onMounted(async () => {
