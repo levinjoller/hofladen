@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { AgGridVue } from 'ag-grid-vue3';
-import { onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { loadPalletData, pallets } from '@/services/palletService';
 import { AG_GRID_LOCALE_DE } from '@ag-grid-community/locale';
 
@@ -71,7 +71,21 @@ const gridApi = ref<any>(null);
 function onGridReady(params: any) {
   gridApi.value = params.api;
   params.api.sizeColumnsToFit();
-}
+};
+
+const handleResize = () => {
+  if (gridApi.value) {
+    gridApi.value.sizeColumnsToFit();
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+});
 </script>
 
 <style scoped>
