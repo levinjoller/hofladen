@@ -12,6 +12,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@ag-grid-community/locale": "^34.0.1",
     "@capacitor/app": "7.0.1",
     "@capacitor/core": "7.4.2",
     "@capacitor/haptics": "7.0.1",
@@ -20,6 +21,8 @@
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
     "@supabase/supabase-js": "^2.50.5",
+    "ag-grid-community": "^34.0.1",
+    "ag-grid-vue3": "^34.0.1",
     "ionicons": "^7.0.0",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0"

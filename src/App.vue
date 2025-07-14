@@ -1,6 +1,6 @@
 <template>
   <ion-app>
-    <ion-menu content-id="main-content" type="overlay" :swipe-gesture="!!user" v-if="user">
+    <ion-menu v-if="user" content-id="main-content" type="overlay" swipe-gesture>
       <ion-header>
         <ion-toolbar>
           <ion-title>Navigation</ion-title>
@@ -61,6 +61,7 @@ const appPages = [
   { title: 'Produkte', url: '/products-overview', icon: nutrition, requiresAuth: true },
   { title: 'Lieferanten', url: '/suppliers-overview', icon: people, requiresAuth: true },
   { title: 'Kunden', url: '/customers', icon: personCircle, requiresAuth: true },
+  { title: 'Paloxen', url: '/pallets', icon: layers, requiresAuth: true }
 ];
 
 const { showToast, toastMessage, toastColor, toastDuration } = useToast();
