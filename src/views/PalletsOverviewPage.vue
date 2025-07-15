@@ -13,11 +13,11 @@
       <div class="ag-theme-quartz ag-grid-wrapper">
         <ag-grid-vue
           class="ag-grid"
-          style="width: 100%; height: 100%;"
+          style="width: 100%; height: 100%"
           :rowData="rowData"
           :columnDefs="columnDefs"
           :defaultColDef="defaultColDef"
-          :rowSelection="{mode: 'singleRow'}"
+          :rowSelection="{ mode: 'singleRow' }"
           @grid-ready="onGridReady"
           :gridOptions="gridOptions"
         />
@@ -27,11 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import { AgGridVue } from 'ag-grid-vue3';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
-import { loadPalletData, pallets } from '@/services/palletService';
-import { AG_GRID_LOCALE_DE } from '@ag-grid-community/locale';
-
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { AgGridVue } from "ag-grid-vue3";
+import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
+import { ColDef } from "ag-grid-community";
+import { loadPalletsForOverview, pallets } from "@/services/pallet-service";
+import { AgGridPalletRow } from "@/types/ag-grid-pallet-row";
 import {
   IonPage,
   IonHeader,
@@ -39,20 +40,19 @@ import {
   IonTitle,
   IonContent,
   IonButtons,
-  IonMenuButton
-} from '@ionic/vue';
+  IonMenuButton,
+} from "@ionic/vue";
 const gridOptions = {
-    localeText: AG_GRID_LOCALE_DE,
-}
-const rowData = ref<any[]>([]);
-const columnDefs = ref([
-  { headerName: 'Paloxen-Nr', field: 'id' },
-  { headerName: 'Produkt', field: 'product_name' },
-  { headerName: 'Kunde', field: 'customer_name' },
-  { headerName: 'Lieferant', field: 'supplier_name' },
-  { headerName: 'Lagerplatz', field: 'slot_level' },
+  localeText: AG_GRID_LOCALE_DE,
+};
+const rowData = ref<AgGridPalletRow[]>([]);
+const columnDefs = ref<ColDef<AgGridPalletRow>[]>([
+  { headerName: "Paloxen-Nr", field: "pallet_id" },
+  { headerName: "Produkt", field: "product_name" },
+  { headerName: "Kunde", field: "customer_name" },
+  { headerName: "Lieferant", field: "supplier_name" },
+  { headerName: "Lagerplatz", field: "stock_column_row_level" },
 ]);
-
 const defaultColDef = {
   sortable: true,
   filter: true,
@@ -62,7 +62,7 @@ const defaultColDef = {
 };
 
 onMounted(async () => {
-  await loadPalletData();
+  await loadPalletsForOverview();
   rowData.value = pallets.value;
 });
 
@@ -71,7 +71,7 @@ const gridApi = ref<any>(null);
 function onGridReady(params: any) {
   gridApi.value = params.api;
   params.api.sizeColumnsToFit();
-};
+}
 
 const handleResize = () => {
   if (gridApi.value) {
@@ -80,11 +80,11 @@ const handleResize = () => {
 };
 
 onMounted(() => {
-  window.addEventListener('resize', handleResize);
+  window.addEventListener("resize", handleResize);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleResize);
+  window.removeEventListener("resize", handleResize);
 });
 </script>
 
