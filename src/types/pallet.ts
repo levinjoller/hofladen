@@ -1,5 +1,3 @@
-// src/types/pallet.ts (oder wo auch immer Sie Ihre Typen definieren)
-
 export interface Pallet {
   id: number;
   created_at: string;
@@ -25,8 +23,8 @@ export interface Pallet {
         display_name: string;
         stock: {
           display_name: string;
-        };
-      };
-    };
+        } | null;
+      } | null;
+    } | null;
   } | null;
 }
