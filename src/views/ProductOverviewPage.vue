@@ -26,16 +26,24 @@
               <ion-item v-for="product in products" :key="product.id">
                 <ion-label>
                   <h2>{{ product.display_name }}</h2>
-                  <p>Erstellt am: {{ new Date(product.created_at).toLocaleDateString() }}</p>
+                  <p>
+                    Erstellt am:
+                    {{ new Date(product.created_at).toLocaleDateString() }}
+                  </p>
                 </ion-label>
               </ion-item>
             </ion-list>
-            <p v-else-if="!productsLoading && products.length === 0" class="ion-text-center">Keine Produkte gefunden.</p>
+            <p
+              v-else-if="!productsLoading && products.length === 0"
+              class="ion-text-center"
+            >
+              Keine Produkte gefunden.
+            </p>
             <p v-else class="ion-text-center">Lade Produkte...</p>
           </ion-card-content>
         </ion-card>
       </div>
-    </ion-content>  
+    </ion-content>
   </ion-page>
 </template>
 
@@ -56,16 +64,16 @@ import {
   IonLabel,
   IonMenuButton,
   onIonViewWillEnter,
-} from '@ionic/vue';
+} from "@ionic/vue";
 
 import {
   products,
   productsLoading,
-  loadProductData,
-} from '@/services/productService';
+  loadProductForOverview,
+} from "@/services/product-service";
 
 const loadProducts = async () => {
-  await loadProductData(true);
+  await loadProductForOverview(true);
 };
 
 onIonViewWillEnter(() => {
