@@ -26,12 +26,27 @@
               <ion-item v-for="supplier in suppliers" :key="supplier.id">
                 <ion-label>
                   <h2>{{ supplier.person?.display_name }}</h2>
-                  <p>Erstellt am: {{ new Date(supplier.created_at).toLocaleDateString('de-DE') }}</p>
+                  <p>
+                    Erstellt am:
+                    {{
+                      new Date(supplier.created_at).toLocaleDateString("de-DE")
+                    }}
+                  </p>
                 </ion-label>
               </ion-item>
             </ion-list>
-            <p v-else-if="!suppliersLoading && suppliers.length === 0" class="ion-text-center">Keine Lieferanten gefunden.</p>
-            <p v-else-if="suppliersError" class="ion-text-center ion-text-danger">{{ suppliersError }}</p>
+            <p
+              v-else-if="!suppliersLoading && suppliers.length === 0"
+              class="ion-text-center"
+            >
+              Keine Lieferanten gefunden.
+            </p>
+            <p
+              v-else-if="suppliersError"
+              class="ion-text-center ion-text-danger"
+            >
+              {{ suppliersError }}
+            </p>
             <p v-else class="ion-text-center">Lade Lieferanten...</p>
           </ion-card-content>
         </ion-card>
@@ -57,17 +72,17 @@ import {
   IonLabel,
   IonMenuButton,
   onIonViewWillEnter,
-} from '@ionic/vue';
+} from "@ionic/vue";
 
 import {
   suppliers,
   suppliersLoading,
   suppliersError,
-  loadSupplierData,
-} from '@/services/supplierService';
+  loadSuppliersForList,
+} from "@/services/supplier-service";
 
 const loadSuppliers = async () => {
-  await loadSupplierData(true);
+  await loadSuppliersForList(true);
 };
 
 onIonViewWillEnter(() => {

@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { 
-  IonPage, 
+import { ref } from "vue";
+import {
+  IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
@@ -31,21 +31,21 @@ import {
   IonLabel,
   IonInput,
   IonButton,
-} from '@ionic/vue';
+} from "@ionic/vue";
 
-import { useRouter } from 'vue-router';
-import { login } from '@/services/authService';
+import { useRouter } from "vue-router";
+import { login } from "@/services/auth-service";
 
 const router = useRouter();
 
-const email = ref('');
-const password = ref('');
+const email = ref("");
+const password = ref("");
 
 const handleLogin = async () => {
   const success = await login(email.value, password.value);
 
   if (success) {
-    router.push('/home');
+    router.push("/home");
   }
 };
 </script>

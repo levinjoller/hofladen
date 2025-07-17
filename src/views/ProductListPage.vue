@@ -69,11 +69,11 @@ import {
 import {
   products,
   productsLoading,
-  loadProductForOverview,
+  loadProductsForList,
 } from "@/services/product-service";
 
 const loadProducts = async () => {
-  await loadProductForOverview(true);
+  await loadProductsForList(true);
 };
 
 onIonViewWillEnter(() => {

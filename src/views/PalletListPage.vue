@@ -31,7 +31,7 @@ import { onBeforeUnmount, onMounted, ref } from "vue";
 import { AgGridVue } from "ag-grid-vue3";
 import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
 import { ColDef } from "ag-grid-community";
-import { loadPalletsForOverview, pallets } from "@/services/pallet-service";
+import { loadPalletsForList, pallets } from "@/services/pallet-service";
 import { AgGridPalletRow } from "@/types/ag-grid-pallet-row";
 import {
   IonPage,
@@ -62,7 +62,7 @@ const defaultColDef = {
 };
 
 onMounted(async () => {
-  await loadPalletsForOverview();
+  await loadPalletsForList();
   rowData.value = pallets.value;
 });
 

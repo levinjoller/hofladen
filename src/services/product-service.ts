@@ -1,6 +1,6 @@
 import { supabase } from "@/supabase";
 import { ref } from "vue";
-import { presentToast } from "@/services/toastService";
+import { presentToast } from "@/services/toast-service";
 import { Product } from "@/types/product";
 
 export const products = ref<Product[]>([]);
@@ -11,7 +11,7 @@ export const productsError = ref<string | null>(null);
  * Fetches product data once.
  * @param forceReload If true, data will be reloaded even if products.value.length > 0.
  */
-export async function loadProductForOverview(forceReload: boolean = false) {
+export async function loadProductsForList(forceReload: boolean = false) {
   if ((products.value.length === 0 && !productsLoading.value) || forceReload) {
     productsLoading.value = true;
     productsError.value = null;
@@ -40,6 +40,6 @@ export async function reinitializeProductData() {
   products.value = [];
   productsLoading.value = true;
   productsError.value = null;
-  await loadProductForOverview(true);
+  await loadProductsForList(true);
   console.log("Reinitialized product data (no Realtime subscription).");
 }

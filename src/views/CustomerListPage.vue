@@ -26,12 +26,27 @@
               <ion-item v-for="customer in customers" :key="customer.id">
                 <ion-label>
                   <h2>{{ customer.person?.display_name }}</h2>
-                  <p>Erstellt am: {{ new Date(customer.created_at).toLocaleDateString('de-DE') }}</p>
+                  <p>
+                    Erstellt am:
+                    {{
+                      new Date(customer.created_at).toLocaleDateString("de-DE")
+                    }}
+                  </p>
                 </ion-label>
               </ion-item>
             </ion-list>
-            <p v-else-if="!customersLoading && customers.length === 0" class="ion-text-center">Keine Kunden gefunden.</p>
-            <p v-else-if="customersError" class="ion-text-center ion-text-danger">{{ customersError }}</p>
+            <p
+              v-else-if="!customersLoading && customers.length === 0"
+              class="ion-text-center"
+            >
+              Keine Kunden gefunden.
+            </p>
+            <p
+              v-else-if="customersError"
+              class="ion-text-center ion-text-danger"
+            >
+              {{ customersError }}
+            </p>
             <p v-else class="ion-text-center">Lade Kunden...</p>
           </ion-card-content>
         </ion-card>
@@ -56,12 +71,17 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonCardContent
-} from '@ionic/vue';
-import { customers, customersLoading, customersError, loadCustomerData } from '@/services/customerService';
+  IonCardContent,
+} from "@ionic/vue";
+import {
+  customers,
+  customersLoading,
+  customersError,
+  loadCustomersForList,
+} from "@/services/customer-service";
 
 const loadCustomers = async () => {
-  await loadCustomerData(true);
+  await loadCustomersForList(true);
 };
 
 onIonViewWillEnter(() => {

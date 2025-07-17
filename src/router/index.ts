@@ -1,68 +1,72 @@
-import { createRouter, createWebHashHistory } from '@ionic/vue-router';
-import { RouteRecordRaw } from 'vue-router';
-import HomePage from '../views/HomePage.vue'
-import ProductsOverviewPage from '@/views/ProductsOverviewPage.vue';
-import LoginPage from '@/views/LoginPage.vue';
-import SuppliersOverviewPage from '@/views/SuppliersOverviewPage.vue';
-import { supabase } from '@/supabase';
+import { createRouter, createWebHashHistory } from "@ionic/vue-router";
+import { RouteRecordRaw } from "vue-router";
+import { supabase } from "@/supabase";
+import HomePage from "../views/HomePage.vue";
+import ProductListPage from "@/views/ProductListPage.vue";
+import LoginPage from "@/views/LoginPage.vue";
+import SupplierListPage from "@/views/SupplierListPage.vue";
+import CustomerListPage from "@/views/CustomerListPage.vue";
+import PalletListPage from "@/views/PalletListPage.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    redirect: '/login'
+    path: "/",
+    redirect: "/login",
   },
   {
-    path: '/home',
-    name: 'Home',
+    path: "/login",
+    name: "Login",
+    component: LoginPage,
+  },
+  {
+    path: "/home",
+    name: "Home",
     component: HomePage,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
-    path: '/products-overview',
-    name: 'ProductsOverview',
-    component: ProductsOverviewPage,
-    meta: { requiresAuth: true }
+    path: "/product",
+    name: "ProductList",
+    component: ProductListPage,
+    meta: { requiresAuth: true },
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: LoginPage
+    path: "/supplier",
+    name: "SupplierList",
+    component: SupplierListPage,
+    meta: { requiresAuth: true },
   },
   {
-    path: '/suppliers-overview',
-    name: 'SuppliersOverview',
-    component: SuppliersOverviewPage,
-    meta: { requiresAuth: true }
+    path: "/customer",
+    name: "CustomerList",
+    component: CustomerListPage,
+    meta: { requiresAuth: true },
   },
   {
-    path: '/customers',
-    name: 'CustomersOverview',
-    component: () => import('@/views/CustomersOverviewPage.vue'),
-    meta: { requiresAuth: true }
+    path: "/pallet",
+    name: "PalletList",
+    component: PalletListPage,
+    meta: { requiresAuth: true },
   },
-  {
-    path: '/pallets',
-    name: 'PalletsOverview',
-    component: () => import('@/views/PalletsOverviewPage.vue'),
-    meta: { requiresAuth: true }
-  }
-]
+];
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
-  routes
-})
+  routes,
+});
 
 router.beforeEach(async (to, from, next) => {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   if (to.meta.requiresAuth && !session) {
-    next('/login');
-  } else if (to.path === '/login' && session) {
-    next('/home');
+    next("/login");
+  } else if (to.path === "/login" && session) {
+    next("/home");
   } else {
     next();
   }
 });
 
-export default router
+export default router;

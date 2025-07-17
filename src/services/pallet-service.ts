@@ -1,13 +1,13 @@
 import { supabase } from "@/supabase";
 import { ref } from "vue";
-import { presentToast } from "./toastService";
+import { presentToast } from "./toast-service";
 import { AgGridPalletRow } from "@/types/ag-grid-pallet-row";
 
 export const pallets = ref<AgGridPalletRow[]>([]);
 export const palletsLoading = ref(false);
 export const palletsError = ref<string | null>(null);
 
-export async function loadPalletsForOverview(forceReload: boolean = false) {
+export async function loadPalletsForList(forceReload: boolean = false) {
   if ((pallets.value.length === 0 && !palletsLoading.value) || forceReload) {
     palletsLoading.value = true;
     palletsError.value = null;
