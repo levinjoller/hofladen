@@ -5,22 +5,13 @@
         <ion-buttons slot="start">
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Produkt Übersicht</ion-title>
+        <ion-title>Produkte Übersicht</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Produkt Übersicht</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
       <div class="ion-padding">
         <ion-card>
-          <ion-card-header>
-            <ion-card-title>Produkte Übersicht</ion-card-title>
-          </ion-card-header>
           <ion-card-content>
             <ion-list v-if="!productsLoading && products.length > 0">
               <ion-item v-for="product in products" :key="product.id">
@@ -56,8 +47,6 @@ import {
   IonToolbar,
   IonButtons,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
   IonCardContent,
   IonList,
   IonItem,
@@ -65,18 +54,22 @@ import {
   IonMenuButton,
   onIonViewWillEnter,
 } from "@ionic/vue";
-
 import {
   products,
   productsLoading,
   loadProductsForList,
 } from "@/services/product-service";
+import { onMounted } from "vue";
 
 const loadProducts = async () => {
   await loadProductsForList(true);
 };
 
 onIonViewWillEnter(() => {
+  loadProducts();
+});
+
+onMounted(() => {
   loadProducts();
 });
 </script>

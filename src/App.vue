@@ -86,19 +86,19 @@ const appPages = [
   { title: "Home", url: "/home", icon: home, requiresAuth: true },
   {
     title: "Produkte",
-    url: "/products-overview",
+    url: "/product",
     icon: nutrition,
     requiresAuth: true,
   },
   {
     title: "Lieferanten",
-    url: "/suppliers-overview",
+    url: "/supplier",
     icon: people,
     requiresAuth: true,
   },
   {
     title: "Kunden",
-    url: "/customers",
+    url: "/customer",
     icon: personCircle,
     requiresAuth: true,
   },

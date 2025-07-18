@@ -10,17 +10,8 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Kunden Übersicht</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
       <div class="ion-padding">
         <ion-card>
-          <ion-card-header>
-            <ion-card-title>Kunden</ion-card-title>
-          </ion-card-header>
           <ion-card-content>
             <ion-list v-if="!customersLoading && customers.length > 0">
               <ion-item v-for="customer in customers" :key="customer.id">
@@ -69,8 +60,6 @@ import {
   IonLabel,
   onIonViewWillEnter,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
   IonCardContent,
 } from "@ionic/vue";
 import {
@@ -79,12 +68,17 @@ import {
   customersError,
   loadCustomersForList,
 } from "@/services/customer-service";
+import { onMounted } from "vue";
 
 const loadCustomers = async () => {
   await loadCustomersForList(true);
 };
 
 onIonViewWillEnter(() => {
+  loadCustomers();
+});
+
+onMounted(() => {
   loadCustomers();
 });
 </script>

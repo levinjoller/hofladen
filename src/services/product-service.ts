@@ -1,9 +1,12 @@
 import { supabase } from "@/supabase";
 import { ref } from "vue";
 import { presentToast } from "@/services/toast-service";
-import { Product } from "@/types/product";
+import type { Tables } from "@/types/database.types";
+import { ProductListItem } from "@/types/product-list-item";
 
-export const products = ref<Product[]>([]);
+export type ProductRow = Tables<"products">;
+
+export const products = ref<ProductListItem[]>([]);
 export const productsLoading = ref(false);
 export const productsError = ref<string | null>(null);
 
@@ -16,11 +19,16 @@ export async function loadProductsForList(forceReload: boolean = false) {
     productsLoading.value = true;
     productsError.value = null;
     try {
-      const { data, error } = await supabase.from("products").select("*");
-      if (error) {
-        throw new Error(error.message);
-      }
-      products.value = data || [];
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .overrideTypes<ProductRow[], { merge: false }>();
+      if (error) throw new Error(error.message);
+      products.value = data.map(({ id, created_at, display_name }) => ({
+        id,
+        created_at,
+        display_name,
+      }));
     } catch (err: any) {
       productsError.value = `Fehler beim Laden der Produkte: ${err.message}`;
       console.error("Error loading products:", err);
@@ -33,8 +41,6 @@ export async function loadProductsForList(forceReload: boolean = false) {
 
 /**
  * Reinitializes product data (useful for app resume or forced refresh).
- * This function is called when the app comes back into foreground or on a pull-to-refresh.
- * It ensures data is fresh.
  */
 export async function reinitializeProductData() {
   products.value = [];

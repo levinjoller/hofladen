@@ -10,22 +10,13 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Lieferanten Übersicht</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
       <div class="ion-padding">
         <ion-card>
-          <ion-card-header>
-            <ion-card-title>Lieferanten</ion-card-title>
-          </ion-card-header>
           <ion-card-content>
             <ion-list v-if="!suppliersLoading && suppliers.length > 0">
               <ion-item v-for="supplier in suppliers" :key="supplier.id">
                 <ion-label>
-                  <h2>{{ supplier.person?.display_name }}</h2>
+                  <h2>{{ supplier.person_name }}</h2>
                   <p>
                     Erstellt am:
                     {{
@@ -64,8 +55,6 @@ import {
   IonToolbar,
   IonButtons,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
   IonCardContent,
   IonList,
   IonItem,
@@ -73,19 +62,23 @@ import {
   IonMenuButton,
   onIonViewWillEnter,
 } from "@ionic/vue";
-
 import {
   suppliers,
   suppliersLoading,
   suppliersError,
   loadSuppliersForList,
 } from "@/services/supplier-service";
+import { onMounted } from "vue";
 
 const loadSuppliers = async () => {
   await loadSuppliersForList(true);
 };
 
 onIonViewWillEnter(() => {
+  loadSuppliers();
+});
+
+onMounted(() => {
   loadSuppliers();
 });
 </script>
