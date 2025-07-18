@@ -9,7 +9,12 @@
     "preview": "vite preview",
     "test:e2e": "cypress run",
     "test:unit": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db:dump": "npx supabase db dump --data-only --schema public --file supabase/seed.sql",
+    "db:reset": "npx supabase db reset",
+    "db:start-local-db-and-sync-schema-and-data": "npx supabase start && npx supabase db pull && npx supabase migration up && npx supabase db reset",
+    "db:start": "npx supabase start",
+    "db:stop": "npx supabase stop && powershell -Command \"docker ps -a --filter 'name=supabase' --format '{{.ID}}' | % { docker rm -f $_ }\""
   },
   "dependencies": {
     "@ag-grid-community/locale": "^34.0.2",
