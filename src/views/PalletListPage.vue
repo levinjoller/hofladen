@@ -41,6 +41,7 @@ import {
   IonContent,
   IonButtons,
   IonMenuButton,
+  onIonViewDidEnter,
 } from "@ionic/vue";
 const gridOptions = {
   localeText: AG_GRID_LOCALE_DE,
@@ -70,8 +71,11 @@ const gridApi = ref<any>(null);
 
 function onGridReady(params: any) {
   gridApi.value = params.api;
-  params.api.sizeColumnsToFit();
 }
+
+onIonViewDidEnter(() => {
+  handleResize();
+});
 
 const handleResize = () => {
   if (gridApi.value) {
