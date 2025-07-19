@@ -19,18 +19,27 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="ag-theme-quartz ag-grid-wrapper">
-        <ag-grid-vue
-          class="ag-grid"
-          style="width: 100%; height: 100%"
-          :rowData="rowData"
-          :columnDefs="columnDefs"
-          :defaultColDef="defaultColDef"
-          :rowSelection="{ mode: 'singleRow' }"
-          @grid-ready="onGridReady"
-          :gridOptions="gridOptions"
-        />
+      <div class="grid-container">
+        <div class="ag-theme-quartz ag-grid-wrapper">
+          <ag-grid-vue
+            class="ag-grid"
+            style="width: 100%; height: 100%"
+            :rowData="rowData"
+            :columnDefs="columnDefs"
+            :defaultColDef="defaultColDef"
+            :rowSelection="{ mode: 'singleRow' }"
+            @grid-ready="onGridReady"
+            :gridOptions="gridOptions"
+          />
+        </div>
       </div>
+
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button>
+          <ion-icon :icon="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+
       <ion-popover trigger="menu-action-trigger">
         <ion-content class="ion-padding">
           <ion-item button lines="none" @click="exportAsPDF">
@@ -49,7 +58,7 @@ import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
 import { ColDef } from "ag-grid-community";
 import { loadPalletsForList, pallets } from "@/services/pallet-service";
 import { AgGridPalletRow } from "@/types/ag-grid-pallet-row";
-import { ellipsisVertical, ellipsisHorizontal } from "ionicons/icons";
+import { ellipsisVertical, ellipsisHorizontal, add } from "ionicons/icons";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { presentToast } from "@/services/toast-service";
@@ -66,10 +75,15 @@ import {
   IonPopover,
   IonButton,
   IonItem,
+  IonFab,
+  IonFabButton,
 } from "@ionic/vue";
 
 const gridOptions = {
   localeText: AG_GRID_LOCALE_DE,
+  pagination: true,
+  paginationPageSize: 20,
+  paginationPageSizeSelector: false,
 };
 
 const rowData = ref<AgGridPalletRow[]>([]);
@@ -172,11 +186,27 @@ function exportAsPDF() {
 </script>
 
 <style scoped>
-.ag-grid-wrapper {
-  width: 100%;
+.grid-container {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  padding-bottom: 70px;
+}
+
+.ag-grid-wrapper {
+  flex: 1;
+  width: 100%;
   padding: 10px;
   box-sizing: border-box;
   overflow-x: auto;
+}
+
+.ag-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+:deep(.ag-paging-row-summary-panel) {
+  display: none !important;
 }
 </style>
