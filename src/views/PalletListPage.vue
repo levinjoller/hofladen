@@ -6,6 +6,15 @@
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
         <ion-title>Paloxen Übersicht</ion-title>
+        <ion-buttons slot="primary">
+          <ion-button id="menu-action-trigger">
+            <ion-icon
+              slot="icon-only"
+              :ios="ellipsisHorizontal"
+              :md="ellipsisVertical"
+            ></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -22,6 +31,13 @@
           :gridOptions="gridOptions"
         />
       </div>
+      <ion-popover trigger="menu-action-trigger">
+        <ion-content class="ion-padding">
+          <ion-item button lines="none" @click="exportAsPDF">
+            Tabelle exportieren
+          </ion-item>
+        </ion-content>
+      </ion-popover>
     </ion-content>
   </ion-page>
 </template>
@@ -33,6 +49,10 @@ import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
 import { ColDef } from "ag-grid-community";
 import { loadPalletsForList, pallets } from "@/services/pallet-service";
 import { AgGridPalletRow } from "@/types/ag-grid-pallet-row";
+import { ellipsisVertical, ellipsisHorizontal } from "ionicons/icons";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { presentToast } from "@/services/toast-service";
 import {
   IonPage,
   IonHeader,
@@ -42,11 +62,18 @@ import {
   IonButtons,
   IonMenuButton,
   onIonViewDidEnter,
+  IonIcon,
+  IonPopover,
+  IonButton,
+  IonItem,
 } from "@ionic/vue";
+
 const gridOptions = {
   localeText: AG_GRID_LOCALE_DE,
 };
+
 const rowData = ref<AgGridPalletRow[]>([]);
+
 const columnDefs = ref<ColDef<AgGridPalletRow>[]>([
   { headerName: "Paloxen-Nr", field: "pallet_id" },
   { headerName: "Produkt", field: "product_name" },
@@ -54,6 +81,7 @@ const columnDefs = ref<ColDef<AgGridPalletRow>[]>([
   { headerName: "Lieferant", field: "supplier_name" },
   { headerName: "Lagerplatz", field: "stock_column_row_level" },
 ]);
+
 const defaultColDef = {
   sortable: true,
   filter: true,
@@ -90,6 +118,57 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize);
 });
+
+function exportAsPDF() {
+  if (!gridApi.value) return;
+
+  const filteredSortedData: AgGridPalletRow[] = [];
+  gridApi.value.forEachNodeAfterFilterAndSort((node: any) => {
+    filteredSortedData.push(node.data as AgGridPalletRow);
+  });
+
+  if (!filteredSortedData.length) {
+    presentToast("Keine Daten zum Exportieren.", "warning");
+    return;
+  }
+
+  const doc = new jsPDF();
+  doc.text(
+    `Paloxenübersicht vom ${new Date().toLocaleString("de-DE")}`,
+    14,
+    10
+  );
+
+  const displayedColumns: {
+    headerName: string;
+    field: keyof AgGridPalletRow;
+  }[] = gridApi.value.getAllDisplayedColumns().map((col: any) => ({
+    headerName: col.getColDef().headerName,
+    field: col.getColDef().field as keyof AgGridPalletRow,
+  }));
+
+  const headers = displayedColumns.map((c) => c.headerName);
+  const rows = filteredSortedData.map((row) =>
+    displayedColumns.map((c) => row[c.field] || "")
+  );
+
+  autoTable(doc, {
+    head: [headers],
+    body: rows,
+    startY: 20,
+    styles: { fontSize: 8 },
+  });
+
+  const fileName = `paloxen_${new Date()
+    .toLocaleString("de-DE")
+    .replace(/\./g, "")
+    .replace(", ", "_")
+    .replace(/:/g, "")}`;
+
+  doc.save(`${fileName}.pdf`);
+
+  presentToast("Tabelle erfolgreich exportiert.", "success");
+}
 </script>
 
 <style scoped>

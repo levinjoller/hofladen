@@ -10,11 +10,12 @@
     "test:e2e": "cypress run",
     "test:unit": "vitest",
     "lint": "eslint .",
+    "db:generate-types": "npx supabase gen types typescript --local > src/types/database.types.ts",
     "db:dump": "npx supabase db dump --data-only --schema public --file supabase/seed.sql",
     "db:reset": "npx supabase db reset",
     "db:start-local-db-and-sync-schema-and-data": "npx supabase start && npx supabase db pull && npx supabase migration up && npx supabase db reset",
     "db:start": "npx supabase start",
-    "db:stop": "npx supabase stop && powershell -Command \"docker ps -a --filter 'name=supabase' --format '{{.ID}}' | % { docker rm -f $_ }\""
+    "db:stop": "npx supabase stop"
   },
   "dependencies": {
     "@ag-grid-community/locale": "^34.0.2",
@@ -29,6 +30,8 @@
     "ag-grid-community": "^34.0.2",
     "ag-grid-vue3": "^34.0.2",
     "ionicons": "^8.0.13",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
   },
