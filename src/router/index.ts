@@ -48,6 +48,12 @@ const routes: Array<RouteRecordRaw> = [
     component: PalletListPage,
     meta: { requiresAuth: true },
   },
+  {
+    path: "/pallet/new",
+    name: "PalletCreate",
+    component: () => import("@/views/PalletCreatePage.vue"),
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({
