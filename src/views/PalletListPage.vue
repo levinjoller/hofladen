@@ -35,7 +35,7 @@
       </div>
 
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-fab-button>
+        <ion-fab-button @click="$router.push('/pallet/new')">
           <ion-icon :icon="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
