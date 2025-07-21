@@ -38,7 +38,9 @@
             >
               {{ customersError }}
             </p>
-            <p v-else class="ion-text-center">Lade Kunden...</p>
+            <div v-else="loading" class="ion-padding ion-text-center">
+              <ion-spinner name="crescent"></ion-spinner>
+            </div>
           </ion-card-content>
         </ion-card>
       </div>
@@ -61,6 +63,7 @@ import {
   onIonViewWillEnter,
   IonCard,
   IonCardContent,
+  IonSpinner,
 } from "@ionic/vue";
 import {
   customers,
@@ -82,11 +85,3 @@ onMounted(() => {
   loadCustomers();
 });
 </script>
-
-<style scoped>
-.loading-spinner,
-.error-message {
-  text-align: center;
-  padding: 20px;
-}
-</style>

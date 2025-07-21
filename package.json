@@ -26,7 +26,7 @@
     "@capacitor/status-bar": "7.0.1",
     "@ionic/vue": "^8.6.5",
     "@ionic/vue-router": "^8.6.5",
-    "@supabase/supabase-js": "^2.51.0",
+    "@supabase/supabase-js": "^2.52.0",
     "ag-grid-community": "^34.0.2",
     "ag-grid-vue3": "^34.0.2",
     "ionicons": "^8.0.13",
@@ -46,12 +46,12 @@
     "eslint": "^9.31.0",
     "eslint-plugin-vue": "^10.3.0",
     "jsdom": "^26.1.0",
-    "supabase": "^2.31.4",
+    "supabase": "^2.31.8",
     "terser": "^5.43.1",
     "typescript": "~5.8.3",
     "vite": "~7.0.5",
     "vitest": "^3.2.4",
-    "vue-tsc": "^3.0.1"
+    "vue-tsc": "^3.0.3"
   },
   "description": "An Ionic project"
 }

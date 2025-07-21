@@ -38,7 +38,9 @@
             >
               {{ suppliersError }}
             </p>
-            <p v-else class="ion-text-center">Lade Lieferanten...</p>
+            <div v-else="loading" class="ion-padding ion-text-center">
+              <ion-spinner name="crescent"></ion-spinner>
+            </div>
           </ion-card-content>
         </ion-card>
       </div>
@@ -61,6 +63,7 @@ import {
   IonLabel,
   IonMenuButton,
   onIonViewWillEnter,
+  IonSpinner,
 } from "@ionic/vue";
 import {
   suppliers,
