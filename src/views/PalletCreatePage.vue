@@ -73,6 +73,24 @@
           />
         </ion-list>
       </div>
+      <div v-else-if="currentStep === 2">
+        <ion-grid>
+          <h2>Lager {{ selectedStock?.display_name }} - Lagerplatz wählen</h2>
+          <ion-row v-for="(row, rowIndex) in rows" :key="rowIndex">
+            <ion-col v-for="(col, colIndex) in columns" :key="colIndex">
+              <ion-card
+                :color="isSelected(`${col}${row}`) ? 'primary' : ''"
+                @click="toggleSelect(`${col}${row}`)"
+              >
+                <ion-card-content class="ion-text-center">
+                  {{ col }}{{ row }}
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+      <div v-else-if="currentStep === 3"></div>
     </ion-content>
 
     <ion-footer class="ion-padding">
@@ -107,6 +125,11 @@ import {
   IonLabel,
   IonText,
   IonBackButton,
+  IonCard,
+  IonCardContent,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from "@ionic/vue";
 import { ref, computed } from "vue";
 import DropdownSearchModal from "@/components/DropdownSearchModal.vue";
@@ -141,11 +164,13 @@ const currentStep = ref(1);
 const canProceed = computed(() => {
   if (currentStep.value === 1) {
     return (
-      selectedCustomer.value &&
-      selectedSupplier.value &&
-      selectedStock.value &&
-      selectedProduct.value
+      selectedCustomer.value !== null &&
+      selectedSupplier.value !== null &&
+      selectedStock.value !== null &&
+      selectedProduct.value !== null
     );
+  } else if (currentStep.value === 2) {
+    return selectedSlot.value !== null;
   }
   return false;
 });
@@ -163,4 +188,31 @@ const prevStep = () => {
     currentStep.value--;
   }
 };
+
+const columns = ref(["A", "B", "C", "D"]);
+const rows = ref([1, 2, 3, 4, 5]);
+
+const selectedSlot = ref<string | null>(null);
+
+const isSelected = (slot: string) => {
+  return selectedSlot.value === slot;
+};
+
+const toggleSelect = (slot: string) => {
+  if (selectedSlot.value === slot) {
+    selectedSlot.value = null;
+  } else {
+    selectedSlot.value = slot;
+  }
+};
 </script>
+
+<style scoped>
+ion-card {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+ion-card:hover {
+  transform: scale(1.05);
+}
+</style>

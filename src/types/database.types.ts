@@ -7,10 +7,30 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -179,6 +199,7 @@ export type Database = {
           id: number
           is_taken: boolean
           level: number
+          max_level: number
         }
         Insert: {
           created_at?: string
@@ -187,6 +208,7 @@ export type Database = {
           id?: number
           is_taken: boolean
           level: number
+          max_level?: number
         }
         Update: {
           created_at?: string
@@ -195,6 +217,7 @@ export type Database = {
           id?: number
           is_taken?: boolean
           level?: number
+          max_level?: number
         }
         Relationships: [
           {
@@ -212,7 +235,6 @@ export type Database = {
           display_name: string
           fk_stock_column: number
           id: number
-          max_level: number | null
           y_position: number
         }
         Insert: {
@@ -220,7 +242,6 @@ export type Database = {
           display_name: string
           fk_stock_column: number
           id?: number
-          max_level?: number | null
           y_position: number
         }
         Update: {
@@ -228,7 +249,6 @@ export type Database = {
           display_name?: string
           fk_stock_column?: number
           id?: number
-          max_level?: number | null
           y_position?: number
         }
         Relationships: [
@@ -451,7 +471,11 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
 } as const
+

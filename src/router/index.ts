@@ -61,6 +61,12 @@ const router = createRouter({
   routes,
 });
 
+supabase.auth.onAuthStateChange((event, session) => {
+  if (!session) {
+    router.push("/login");
+  }
+});
+
 router.beforeEach(async (to, from, next) => {
   const {
     data: { session },
