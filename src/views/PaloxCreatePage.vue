@@ -3,7 +3,7 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button default-href="/pallet" />
+          <ion-back-button default-href="/palox" />
         </ion-buttons>
         <ion-title>Paloxe erfassen - Schritt {{ currentStep }}</ion-title>
       </ion-toolbar>
@@ -146,7 +146,7 @@ import {
   stocks,
   stocksLoading,
   fetchStocks,
-} from "@/services/pallet-create-service";
+} from "@/services/palox-create-service";
 import { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { presentToast } from "@/services/toast-service";
 

@@ -35,7 +35,7 @@
       </div>
 
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-fab-button @click="$router.push('/pallet/new')">
+        <ion-fab-button @click="$router.push('/palox/new')">
           <ion-icon :icon="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
@@ -56,8 +56,8 @@ import { onMounted, ref } from "vue";
 import { AgGridVue } from "ag-grid-vue3";
 import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
 import { ColDef } from "ag-grid-community";
-import { loadPalletsForList, pallets } from "@/services/pallet-service";
-import { AgGridPalletRow } from "@/types/ag-grid-pallet-row";
+import { loadpaloxesForList, paloxes } from "@/services/palox-service";
+import { AgGridPaloxRow } from "@/types/ag-grid-palox-row";
 import { ellipsisVertical, ellipsisHorizontal, add } from "ionicons/icons";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -86,10 +86,10 @@ const gridOptions = {
   paginationPageSizeSelector: false,
 };
 
-const rowData = ref<AgGridPalletRow[]>([]);
+const rowData = ref<AgGridPaloxRow[]>([]);
 
-const columnDefs = ref<ColDef<AgGridPalletRow>[]>([
-  { headerName: "Paloxen-Nr", field: "pallet_id" },
+const columnDefs = ref<ColDef<AgGridPaloxRow>[]>([
+  { headerName: "Paloxen-Nr", field: "palox_id" },
   { headerName: "Produkt", field: "product_name" },
   { headerName: "Kunde", field: "customer_name" },
   { headerName: "Lieferant", field: "supplier_name" },
@@ -105,8 +105,8 @@ const defaultColDef = {
 };
 
 onMounted(async () => {
-  await loadPalletsForList();
-  rowData.value = pallets.value;
+  await loadpaloxesForList();
+  rowData.value = paloxes.value;
 });
 
 const gridApi = ref<any>(null);
@@ -132,9 +132,9 @@ onMounted(() => {
 function exportAsPDF() {
   if (!gridApi.value) return;
 
-  const filteredSortedData: AgGridPalletRow[] = [];
+  const filteredSortedData: AgGridPaloxRow[] = [];
   gridApi.value.forEachNodeAfterFilterAndSort((node: any) => {
-    filteredSortedData.push(node.data as AgGridPalletRow);
+    filteredSortedData.push(node.data as AgGridPaloxRow);
   });
 
   if (!filteredSortedData.length) {
@@ -151,10 +151,10 @@ function exportAsPDF() {
 
   const displayedColumns: {
     headerName: string;
-    field: keyof AgGridPalletRow;
+    field: keyof AgGridPaloxRow;
   }[] = gridApi.value.getAllDisplayedColumns().map((col: any) => ({
     headerName: col.getColDef().headerName,
-    field: col.getColDef().field as keyof AgGridPalletRow,
+    field: col.getColDef().field as keyof AgGridPaloxRow,
   }));
 
   const headers = displayedColumns.map((c) => c.headerName);

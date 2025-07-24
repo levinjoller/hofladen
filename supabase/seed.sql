@@ -110,16 +110,16 @@ INSERT INTO "public"."suppliers" ("id", "created_at", "fk_person") VALUES
 
 
 --
--- Data for Name: pallets; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: paloxes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."pallets" ("id", "created_at", "fk_customer", "fk_product", "fk_supplier", "fk_stock_column_slot_level", "updated_at") VALUES
+INSERT INTO "public"."paloxes" ("id", "created_at", "fk_customer", "fk_product", "fk_supplier", "fk_stock_column_slot_level", "updated_at") VALUES
 	(1, '2025-07-13 17:52:08.711434+00', 1, 1, 3, 1, '2025-07-13 17:52:08.711434'),
 	(2, '2025-07-14 15:12:25.233342+00', 1, 2, 4, 2, '2025-07-14 15:12:25.233342');
 
 
 --
--- Data for Name: pallet_histories; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: palox_histories; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
@@ -139,17 +139,17 @@ SELECT pg_catalog.setval('"public"."customers_id_seq"', 1, true);
 
 
 --
--- Name: pallet_histories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: palox_histories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."pallet_histories_id_seq"', 1, false);
+SELECT pg_catalog.setval('"public"."palox_histories_id_seq"', 1, false);
 
 
 --
--- Name: pallets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: paloxes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."pallets_id_seq"', 2, true);
+SELECT pg_catalog.setval('"public"."paloxes_id_seq"', 2, true);
 
 
 --

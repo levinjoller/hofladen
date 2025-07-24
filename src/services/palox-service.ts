@@ -2,7 +2,7 @@ import { supabase } from "@/supabase";
 import { ref } from "vue";
 import { presentToast } from "./toast-service";
 import { Tables } from "@/types/database.types";
-import { AgGridPalletRow } from "@/types/ag-grid-pallet-row";
+import { AgGridPaloxRow } from "@/types/ag-grid-palox-row";
 
 export type CustomerRow = Tables<"customers">;
 export type PersonRow = Tables<"persons">;
@@ -12,7 +12,7 @@ export type StockColumnSlotLevelRow = Tables<"stock_column_slot_levels">;
 export type StockColumnSlotRow = Tables<"stock_column_slots">;
 export type StockColumnRow = Tables<"stock_columns">;
 export type StockRow = Tables<"stocks">;
-export type PalletRow = Tables<"pallets">;
+export type PaloxRow = Tables<"paloxes">;
 
 export type CustomerWithPerson = {
   person: Pick<PersonRow, "display_name"> | null;
@@ -35,24 +35,24 @@ export type StockColumnSlotLevelWithRelations = Pick<
   };
 };
 
-export type PalletWithRelations = Pick<PalletRow, "id" | "created_at"> & {
+export type PaloxWithRelations = Pick<PaloxRow, "id" | "created_at"> & {
   customer: CustomerWithPerson | null;
   product: ProductWithName | null;
   supplier: SupplierWithPerson | null;
   stock_column_slot_level: StockColumnSlotLevelWithRelations | null;
 };
-export const pallets = ref<AgGridPalletRow[]>([]);
-export const palletsLoading = ref(false);
-export const palletsError = ref<string | null>(null);
+export const paloxes = ref<AgGridPaloxRow[]>([]);
+export const paloxesLoading = ref(false);
+export const paloxesError = ref<string | null>(null);
 
-export async function loadPalletsForList(forceReload = false) {
-  if ((pallets.value.length === 0 && !palletsLoading.value) || forceReload) {
-    palletsLoading.value = true;
-    palletsError.value = null;
+export async function loadpaloxesForList(forceReload = false) {
+  if ((paloxes.value.length === 0 && !paloxesLoading.value) || forceReload) {
+    paloxesLoading.value = true;
+    paloxesError.value = null;
 
     try {
       const { data, error } = await supabase
-        .from("pallets")
+        .from("paloxes")
         .select(
           `
           id,
@@ -84,31 +84,31 @@ export async function loadPalletsForList(forceReload = false) {
           )
         `
         )
-        .overrideTypes<PalletWithRelations[], { merge: false }>();
+        .overrideTypes<PaloxWithRelations[], { merge: false }>();
 
       if (error) throw error;
 
-      pallets.value = (data || []).map((pallet) => {
-        const customerName = pallet.customer?.person?.display_name || null;
-        const productName = pallet.product?.display_name || null;
-        const supplierName = pallet.supplier?.person?.display_name || null;
+      paloxes.value = (data || []).map((palox) => {
+        const customerName = palox.customer?.person?.display_name || null;
+        const productName = palox.product?.display_name || null;
+        const supplierName = palox.supplier?.person?.display_name || null;
 
         return {
-          pallet_id: pallet.id,
-          created_at: pallet.created_at,
+          palox_id: palox.id,
+          created_at: palox.created_at,
           customer_name: customerName,
           product_name: productName,
           supplier_name: supplierName,
           stock_column_row_level: getFullStockLocationName(
-            pallet.stock_column_slot_level
+            palox.stock_column_slot_level
           ),
         };
       });
     } catch (err: any) {
-      palletsError.value = err.message || "Unbekannter Fehler";
+      paloxesError.value = err.message || "Unbekannter Fehler";
       presentToast(`Fehler beim Laden der Paletten: ${err.message}`, "danger");
     } finally {
-      palletsLoading.value = false;
+      paloxesLoading.value = false;
     }
   }
 }

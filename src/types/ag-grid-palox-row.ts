@@ -1,5 +1,5 @@
-export interface AgGridPalletRow {
-  pallet_id: number;
+export interface AgGridPaloxRow {
+  palox_id: number;
   created_at: string;
   customer_name: string | null;
   supplier_name: string | null;

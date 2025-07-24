@@ -6,7 +6,7 @@ import ProductListPage from "@/views/ProductListPage.vue";
 import LoginPage from "@/views/LoginPage.vue";
 import SupplierListPage from "@/views/SupplierListPage.vue";
 import CustomerListPage from "@/views/CustomerListPage.vue";
-import PalletListPage from "@/views/PalletListPage.vue";
+import PaloxListPage from "@/views/PaloxListPage.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -43,15 +43,15 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/pallet",
-    name: "PalletList",
-    component: PalletListPage,
+    path: "/palox",
+    name: "PaloxList",
+    component: PaloxListPage,
     meta: { requiresAuth: true },
   },
   {
-    path: "/pallet/new",
-    name: "PalletCreate",
-    component: () => import("@/views/PalletCreatePage.vue"),
+    path: "/palox/new",
+    name: "PaloxCreate",
+    component: () => import("@/views/PaloxCreatePage.vue"),
     meta: { requiresAuth: true },
   },
 ];

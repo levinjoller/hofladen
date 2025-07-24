@@ -102,7 +102,7 @@ const appPages = [
     icon: personCircle,
     requiresAuth: true,
   },
-  { title: "Paloxen", url: "/pallet", icon: layers, requiresAuth: true },
+  { title: "Paloxen", url: "/palox", icon: layers, requiresAuth: true },
 ];
 
 const { showToast, toastMessage, toastColor, toastDuration } = useToast();

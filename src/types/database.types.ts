@@ -60,31 +60,31 @@ export type Database = {
           },
         ]
       }
-      pallet_histories: {
+      palox_histories: {
         Row: {
           created_at: string
-          fk_pallet: number
+          fk_palox: number
           fk_stock_column_slot_level: number
           id: number
         }
         Insert: {
           created_at?: string
-          fk_pallet: number
+          fk_palox: number
           fk_stock_column_slot_level: number
           id?: number
         }
         Update: {
           created_at?: string
-          fk_pallet?: number
+          fk_palox?: number
           fk_stock_column_slot_level?: number
           id?: number
         }
         Relationships: [
           {
             foreignKeyName: "pallet_histories_fk_pallet_fkey"
-            columns: ["fk_pallet"]
+            columns: ["fk_palox"]
             isOneToOne: false
-            referencedRelation: "pallets"
+            referencedRelation: "paloxes"
             referencedColumns: ["id"]
           },
           {
@@ -96,10 +96,35 @@ export type Database = {
           },
         ]
       }
-      pallets: {
+      palox_types: {
+        Row: {
+          created_at: string
+          description: number | null
+          display_name: string
+          id: number
+          label_prefix: string
+        }
+        Insert: {
+          created_at?: string
+          description?: number | null
+          display_name: string
+          id?: number
+          label_prefix: string
+        }
+        Update: {
+          created_at?: string
+          description?: number | null
+          display_name?: string
+          id?: number
+          label_prefix?: string
+        }
+        Relationships: []
+      }
+      paloxes: {
         Row: {
           created_at: string
           fk_customer: number | null
+          fk_palox_types: number | null
           fk_product: number
           fk_stock_column_slot_level: number
           fk_supplier: number | null
@@ -109,6 +134,7 @@ export type Database = {
         Insert: {
           created_at?: string
           fk_customer?: number | null
+          fk_palox_types?: number | null
           fk_product: number
           fk_stock_column_slot_level: number
           fk_supplier?: number | null
@@ -118,6 +144,7 @@ export type Database = {
         Update: {
           created_at?: string
           fk_customer?: number | null
+          fk_palox_types?: number | null
           fk_product?: number
           fk_stock_column_slot_level?: number
           fk_supplier?: number | null
@@ -151,6 +178,13 @@ export type Database = {
             columns: ["fk_supplier"]
             isOneToOne: false
             referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paloxes_fk_palox_types_fkey"
+            columns: ["fk_palox_types"]
+            isOneToOne: false
+            referencedRelation: "palox_types"
             referencedColumns: ["id"]
           },
         ]
