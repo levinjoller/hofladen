@@ -17,10 +17,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
-          extensions?: Json
           operationName?: string
           query?: string
           variables?: Json
+          extensions?: Json
         }
         Returns: Json
       }
@@ -124,7 +124,7 @@ export type Database = {
         Row: {
           created_at: string
           fk_customer: number | null
-          fk_palox_types: number | null
+          fk_palox_types: number
           fk_product: number
           fk_stock_column_slot_level: number
           fk_supplier: number | null
@@ -134,7 +134,7 @@ export type Database = {
         Insert: {
           created_at?: string
           fk_customer?: number | null
-          fk_palox_types?: number | null
+          fk_palox_types: number
           fk_product: number
           fk_stock_column_slot_level: number
           fk_supplier?: number | null
@@ -144,7 +144,7 @@ export type Database = {
         Update: {
           created_at?: string
           fk_customer?: number | null
-          fk_palox_types?: number | null
+          fk_palox_types?: number
           fk_product?: number
           fk_stock_column_slot_level?: number
           fk_supplier?: number | null

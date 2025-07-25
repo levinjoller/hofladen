@@ -37,6 +37,15 @@ INSERT INTO "public"."customers" ("id", "created_at", "fk_person") VALUES
 
 
 --
+-- Data for Name: palox_types; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."palox_types" ("id", "created_at", "label_prefix", "display_name", "description") VALUES
+	(1, '2025-07-25 09:38:13.09273+00', 'STD-', 'Holz', NULL),
+	(2, '2025-07-25 09:38:30.35089+00', 'AGR-', 'Plastik', NULL);
+
+
+--
 -- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -113,9 +122,9 @@ INSERT INTO "public"."suppliers" ("id", "created_at", "fk_person") VALUES
 -- Data for Name: paloxes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."paloxes" ("id", "created_at", "fk_customer", "fk_product", "fk_supplier", "fk_stock_column_slot_level", "updated_at") VALUES
-	(1, '2025-07-13 17:52:08.711434+00', 1, 1, 3, 1, '2025-07-13 17:52:08.711434'),
-	(2, '2025-07-14 15:12:25.233342+00', 1, 2, 4, 2, '2025-07-14 15:12:25.233342');
+INSERT INTO "public"."paloxes" ("id", "created_at", "fk_customer", "fk_product", "fk_supplier", "fk_stock_column_slot_level", "updated_at", "fk_palox_types") VALUES
+	(1, '2025-07-24 12:44:42.073579+00', 1, 1, NULL, 1, '2025-07-24 12:44:42.073579', 1),
+	(2, '2025-07-24 12:45:24.055213+00', NULL, 2, 4, 2, '2025-07-24 12:45:24.055213', 2);
 
 
 --
@@ -143,6 +152,13 @@ SELECT pg_catalog.setval('"public"."customers_id_seq"', 1, true);
 --
 
 SELECT pg_catalog.setval('"public"."palox_histories_id_seq"', 1, false);
+
+
+--
+-- Name: palox_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"public"."palox_types_id_seq"', 2, true);
 
 
 --
