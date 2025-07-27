@@ -35,7 +35,7 @@
 
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
         <ion-fab-button @click="$router.push('/palox/new')">
-          <ion-icon :icon="add"></ion-icon>
+          <ion-icon :icon="archive"></ion-icon>
         </ion-fab-button>
       </ion-fab>
 
@@ -57,7 +57,7 @@ import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
 import { ColDef } from "ag-grid-community";
 import { loadpaloxesForList, paloxes } from "@/services/palox-service";
 import { AgGridPaloxRow } from "@/types/ag-grid-palox-row";
-import { ellipsisVertical, ellipsisHorizontal, add } from "ionicons/icons";
+import { ellipsisVertical, ellipsisHorizontal, archive } from "ionicons/icons";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { presentToast } from "@/services/toast-service";

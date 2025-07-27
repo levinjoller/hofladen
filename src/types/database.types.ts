@@ -111,7 +111,7 @@ export type Database = {
           display_name: string
           id?: number
           label_prefix: string
-          next_palox_number?: number
+          next_palox_number: number
         }
         Update: {
           created_at?: string
@@ -129,7 +129,7 @@ export type Database = {
           fk_customer: number | null
           fk_palox_type: number
           fk_product: number
-          fk_stock_column_slot_level: number
+          fk_stock_column_slot_level: number | null
           fk_supplier: number | null
           id: number
           number_per_type: number
@@ -140,7 +140,7 @@ export type Database = {
           fk_customer?: number | null
           fk_palox_type: number
           fk_product: number
-          fk_stock_column_slot_level: number
+          fk_stock_column_slot_level?: number | null
           fk_supplier?: number | null
           id?: number
           number_per_type: number
@@ -151,7 +151,7 @@ export type Database = {
           fk_customer?: number | null
           fk_palox_type?: number
           fk_product?: number
-          fk_stock_column_slot_level?: number
+          fk_stock_column_slot_level?: number | null
           fk_supplier?: number | null
           id?: number
           number_per_type?: number

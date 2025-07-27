@@ -5,13 +5,28 @@
         <ion-buttons slot="start">
           <ion-back-button default-href="/palox" />
         </ion-buttons>
-        <ion-title>Paloxe erfassen - Schritt {{ currentStep }}</ion-title>
+        <ion-title>Paloxe einlagern - {{ currentStep }} / 4</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding">
       <div v-if="currentStep === 1">
         <ion-list>
+          <ion-item button @click="isPaloxModalOpen = true">
+            <ion-label>Paloxe</ion-label>
+            <ion-text>
+              {{ selectedPalox?.display_name || "Bitte wählen" }}
+            </ion-text>
+          </ion-item>
+          <DropdownSearchModal
+            v-model="isPaloxModalOpen"
+            v-model:selected="selectedPalox"
+            title="Paloxen"
+            :options="paloxes"
+            :loading="paloxesLoading"
+            :fetch-method="() => fetchPaloxes(false)"
+          />
+
           <ion-item button @click="isSupplierModalOpen = true">
             <ion-label>Lieferant</ion-label>
             <ion-text>
@@ -25,21 +40,6 @@
             :options="suppliers"
             :loading="suppliersLoading"
             :fetch-method="() => fetchSuppliers(false)"
-          />
-
-          <ion-item button @click="isCustomerModalOpen = true">
-            <ion-label>Kunde</ion-label>
-            <ion-text>
-              {{ selectedCustomer?.display_name || "Bitte wählen" }}
-            </ion-text>
-          </ion-item>
-          <DropdownSearchModal
-            v-model="isCustomerModalOpen"
-            v-model:selected="selectedCustomer"
-            title="Kunden"
-            :options="customers"
-            :loading="customersLoading"
-            :fetch-method="() => fetchCustomers(false)"
           />
 
           <ion-item button @click="isProductModalOpen = true">
@@ -72,7 +72,28 @@
             :fetch-method="() => fetchStocks(false)"
           />
         </ion-list>
+        <h3>Optional</h3>
+        <ion-item button @click="isCustomerModalOpen = true">
+          <ion-label>Kunde</ion-label>
+          <ion-text>
+            {{ selectedCustomer?.display_name || "Bitte wählen" }}
+          </ion-text>
+          <ion-buttons slot="end" v-if="selectedCustomer">
+            <ion-button @click.stop="selectedCustomer = null">
+              <ion-icon :icon="closeCircleOutline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-item>
+        <DropdownSearchModal
+          v-model="isCustomerModalOpen"
+          v-model:selected="selectedCustomer"
+          title="Kunden"
+          :options="customers"
+          :loading="customersLoading"
+          :fetch-method="() => fetchCustomers(false)"
+        />
       </div>
+
       <div v-else-if="currentStep === 2">
         <ion-grid>
           <h2>Lager {{ selectedStock?.display_name }} - Lagerplatz wählen</h2>
@@ -93,7 +114,7 @@
       <div v-else-if="currentStep === 3"></div>
     </ion-content>
 
-    <ion-footer class="ion-padding">
+    <ion-footer>
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-button @click="prevStep" :disabled="currentStep === 1">
@@ -130,10 +151,15 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonIcon,
 } from "@ionic/vue";
 import { ref, computed } from "vue";
 import DropdownSearchModal from "@/components/DropdownSearchModal.vue";
+import { closeCircleOutline } from "ionicons/icons";
 import {
+  paloxes,
+  paloxesLoading,
+  fetchPaloxes,
   suppliers,
   suppliersLoading,
   fetchSuppliers,
@@ -150,11 +176,13 @@ import {
 import { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { presentToast } from "@/services/toast-service";
 
+const isPaloxModalOpen = ref(false);
 const isSupplierModalOpen = ref(false);
 const isCustomerModalOpen = ref(false);
 const isProductModalOpen = ref(false);
 const isStockModalOpen = ref(false);
 
+const selectedPalox = ref<DropdownSearchItem | null>(null);
 const selectedSupplier = ref<DropdownSearchItem | null>(null);
 const selectedCustomer = ref<DropdownSearchItem | null>(null);
 const selectedProduct = ref<DropdownSearchItem | null>(null);
@@ -164,7 +192,7 @@ const currentStep = ref(1);
 const canProceed = computed(() => {
   if (currentStep.value === 1) {
     return (
-      selectedCustomer.value !== null &&
+      selectedPalox.value !== null &&
       selectedSupplier.value !== null &&
       selectedStock.value !== null &&
       selectedProduct.value !== null
