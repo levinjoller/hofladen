@@ -1,5 +1,5 @@
 export interface AgGridPaloxRow {
-  palox_id: number;
+  palox_number: string;
   created_at: string;
   customer_name: string | null;
   supplier_name: string | null;

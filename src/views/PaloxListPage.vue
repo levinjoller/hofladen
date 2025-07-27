@@ -27,7 +27,6 @@
             :rowData="rowData"
             :columnDefs="columnDefs"
             :defaultColDef="defaultColDef"
-            :rowSelection="{ mode: 'singleRow' }"
             @grid-ready="onGridReady"
             :gridOptions="gridOptions"
           />
@@ -89,7 +88,7 @@ const gridOptions = {
 const rowData = ref<AgGridPaloxRow[]>([]);
 
 const columnDefs = ref<ColDef<AgGridPaloxRow>[]>([
-  { headerName: "Paloxen-Nr", field: "palox_id" },
+  { headerName: "Paloxen-Nr", field: "palox_number" },
   { headerName: "Produkt", field: "product_name" },
   { headerName: "Kunde", field: "customer_name" },
   { headerName: "Lieferant", field: "supplier_name" },

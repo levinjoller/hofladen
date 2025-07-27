@@ -13,6 +13,7 @@ export type StockColumnSlotRow = Tables<"stock_column_slots">;
 export type StockColumnRow = Tables<"stock_columns">;
 export type StockRow = Tables<"stocks">;
 export type PaloxRow = Tables<"paloxes">;
+export type PaloxTypeRow = Tables<"palox_types">;
 
 export type CustomerWithPerson = {
   person: Pick<PersonRow, "display_name"> | null;
@@ -35,11 +36,15 @@ export type StockColumnSlotLevelWithRelations = Pick<
   };
 };
 
-export type PaloxWithRelations = Pick<PaloxRow, "id" | "created_at"> & {
+export type PaloxWithRelations = Pick<
+  PaloxRow,
+  "id" | "number_per_type" | "created_at"
+> & {
   customer: CustomerWithPerson | null;
   product: ProductWithName | null;
   supplier: SupplierWithPerson | null;
   stock_column_slot_level: StockColumnSlotLevelWithRelations | null;
+  palox_type: Pick<PaloxTypeRow, "label_prefix"> | null;
 };
 export const paloxes = ref<AgGridPaloxRow[]>([]);
 export const paloxesLoading = ref(false);
@@ -57,6 +62,7 @@ export async function loadpaloxesForList(forceReload = false) {
           `
           id,
           created_at,
+          number_per_type,
           customer:fk_customer (
             person:fk_person (
               display_name
@@ -81,6 +87,9 @@ export async function loadpaloxesForList(forceReload = false) {
                 )
               )
             )
+          ),
+          palox_type:fk_palox_type (
+            label_prefix
           )
         `
         )
@@ -94,7 +103,7 @@ export async function loadpaloxesForList(forceReload = false) {
         const supplierName = palox.supplier?.person?.display_name || null;
 
         return {
-          palox_id: palox.id,
+          palox_number: getFullPaloxNumber(palox),
           created_at: palox.created_at,
           customer_name: customerName,
           product_name: productName,
@@ -123,6 +132,16 @@ function getFullStockLocationName(
     slotLevel.stock_column_slot.display_name,
     slotLevel.display_name,
   ].filter(Boolean);
-
   return parts.length > 0 ? parts.join(".") : null;
+}
+
+function getFullPaloxNumber(palox: PaloxWithRelations): string {
+  const parts: string[] = [];
+  if (palox.palox_type?.label_prefix) {
+    parts.push(palox.palox_type.label_prefix);
+  } else {
+    parts.push("N/A");
+  }
+  parts.push(palox.number_per_type.toString().padStart(4, "0"));
+  return parts.join("-");
 }

@@ -17,10 +17,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
+          extensions?: Json
           operationName?: string
           query?: string
           variables?: Json
-          extensions?: Json
         }
         Returns: Json
       }
@@ -124,31 +124,34 @@ export type Database = {
         Row: {
           created_at: string
           fk_customer: number | null
-          fk_palox_types: number
+          fk_palox_type: number
           fk_product: number
           fk_stock_column_slot_level: number
           fk_supplier: number | null
           id: number
+          number_per_type: number
           updated_at: string | null
         }
         Insert: {
           created_at?: string
           fk_customer?: number | null
-          fk_palox_types: number
+          fk_palox_type: number
           fk_product: number
           fk_stock_column_slot_level: number
           fk_supplier?: number | null
           id?: number
+          number_per_type: number
           updated_at?: string | null
         }
         Update: {
           created_at?: string
           fk_customer?: number | null
-          fk_palox_types?: number
+          fk_palox_type?: number
           fk_product?: number
           fk_stock_column_slot_level?: number
           fk_supplier?: number | null
           id?: number
+          number_per_type?: number
           updated_at?: string | null
         }
         Relationships: [
@@ -181,8 +184,8 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "paloxes_fk_palox_types_fkey"
-            columns: ["fk_palox_types"]
+            foreignKeyName: "paloxes_fk_palox_type_fkey"
+            columns: ["fk_palox_type"]
             isOneToOne: false
             referencedRelation: "palox_types"
             referencedColumns: ["id"]
@@ -242,7 +245,7 @@ export type Database = {
           id?: number
           is_taken: boolean
           level: number
-          max_level?: number
+          max_level: number
         }
         Update: {
           created_at?: string

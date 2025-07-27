@@ -41,8 +41,8 @@ INSERT INTO "public"."customers" ("id", "created_at", "fk_person") VALUES
 --
 
 INSERT INTO "public"."palox_types" ("id", "created_at", "label_prefix", "display_name", "description") VALUES
-	(1, '2025-07-25 09:38:13.09273+00', 'STD-', 'Holz', NULL),
-	(2, '2025-07-25 09:38:30.35089+00', 'AGR-', 'Plastik', NULL);
+	(1, '2025-07-25 09:38:13.09273+00', 'STD', 'Holz', NULL),
+	(2, '2025-07-25 09:38:30.35089+00', 'AGR', 'Plastik', NULL);
 
 
 --
@@ -122,9 +122,9 @@ INSERT INTO "public"."suppliers" ("id", "created_at", "fk_person") VALUES
 -- Data for Name: paloxes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."paloxes" ("id", "created_at", "fk_customer", "fk_product", "fk_supplier", "fk_stock_column_slot_level", "updated_at", "fk_palox_types") VALUES
-	(1, '2025-07-24 12:44:42.073579+00', 1, 1, NULL, 1, '2025-07-24 12:44:42.073579', 1),
-	(2, '2025-07-24 12:45:24.055213+00', NULL, 2, 4, 2, '2025-07-24 12:45:24.055213', 2);
+INSERT INTO "public"."paloxes" ("id", "created_at", "fk_customer", "fk_product", "fk_supplier", "fk_stock_column_slot_level", "updated_at", "fk_palox_type", "number_per_type") VALUES
+	(1, '2025-07-24 12:44:42.073579+00', 1, 1, NULL, 1, '2025-07-24 12:44:42.073579', 1, 1),
+	(2, '2025-07-24 12:45:24.055213+00', NULL, 2, 4, 2, '2025-07-24 12:45:24.055213', 2, 1);
 
 
 --

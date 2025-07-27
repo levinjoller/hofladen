@@ -13,7 +13,7 @@
     "db:generate-types": "npx supabase gen types typescript --local > src/types/database.types.ts",
     "db:dump": "npx supabase db dump --data-only --schema public --file supabase/seed.sql",
     "db:reset": "npx supabase db reset",
-    "db:start-local-db-and-sync-schema-and-data": "npx supabase start && npx supabase db pull && npx supabase migration up && npx supabase db reset",
+    "db:start-db-pull-remote-migrations-db-reset": "npx supabase start && npx supabase db pull && npx supabase migration up && npx supabase db reset",
     "db:start": "npx supabase start",
     "db:stop": "npx supabase stop"
   },
