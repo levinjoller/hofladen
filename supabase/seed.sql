@@ -40,9 +40,9 @@ INSERT INTO "public"."customers" ("id", "created_at", "fk_person") VALUES
 -- Data for Name: palox_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."palox_types" ("id", "created_at", "label_prefix", "display_name", "description") VALUES
-	(1, '2025-07-25 09:38:13.09273+00', 'STD', 'Holz', NULL),
-	(2, '2025-07-25 09:38:30.35089+00', 'AGR', 'Plastik', NULL);
+INSERT INTO "public"."palox_types" ("id", "created_at", "label_prefix", "display_name", "description", "next_palox_number") VALUES
+	(1, '2025-07-25 09:38:13.09273+00', 'STD', 'Holz', NULL, 2),
+	(2, '2025-07-25 09:38:30.35089+00', 'AGR', 'Plastik', NULL, 2);
 
 
 --

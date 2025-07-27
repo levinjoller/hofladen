@@ -103,6 +103,7 @@ export type Database = {
           display_name: string
           id: number
           label_prefix: string
+          next_palox_number: number
         }
         Insert: {
           created_at?: string
@@ -110,6 +111,7 @@ export type Database = {
           display_name: string
           id?: number
           label_prefix: string
+          next_palox_number?: number
         }
         Update: {
           created_at?: string
@@ -117,6 +119,7 @@ export type Database = {
           display_name?: string
           id?: number
           label_prefix?: string
+          next_palox_number?: number
         }
         Relationships: []
       }
