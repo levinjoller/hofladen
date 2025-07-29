@@ -80,7 +80,7 @@ function getFullPaloxNumber(palox: PaloxWithPaloxType): string {
   } else {
     parts.push("N/A");
   }
-  parts.push(palox.number_per_type.toString().padStart(4, "0"));
+  parts.push(palox.number_per_type.toString().padStart(3, "0"));
   return parts.join("-");
 }
 
@@ -175,17 +175,14 @@ export async function fetchStocks(forceReload = false): Promise<void> {
     try {
       const { data, error } = await supabase
         .from("stocks")
-        .select("id, display_name")
-        .order("display_name", { ascending: true })
-        .overrideTypes<
-          Pick<StockRow, "id" | "display_name">[],
-          { merge: false }
-        >();
+        .select("id, stock")
+        .order("stock", { ascending: true })
+        .overrideTypes<Pick<StockRow, "id" | "stock">[], { merge: false }>();
       if (error) throw error;
 
       stocks.value = data.map((item) => ({
         id: item.id,
-        display_name: item.display_name,
+        display_name: item.stock.toString(),
       }));
     } catch (e: any) {
       console.error("Fehler beim Laden der Lager:", e.message);

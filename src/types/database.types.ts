@@ -130,7 +130,7 @@ export type Database = {
           fk_palox_type: number
           fk_product: number
           fk_stock_column_slot_level: number | null
-          fk_supplier: number | null
+          fk_supplier: number
           id: number
           number_per_type: number
           updated_at: string | null
@@ -141,7 +141,7 @@ export type Database = {
           fk_palox_type: number
           fk_product: number
           fk_stock_column_slot_level?: number | null
-          fk_supplier?: number | null
+          fk_supplier: number
           id?: number
           number_per_type: number
           updated_at?: string | null
@@ -152,7 +152,7 @@ export type Database = {
           fk_palox_type?: number
           fk_product?: number
           fk_stock_column_slot_level?: number | null
-          fk_supplier?: number | null
+          fk_supplier?: number
           id?: number
           number_per_type?: number
           updated_at?: string | null
@@ -234,30 +234,24 @@ export type Database = {
       stock_column_slot_levels: {
         Row: {
           created_at: string
-          display_name: string
           fk_stock_column_slot: number
           id: number
           is_taken: boolean
           level: number
-          max_level: number
         }
         Insert: {
           created_at?: string
-          display_name: string
           fk_stock_column_slot: number
           id?: number
           is_taken: boolean
           level: number
-          max_level: number
         }
         Update: {
           created_at?: string
-          display_name?: string
           fk_stock_column_slot?: number
           id?: number
           is_taken?: boolean
           level?: number
-          max_level?: number
         }
         Relationships: [
           {
@@ -272,24 +266,27 @@ export type Database = {
       stock_column_slots: {
         Row: {
           created_at: string
-          display_name: string
+          current_taken_levels: number
           fk_stock_column: number
           id: number
-          y_position: number
+          max_level: number
+          slot: number
         }
         Insert: {
           created_at?: string
-          display_name: string
+          current_taken_levels: number
           fk_stock_column: number
           id?: number
-          y_position: number
+          max_level: number
+          slot: number
         }
         Update: {
           created_at?: string
-          display_name?: string
+          current_taken_levels?: number
           fk_stock_column?: number
           id?: number
-          y_position?: number
+          max_level?: number
+          slot?: number
         }
         Relationships: [
           {
@@ -303,25 +300,25 @@ export type Database = {
       }
       stock_columns: {
         Row: {
+          column: number
           created_at: string
           display_name: string
           fk_stock: number
           id: number
-          x_position: number
         }
         Insert: {
+          column: number
           created_at?: string
           display_name: string
           fk_stock: number
           id?: number
-          x_position: number
         }
         Update: {
+          column?: number
           created_at?: string
           display_name?: string
           fk_stock?: number
           id?: number
-          x_position?: number
         }
         Relationships: [
           {
@@ -336,18 +333,18 @@ export type Database = {
       stocks: {
         Row: {
           created_at: string
-          display_name: string
           id: number
+          stock: number
         }
         Insert: {
           created_at?: string
-          display_name: string
           id?: number
+          stock: number
         }
         Update: {
           created_at?: string
-          display_name?: string
           id?: number
+          stock?: number
         }
         Relationships: []
       }

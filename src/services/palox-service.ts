@@ -27,11 +27,11 @@ export type ProductWithName = Pick<ProductRow, "display_name">;
 
 export type StockColumnSlotLevelWithRelations = Pick<
   StockColumnSlotLevelRow,
-  "display_name"
+  "level"
 > & {
-  stock_column_slot: Pick<StockColumnSlotRow, "display_name"> & {
+  stock_column_slot: Pick<StockColumnSlotRow, "slot"> & {
     stock_column: Pick<StockColumnRow, "display_name"> & {
-      stock: Pick<StockRow, "display_name">;
+      stock: Pick<StockRow, "stock">;
     };
   };
 };
@@ -77,13 +77,13 @@ export async function loadpaloxesForList(forceReload = false) {
             )
           ),
           stock_column_slot_level:fk_stock_column_slot_level (
-            display_name,
+            level,
             stock_column_slot:fk_stock_column_slot (
-              display_name,
+              slot,
               stock_column:fk_stock_column (
                 display_name,
                 stock:fk_stock (
-                  display_name
+                  stock
                 )
               )
             )
@@ -93,6 +93,7 @@ export async function loadpaloxesForList(forceReload = false) {
           )
         `
         )
+        .not("fk_stock_column_slot_level", "is", null)
         .overrideTypes<PaloxWithRelations[], { merge: false }>();
 
       if (error) throw error;
@@ -127,10 +128,10 @@ function getFullStockLocationName(
 ): string | null {
   if (!slotLevel) return null;
   const parts: string[] = [
-    slotLevel.stock_column_slot.stock_column.stock.display_name,
+    slotLevel.stock_column_slot.stock_column.stock.stock.toString(),
     slotLevel.stock_column_slot.stock_column.display_name,
-    slotLevel.stock_column_slot.display_name,
-    slotLevel.display_name,
+    slotLevel.stock_column_slot.slot.toString(),
+    slotLevel.level.toString(),
   ].filter(Boolean);
   return parts.length > 0 ? parts.join(".") : null;
 }
@@ -142,6 +143,6 @@ function getFullPaloxNumber(palox: PaloxWithRelations): string {
   } else {
     parts.push("N/A");
   }
-  parts.push(palox.number_per_type.toString().padStart(4, "0"));
+  parts.push(palox.number_per_type.toString().padStart(3, "0"));
   return parts.join("-");
 }
