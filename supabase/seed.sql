@@ -60,53 +60,53 @@ INSERT INTO "public"."products" ("id", "created_at", "display_name") VALUES
 -- Data for Name: stocks; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."stocks" ("id", "created_at", "display_name") VALUES
-	(1, '2025-07-13 17:46:32.35945+00', '1');
+INSERT INTO "public"."stocks" ("id", "created_at", "stock") VALUES
+	(1, '2025-07-13 17:46:32.35945+00', 1);
 
 
 --
 -- Data for Name: stock_columns; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."stock_columns" ("id", "created_at", "display_name", "fk_stock", "x_position") VALUES
-	(1, '2025-07-13 17:47:16.036281+00', 'A', 1, 0),
-	(2, '2025-07-15 13:54:19.013483+00', 'B', 1, 1),
-	(3, '2025-07-15 13:54:52.762284+00', 'C', 1, 2),
-	(4, '2025-07-15 13:55:17.637164+00', 'D', 1, 3);
+INSERT INTO "public"."stock_columns" ("id", "created_at", "display_name", "fk_stock", "column") VALUES
+	(1, '2025-07-13 17:47:16.036281+00', 'A', 1, 1),
+	(2, '2025-07-15 13:54:19.013483+00', 'B', 1, 2),
+	(3, '2025-07-15 13:54:52.762284+00', 'C', 1, 3),
+	(4, '2025-07-15 13:55:17.637164+00', 'D', 1, 4);
 
 
 --
 -- Data for Name: stock_column_slots; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."stock_column_slots" ("id", "created_at", "display_name", "fk_stock_column", "y_position") VALUES
-	(1, '2025-07-13 17:49:22.848254+00', '1', 1, 0),
-	(2, '2025-07-15 13:56:49.913288+00', '2', 1, 1),
-	(3, '2025-07-15 13:57:34.933579+00', '3', 1, 2),
-	(4, '2025-07-15 13:58:03.226428+00', '4', 1, 3),
-	(5, '2025-07-15 13:58:31.974871+00', '1', 2, 0),
-	(6, '2025-07-15 13:58:50.887704+00', '2', 2, 1),
-	(7, '2025-07-15 13:59:09.112671+00', '3', 2, 2),
-	(8, '2025-07-15 13:59:27.033554+00', '4', 2, 3),
-	(9, '2025-07-15 13:59:49.837629+00', '1', 3, 0),
-	(10, '2025-07-15 14:00:05.942211+00', '2', 3, 1),
-	(11, '2025-07-15 14:00:22.080056+00', '3', 3, 2),
-	(12, '2025-07-15 14:00:45.550345+00', '4', 3, 3),
-	(13, '2025-07-15 14:01:05.081254+00', '1', 4, 0),
-	(14, '2025-07-15 14:01:24.791937+00', '2', 4, 1),
-	(15, '2025-07-15 14:01:42.355299+00', '3', 4, 2),
-	(16, '2025-07-15 14:01:55.463444+00', '4', 4, 3);
+INSERT INTO "public"."stock_column_slots" ("id", "created_at", "fk_stock_column", "current_taken_levels", "max_level", "slot") VALUES
+	(5, '2025-07-15 13:58:31.974871+00', 2, 0, 1, 1),
+	(9, '2025-07-15 13:59:49.837629+00', 3, 0, 1, 1),
+	(13, '2025-07-15 14:01:05.081254+00', 4, 0, 1, 1),
+	(2, '2025-07-15 13:56:49.913288+00', 1, 0, 2, 2),
+	(3, '2025-07-15 13:57:34.933579+00', 1, 0, 1, 3),
+	(4, '2025-07-15 13:58:03.226428+00', 1, 0, 1, 4),
+	(6, '2025-07-15 13:58:50.887704+00', 2, 0, 1, 2),
+	(7, '2025-07-15 13:59:09.112671+00', 2, 0, 1, 3),
+	(8, '2025-07-15 13:59:27.033554+00', 2, 0, 1, 4),
+	(10, '2025-07-15 14:00:05.942211+00', 3, 0, 1, 2),
+	(11, '2025-07-15 14:00:22.080056+00', 3, 0, 1, 3),
+	(12, '2025-07-15 14:00:45.550345+00', 3, 0, 1, 4),
+	(14, '2025-07-15 14:01:24.791937+00', 4, 0, 1, 2),
+	(15, '2025-07-15 14:01:42.355299+00', 4, 0, 1, 3),
+	(16, '2025-07-15 14:01:55.463444+00', 4, 0, 1, 4),
+	(1, '2025-07-13 17:49:22.848254+00', 1, 2, 2, 1);
 
 
 --
 -- Data for Name: stock_column_slot_levels; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."stock_column_slot_levels" ("id", "created_at", "fk_stock_column_slot", "is_taken", "level", "display_name", "max_level") VALUES
-	(1, '2025-07-13 17:49:57.929309+00', 1, true, 0, '1', 1),
-	(2, '2025-07-14 15:11:13.055369+00', 1, true, 1, '2', 1),
-	(3, '2025-07-15 14:04:15.8248+00', 2, false, 0, '1', 1),
-	(4, '2025-07-15 14:04:39.294914+00', 2, false, 1, '2', 1);
+INSERT INTO "public"."stock_column_slot_levels" ("id", "created_at", "fk_stock_column_slot", "is_taken", "level") VALUES
+	(1, '2025-07-13 17:49:57.929309+00', 1, true, 1),
+	(2, '2025-07-14 15:11:13.055369+00', 1, true, 2),
+	(3, '2025-07-15 14:04:15.8248+00', 2, false, 1),
+	(4, '2025-07-15 14:04:39.294914+00', 2, false, 2);
 
 
 --
@@ -123,8 +123,9 @@ INSERT INTO "public"."suppliers" ("id", "created_at", "fk_person") VALUES
 --
 
 INSERT INTO "public"."paloxes" ("id", "created_at", "fk_customer", "fk_product", "fk_supplier", "fk_stock_column_slot_level", "updated_at", "fk_palox_type", "number_per_type") VALUES
-	(1, '2025-07-24 12:44:42.073579+00', 1, 1, NULL, 1, '2025-07-24 12:44:42.073579', 1, 1),
-	(2, '2025-07-24 12:45:24.055213+00', NULL, 2, 4, 2, '2025-07-24 12:45:24.055213', 2, 1);
+	(2, '2025-07-24 12:45:24.055213+00', NULL, 2, 4, 2, '2025-07-24 12:45:24.055213', 2, 1),
+	(3, '2025-07-28 09:31:49.315028+00', NULL, 4, 4, NULL, '2025-07-28 09:31:49.315028', 1, 2),
+	(1, '2025-07-24 12:44:42.073579+00', 1, 1, 3, 1, '2025-07-24 12:44:42.073579', 1, 1);
 
 
 --
@@ -165,7 +166,7 @@ SELECT pg_catalog.setval('"public"."palox_types_id_seq"', 2, true);
 -- Name: paloxes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."paloxes_id_seq"', 2, true);
+SELECT pg_catalog.setval('"public"."paloxes_id_seq"', 3, true);
 
 
 --
