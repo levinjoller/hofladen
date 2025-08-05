@@ -31,7 +31,6 @@ export async function loadProductsForList(forceReload: boolean = false) {
       }));
     } catch (err: any) {
       productsError.value = `Fehler beim Laden der Produkte: ${err.message}`;
-      console.error("Error loading products:", err);
       presentToast(productsError.value, "danger");
     } finally {
       productsLoading.value = false;
@@ -47,5 +46,4 @@ export async function reinitializeProductData() {
   productsLoading.value = true;
   productsError.value = null;
   await loadProductsForList(true);
-  console.log("Reinitialized product data (no Realtime subscription).");
 }

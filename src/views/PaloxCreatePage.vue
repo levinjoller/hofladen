@@ -22,9 +22,7 @@
             v-model="isPaloxModalOpen"
             v-model:selected="selectedPalox"
             title="Paloxen"
-            :options="paloxes"
-            :loading="paloxesLoading"
-            :fetch-method="() => fetchPaloxes(false)"
+            :fetchMethod="fetchPaloxes"
           />
 
           <ion-item button @click="isSupplierModalOpen = true">
@@ -37,9 +35,7 @@
             v-model="isSupplierModalOpen"
             v-model:selected="selectedSupplier"
             title="Lieferanten"
-            :options="suppliers"
-            :loading="suppliersLoading"
-            :fetch-method="() => fetchSuppliers(false)"
+            :fetchMethod="fetchSuppliers"
           />
 
           <ion-item button @click="isProductModalOpen = true">
@@ -52,9 +48,7 @@
             v-model="isProductModalOpen"
             v-model:selected="selectedProduct"
             title="Produkte"
-            :options="products"
-            :loading="productsLoading"
-            :fetch-method="() => fetchProducts(false)"
+            :fetchMethod="fetchProducts"
           />
 
           <ion-item button @click="isStockModalOpen = true">
@@ -67,11 +61,10 @@
             v-model="isStockModalOpen"
             v-model:selected="selectedStock"
             title="Lager"
-            :options="stocks"
-            :loading="stocksLoading"
-            :fetch-method="() => fetchStocks(false)"
+            :fetchMethod="fetchStocks"
           />
         </ion-list>
+
         <h3>Optional</h3>
         <ion-item button @click="isCustomerModalOpen = true">
           <ion-label>Kunde</ion-label>
@@ -80,7 +73,7 @@
           </ion-text>
           <ion-buttons slot="end" v-if="selectedCustomer">
             <ion-button @click.stop="selectedCustomer = null">
-              <ion-icon :icon="closeCircleOutline"></ion-icon>
+              <ion-icon :icon="closeCircleOutline" />
             </ion-button>
           </ion-buttons>
         </ion-item>
@@ -88,43 +81,29 @@
           v-model="isCustomerModalOpen"
           v-model:selected="selectedCustomer"
           title="Kunden"
-          :options="customers"
-          :loading="customersLoading"
-          :fetch-method="() => fetchCustomers(false)"
+          :fetchMethod="fetchCustomers"
         />
       </div>
 
       <div v-else-if="currentStep === 2">
-        <ion-grid>
-          <h2>Lager {{ selectedStock?.display_name }} - Lagerplatz wählen</h2>
-          <ion-row v-for="(row, rowIndex) in rows" :key="rowIndex">
-            <ion-col v-for="(col, colIndex) in columns" :key="colIndex">
-              <ion-card
-                :color="isSelected(`${col}${row}`) ? 'primary' : ''"
-                @click="toggleSelect(`${col}${row}`)"
-              >
-                <ion-card-content class="ion-text-center">
-                  {{ col }}{{ row }}
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+        <StockColumnSlotSelectModal
+          :selectedStock="selectedStock"
+          v-model:selectedSlotId="selectedStockColumnSlot"
+        />
       </div>
-      <div v-else-if="currentStep === 3"></div>
     </ion-content>
 
     <ion-footer>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button @click="prevStep" :disabled="currentStep === 1">
-            Zurück
-          </ion-button>
+          <ion-button @click="prevStep" :disabled="currentStep === 1"
+            >Zurück</ion-button
+          >
         </ion-buttons>
         <ion-buttons slot="end">
-          <ion-button @click="nextStep" :disabled="!canProceed">
-            Weiter
-          </ion-button>
+          <ion-button @click="nextStep" :disabled="!canProceed"
+            >Weiter</ion-button
+          >
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
@@ -146,35 +125,20 @@ import {
   IonLabel,
   IonText,
   IonBackButton,
-  IonCard,
-  IonCardContent,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonIcon,
 } from "@ionic/vue";
 import { ref, computed } from "vue";
+import {
+  fetchCustomers,
+  fetchPaloxes,
+  fetchProducts,
+  fetchStocks,
+  fetchSuppliers,
+} from "@/services/palox-create-service";
 import DropdownSearchModal from "@/components/DropdownSearchModal.vue";
 import { closeCircleOutline } from "ionicons/icons";
-import {
-  paloxes,
-  paloxesLoading,
-  fetchPaloxes,
-  suppliers,
-  suppliersLoading,
-  fetchSuppliers,
-  customers,
-  customersLoading,
-  fetchCustomers,
-  products,
-  productsLoading,
-  fetchProducts,
-  stocks,
-  stocksLoading,
-  fetchStocks,
-} from "@/services/palox-create-service";
-import { DropdownSearchItem } from "@/types/dropdown-search-item";
-import { presentToast } from "@/services/toast-service";
+import type { DropdownSearchItem } from "@/types/dropdown-search-item";
+import StockColumnSlotSelectModal from "@/components/StockColumnSlotSelectModal.vue";
 
 const isPaloxModalOpen = ref(false);
 const isSupplierModalOpen = ref(false);
@@ -187,60 +151,25 @@ const selectedSupplier = ref<DropdownSearchItem | null>(null);
 const selectedCustomer = ref<DropdownSearchItem | null>(null);
 const selectedProduct = ref<DropdownSearchItem | null>(null);
 const selectedStock = ref<DropdownSearchItem | null>(null);
+const selectedStockColumnSlot = ref<number | null>(null);
 
 const currentStep = ref(1);
+
 const canProceed = computed(() => {
   if (currentStep.value === 1) {
     return (
-      selectedPalox.value !== null &&
-      selectedSupplier.value !== null &&
-      selectedStock.value !== null &&
-      selectedProduct.value !== null
+      selectedPalox.value &&
+      selectedSupplier.value &&
+      selectedProduct.value &&
+      selectedStock.value
     );
-  } else if (currentStep.value === 2) {
-    return selectedSlot.value !== null;
+  }
+  if (currentStep.value === 2) {
+    return selectedStockColumnSlot.value !== null;
   }
   return false;
 });
 
-const nextStep = () => {
-  if (canProceed.value) {
-    currentStep.value++;
-  } else {
-    presentToast("Bitte füllen Sie alle erforderlichen Felder aus.", "warning");
-  }
-};
-
-const prevStep = () => {
-  if (currentStep.value > 1) {
-    currentStep.value--;
-  }
-};
-
-const columns = ref(["A", "B", "C", "D"]);
-const rows = ref([1, 2, 3, 4, 5]);
-
-const selectedSlot = ref<string | null>(null);
-
-const isSelected = (slot: string) => {
-  return selectedSlot.value === slot;
-};
-
-const toggleSelect = (slot: string) => {
-  if (selectedSlot.value === slot) {
-    selectedSlot.value = null;
-  } else {
-    selectedSlot.value = slot;
-  }
-};
+const nextStep = () => currentStep.value++;
+const prevStep = () => currentStep.value > 1 && currentStep.value--;
 </script>
-
-<style scoped>
-ion-card {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-ion-card:hover {
-  transform: scale(1.05);
-}
-</style>

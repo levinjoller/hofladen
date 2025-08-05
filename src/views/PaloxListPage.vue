@@ -76,6 +76,7 @@ import {
   IonItem,
   IonFab,
   IonFabButton,
+  onIonViewWillLeave,
 } from "@ionic/vue";
 
 const gridOptions = {
@@ -126,6 +127,10 @@ const handleResize = () => {
 
 onMounted(() => {
   window.addEventListener("resize", handleResize);
+});
+
+onIonViewWillLeave(() => {
+  window.removeEventListener("resize", handleResize);
 });
 
 function exportAsPDF() {

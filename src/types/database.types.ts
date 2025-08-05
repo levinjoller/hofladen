@@ -81,14 +81,21 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "pallet_histories_fk_pallet_fkey"
+            foreignKeyName: "palox_histories_fk_palox_fkey"
             columns: ["fk_palox"]
             isOneToOne: false
             referencedRelation: "paloxes"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pallet_histories_fk_stock_column_slot_level_fkey"
+            foreignKeyName: "palox_histories_fk_palox_fkey"
+            columns: ["fk_palox"]
+            isOneToOne: false
+            referencedRelation: "paloxes_palox_types_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "palox_histories_fk_stock_column_slot_level_fkey"
             columns: ["fk_stock_column_slot_level"]
             isOneToOne: false
             referencedRelation: "stock_column_slot_levels"
@@ -159,31 +166,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "pallets_fk_customer_fkey"
+            foreignKeyName: "paloxes_fk_customer_fkey"
             columns: ["fk_customer"]
             isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pallets_fk_product_fkey"
-            columns: ["fk_product"]
+            foreignKeyName: "paloxes_fk_customer_fkey"
+            columns: ["fk_customer"]
             isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pallets_fk_stock_column_slot_level_fkey"
-            columns: ["fk_stock_column_slot_level"]
-            isOneToOne: true
-            referencedRelation: "stock_column_slot_levels"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pallets_fk_supplier_fkey"
-            columns: ["fk_supplier"]
-            isOneToOne: false
-            referencedRelation: "suppliers"
+            referencedRelation: "customers_persons_view"
             referencedColumns: ["id"]
           },
           {
@@ -191,6 +184,41 @@ export type Database = {
             columns: ["fk_palox_type"]
             isOneToOne: false
             referencedRelation: "palox_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paloxes_fk_product_fkey"
+            columns: ["fk_product"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paloxes_fk_product_fkey"
+            columns: ["fk_product"]
+            isOneToOne: false
+            referencedRelation: "products_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paloxes_fk_stock_column_slot_level_fkey"
+            columns: ["fk_stock_column_slot_level"]
+            isOneToOne: true
+            referencedRelation: "stock_column_slot_levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paloxes_fk_supplier_fkey"
+            columns: ["fk_supplier"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paloxes_fk_supplier_fkey"
+            columns: ["fk_supplier"]
+            isOneToOne: false
+            referencedRelation: "suppliers_persons_view"
             referencedColumns: ["id"]
           },
         ]
@@ -261,6 +289,13 @@ export type Database = {
             referencedRelation: "stock_column_slots"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "stock_column_slot_levels_fk_stock_column_slot_fkey"
+            columns: ["fk_stock_column_slot"]
+            isOneToOne: false
+            referencedRelation: "stock_column_slots_columns_view"
+            referencedColumns: ["stock_column_slot_id"]
+          },
         ]
       }
       stock_column_slots: {
@@ -289,6 +324,13 @@ export type Database = {
           slot?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "stock_column_slots_fk_stock_column_fkey"
+            columns: ["fk_stock_column"]
+            isOneToOne: false
+            referencedRelation: "stock_column_slots_columns_view"
+            referencedColumns: ["stock_column_id"]
+          },
           {
             foreignKeyName: "stock_column_slots_fk_stock_column_fkey"
             columns: ["fk_stock_column"]
@@ -322,10 +364,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "rows_fk_warehouse_fkey"
+            foreignKeyName: "stock_columns_fk_stock_fkey"
             columns: ["fk_stock"]
             isOneToOne: false
             referencedRelation: "stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_columns_fk_stock_fkey"
+            columns: ["fk_stock"]
+            isOneToOne: false
+            referencedRelation: "stocks_view"
             referencedColumns: ["id"]
           },
         ]
@@ -376,7 +425,95 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      customers_persons_view: {
+        Row: {
+          id: number | null
+          person_display_name: string | null
+        }
+        Relationships: []
+      }
+      paloxes_palox_types_view: {
+        Row: {
+          fk_stock_column_slot_level: number | null
+          id: number | null
+          number_per_type: number | null
+          palox_types_label_prefix: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paloxes_fk_stock_column_slot_level_fkey"
+            columns: ["fk_stock_column_slot_level"]
+            isOneToOne: true
+            referencedRelation: "stock_column_slot_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products_view: {
+        Row: {
+          display_name: string | null
+          id: number | null
+        }
+        Insert: {
+          display_name?: string | null
+          id?: number | null
+        }
+        Update: {
+          display_name?: string | null
+          id?: number | null
+        }
+        Relationships: []
+      }
+      stock_column_slots_columns_view: {
+        Row: {
+          fk_stock: number | null
+          free_levels: number | null
+          is_full: boolean | null
+          stock_column_display_name: string | null
+          stock_column_id: number | null
+          stock_column_number: number | null
+          stock_column_slot_id: number | null
+          stock_slot_number: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_columns_fk_stock_fkey"
+            columns: ["fk_stock"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_columns_fk_stock_fkey"
+            columns: ["fk_stock"]
+            isOneToOne: false
+            referencedRelation: "stocks_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stocks_view: {
+        Row: {
+          id: number | null
+          stock: number | null
+        }
+        Insert: {
+          id?: number | null
+          stock?: number | null
+        }
+        Update: {
+          id?: number | null
+          stock?: number | null
+        }
+        Relationships: []
+      }
+      suppliers_persons_view: {
+        Row: {
+          id: number | null
+          person_display_name: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

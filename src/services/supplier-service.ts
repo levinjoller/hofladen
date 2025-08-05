@@ -38,7 +38,6 @@ export async function loadSuppliersForList(forceReload = false) {
       }));
     } catch (err: any) {
       suppliersError.value = `Fehler beim Laden der Lieferanten: ${err.message}`;
-      console.error("Error loading suppliers:", err);
       presentToast(suppliersError.value, "danger");
     } finally {
       suppliersLoading.value = false;

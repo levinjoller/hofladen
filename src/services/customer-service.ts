@@ -52,7 +52,6 @@ export async function loadCustomersForList(forceReload: boolean = false) {
     } catch (err: any) {
       const msg = `Fehler beim Laden der Kunden: ${err.message}`;
       customersError.value = msg;
-      console.error("Error loading customers:", err);
       presentToast(msg, "danger");
     } finally {
       customersLoading.value = false;
@@ -65,5 +64,4 @@ export async function loadCustomersForList(forceReload: boolean = false) {
  */
 export async function reinitializeCustomerData() {
   await loadCustomersForList(true);
-  console.log("Reinitialized customer data (no Realtime subscription).");
 }

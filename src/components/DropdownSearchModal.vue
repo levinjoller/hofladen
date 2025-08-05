@@ -4,7 +4,7 @@
       <ion-toolbar>
         <ion-title>{{ title }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button @click="close">Schliessen</ion-button>
+          <ion-button @click="close">Schließen</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -15,7 +15,7 @@
         placeholder="Suchen..."
       ></ion-searchbar>
 
-      <ion-list>
+      <ion-list v-if="filteredOptions.length > 0">
         <ion-item
           v-for="option in filteredOptions"
           :key="option.id"
@@ -26,15 +26,17 @@
         </ion-item>
       </ion-list>
 
-      <div v-if="loading" class="ion-padding ion-text-center">
-        <ion-spinner name="crescent"></ion-spinner>
+      <div v-if="isLoading" class="ion-padding ion-text-center">
+        <ion-spinner name="crescent" />
       </div>
+
       <ion-text
         v-else-if="filteredOptions.length === 0 && searchTerm === ''"
         class="ion-padding"
       >
         Keine Daten verfügbar.
       </ion-text>
+
       <ion-text
         v-else-if="filteredOptions.length === 0 && searchTerm !== ''"
         class="ion-padding"
@@ -63,14 +65,14 @@ import {
 } from "@ionic/vue";
 import { ref, computed, watch } from "vue";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
+import { useFetch } from "@/composables/use-fetch";
+import { presentToast } from "@/services/toast-service";
 
 const props = defineProps<{
   modelValue: boolean;
   selected: DropdownSearchItem | null;
+  fetchMethod: () => Promise<DropdownSearchItem[]>;
   title?: string;
-  options: DropdownSearchItem[];
-  loading: boolean;
-  fetchMethod: () => Promise<void>;
 }>();
 
 const emit = defineEmits<{
@@ -79,35 +81,41 @@ const emit = defineEmits<{
 }>();
 
 const isOpen = ref(props.modelValue);
-const searchTerm = ref("");
-
 watch(
   () => props.modelValue,
-  async (val) => {
+  (val) => {
     isOpen.value = val;
     if (val) {
       searchTerm.value = "";
-      await props.fetchMethod();
+      fetchData();
     }
   }
 );
 
-const close = () => {
-  isOpen.value = false;
-  emit("update:modelValue", false);
-};
+const searchTerm = ref("");
 
-const selectOption = (option: DropdownSearchItem) => {
-  emit("update:selected", option);
-  close();
-};
+const { data, isLoading, error, fetchData } = useFetch(props.fetchMethod);
+
+watch(error, (err) => {
+  if (err) {
+    presentToast(err.message, "danger");
+  }
+});
 
 const filteredOptions = computed(() => {
-  const options = props.options || [];
-  if (!searchTerm.value) {
-    return options;
-  }
-  const lower = searchTerm.value.toLowerCase();
-  return options.filter((o) => o.display_name?.toLowerCase().includes(lower));
+  const list = data.value || [];
+  const term = searchTerm.value.toLowerCase();
+  return term
+    ? list.filter((o) => o.display_name?.toLowerCase().includes(term))
+    : list;
 });
+
+function selectOption(option: DropdownSearchItem) {
+  emit("update:selected", option);
+  close();
+}
+function close() {
+  isOpen.value = false;
+  emit("update:modelValue", false);
+}
 </script>

@@ -20,13 +20,11 @@ export async function login(email: string, password: string): Promise<boolean> {
     });
 
     if (error) {
-      console.error("Login-Fehler:", error.message);
       presentToast(error.message, "danger");
       return false;
     }
 
     if (data.user) {
-      console.log("User eingeloggt:", data.user);
       user.value = data.user;
       presentToast("Login erfolgreich!", "success");
       return true;
@@ -35,7 +33,6 @@ export async function login(email: string, password: string): Promise<boolean> {
     presentToast("Login fehlgeschlagen.", "danger");
     return false;
   } catch (err: any) {
-    console.error("Unerwarteter Login-Fehler:", err);
     presentToast("Ein unerwarteter Fehler ist aufgetreten.", "danger");
     return false;
   }
@@ -56,7 +53,6 @@ export async function logout(): Promise<void> {
     user.value = null;
     presentToast("Sie wurden erfolgreich abgemeldet.", "success", 2000);
   } catch (err: any) {
-    console.error("Logout-Fehler:", err.message);
     presentToast(`Fehler beim Abmelden: ${err.message}`, "danger", 3000);
   }
 }
