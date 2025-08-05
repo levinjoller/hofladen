@@ -1,12 +1,6 @@
 import { createRouter, createWebHashHistory } from "@ionic/vue-router";
 import { RouteRecordRaw } from "vue-router";
 import { supabase } from "@/supabase";
-import HomePage from "../views/HomePage.vue";
-import ProductListPage from "@/views/ProductListPage.vue";
-import LoginPage from "@/views/LoginPage.vue";
-import SupplierListPage from "@/views/SupplierListPage.vue";
-import CustomerListPage from "@/views/CustomerListPage.vue";
-import PaloxListPage from "@/views/PaloxListPage.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -16,36 +10,36 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/login",
     name: "Login",
-    component: LoginPage,
+    component: () => import("@/views/LoginPage.vue"),
   },
   {
     path: "/home",
     name: "Home",
-    component: HomePage,
+    component: () => import("@/views/HomePage.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/product",
     name: "ProductList",
-    component: ProductListPage,
+    component: () => import("@/views/ProductListPage.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/supplier",
     name: "SupplierList",
-    component: SupplierListPage,
+    component: () => import("@/views/SupplierListPage.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/customer",
     name: "CustomerList",
-    component: CustomerListPage,
+    component: () => import("@/views/CustomerListPage.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/palox",
     name: "PaloxList",
-    component: PaloxListPage,
+    component: () => import("@/views/PaloxListPage.vue"),
     meta: { requiresAuth: true },
   },
   {
