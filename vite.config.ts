@@ -27,13 +27,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          if (id.includes("html2canvas")) {
-            return "html2canvas";
-          }
-          if (id.includes("@ionic/vue")) {
-            return "ionic";
-          }
           if (id.includes("node_modules")) {
+            if (id.includes("html2canvas")) return "html2canvas";
+            if (id.includes("@ionic")) return "ionic";
+            if (id.includes("vue")) return "vue";
             return "vendor";
           }
         },
