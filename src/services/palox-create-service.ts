@@ -1,5 +1,4 @@
 import { supabase } from "@/supabase";
-import { ref } from "vue";
 import { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { StockColumnSlotViewModel } from "@/types/stock-column-slot-view-model";
 import { PaloxesPaloxTypesViewArraySchema } from "@/types/generated/paloxes-palox-types-view";
@@ -8,24 +7,7 @@ import { SuppliersPersonsViewArraySchema } from "@/types/generated/suppliers-per
 import { CustomersPersonsViewArraySchema } from "@/types/generated/customers-persons-view";
 import { ProductsViewArraySchema } from "@/types/generated/products-view";
 import { StocksViewArraySchema } from "@/types/generated/stocks-view";
-
-export const paloxes = ref<DropdownSearchItem[]>([]);
-export const paloxesLoading = ref(false);
-
-export const suppliers = ref<DropdownSearchItem[]>([]);
-export const suppliersLoading = ref(false);
-
-export const customers = ref<DropdownSearchItem[]>([]);
-export const customersLoading = ref(false);
-
-export const products = ref<DropdownSearchItem[]>([]);
-export const productsLoading = ref(false);
-
-export const stocks = ref<DropdownSearchItem[]>([]);
-export const stocksLoading = ref(false);
-
-export const stockColumnSlots = ref<StockColumnSlotViewModel[]>([]);
-export const stockColumnSlotsLoading = ref(false);
+import { AssignPaloxToNextFreeLevelInSlotFncParamsSchema } from "@/types/generated/assign-palox-to-next-free-level-in-slot-fnc-params";
 
 export async function fetchPaloxes(): Promise<DropdownSearchItem[]> {
   const { data, error } = await supabase
@@ -109,7 +91,7 @@ export async function fetchCustomers(): Promise<DropdownSearchItem[]> {
 
 export async function fetchProducts(): Promise<DropdownSearchItem[]> {
   const { data, error } = await supabase
-    .from("products")
+    .from("products_view")
     .select()
     .order("display_name", { ascending: true });
   if (error) {
@@ -194,6 +176,40 @@ export async function fetchStockColumnSlots(
     };
   });
 }
+
+export const assignPaloxToSlot = async (params: {
+  paloxId: number;
+  stockColumnSlotId: number;
+  productId: number;
+  supplierId: number;
+  customerId?: number | null;
+}): Promise<void> => {
+  const validatedParams =
+    AssignPaloxToNextFreeLevelInSlotFncParamsSchema.safeParse({
+      p_palox_id: params.paloxId,
+      p_stock_column_slot_id: params.stockColumnSlotId,
+      p_product_id: params.productId,
+      p_supplier_id: params.supplierId,
+      p_customer_id: params.customerId,
+    });
+  if (!validatedParams.success) {
+    const zodErrorMessage = createZodErrorMessage(validatedParams.error.issues);
+    throw new Error(
+      `Die zu speichernden Daten entsprechen nicht dem erwarteten Format: ${zodErrorMessage}`
+    );
+  }
+  const { data, error } = await supabase.rpc(
+    "assign_palox_to_next_free_level_in_slot_fnc",
+    {
+      ...validatedParams.data,
+      p_customer_id: validatedParams.data.p_customer_id ?? undefined,
+    }
+  );
+  if (error) {
+    throw new Error(`Fehler bei der Einlagerung: ${error.message}`);
+  }
+  return data;
+};
 
 function createZodErrorMessage(issues: any[]): string {
   return issues

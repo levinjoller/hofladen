@@ -1,0 +1,22 @@
+{
+  "schemas": [
+    {
+      "file": "paloxes-in-stock-view.ts",
+      "replacements": [
+        {
+          "from": "customer_person_display_name: z.string()",
+          "to": "customer_person_display_name: z.string().nullable()"
+        }
+      ]
+    },
+    {
+      "file": "assign-palox-to-next-free-level-in-slot-fnc-params.ts",
+      "replacements": [
+        {
+          "from": "p_customer_id: z.int()",
+          "to": "p_customer_id: z.int().nullable().optional()"
+        }
+      ]
+    }
+  ]
+}

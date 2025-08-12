@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-back-button default-href="/palox" />
         </ion-buttons>
-        <ion-title>Paloxe einlagern - {{ currentStep }} / 4</ion-title>
+        <ion-title>Paloxe einlagern - {{ currentStep }} / 3</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -87,8 +87,8 @@
 
       <div v-else-if="currentStep === 2">
         <StockColumnSlotSelectModal
+          v-model="selectedStockColumnSlot"
           :selectedStock="selectedStock"
-          v-model:selectedSlotId="selectedStockColumnSlot"
         />
       </div>
     </ion-content>
@@ -96,14 +96,21 @@
     <ion-footer>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button @click="prevStep" :disabled="currentStep === 1"
-            >Zurück</ion-button
+          <ion-button
+            @click="prevStep"
+            :disabled="currentStep === 1"
+            v-if="currentStep <= 2"
           >
+            Zurück
+          </ion-button>
         </ion-buttons>
         <ion-buttons slot="end">
-          <ion-button @click="nextStep" :disabled="!canProceed"
-            >Weiter</ion-button
-          >
+          <ion-button @click="nextStep" :disabled="!canProceed || isLoading">
+            <span v-if="!isLoading">{{
+              currentStep === 2 ? "Einlagern" : "Weiter"
+            }}</span>
+            <ion-spinner v-else name="dots"></ion-spinner>
+          </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
@@ -126,19 +133,28 @@ import {
   IonText,
   IonBackButton,
   IonIcon,
+  IonSpinner,
 } from "@ionic/vue";
-import { ref, computed } from "vue";
+import { ref, computed, defineAsyncComponent } from "vue";
 import {
+  assignPaloxToSlot,
   fetchCustomers,
   fetchPaloxes,
   fetchProducts,
   fetchStocks,
   fetchSuppliers,
 } from "@/services/palox-create-service";
-import DropdownSearchModal from "@/components/DropdownSearchModal.vue";
-import { closeCircleOutline } from "ionicons/icons";
+const DropdownSearchModal = defineAsyncComponent(
+  () => import("@/components/DropdownSearchModal.vue")
+);
+const StockColumnSlotSelectModal = defineAsyncComponent(
+  () => import("@/components/StockColumnSlotSelectModal.vue")
+);
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
-import StockColumnSlotSelectModal from "@/components/StockColumnSlotSelectModal.vue";
+import { closeCircleOutline } from "ionicons/icons";
+import { useFetch } from "@/composables/use-fetch";
+import { presentToast } from "@/services/toast-service";
+import { StockColumnSlotViewModel } from "@/types/stock-column-slot-view-model";
 
 const isPaloxModalOpen = ref(false);
 const isSupplierModalOpen = ref(false);
@@ -151,7 +167,7 @@ const selectedSupplier = ref<DropdownSearchItem | null>(null);
 const selectedCustomer = ref<DropdownSearchItem | null>(null);
 const selectedProduct = ref<DropdownSearchItem | null>(null);
 const selectedStock = ref<DropdownSearchItem | null>(null);
-const selectedStockColumnSlot = ref<number | null>(null);
+const selectedStockColumnSlot = ref<StockColumnSlotViewModel | null>(null);
 
 const currentStep = ref(1);
 
@@ -170,6 +186,38 @@ const canProceed = computed(() => {
   return false;
 });
 
-const nextStep = () => currentStep.value++;
+const { isLoading, error, fetchData } = useFetch(assignPaloxToSlot);
+
+const nextStep = async () => {
+  if (
+    currentStep.value === 2 &&
+    selectedPalox.value !== null &&
+    selectedStockColumnSlot.value !== null &&
+    selectedProduct.value !== null &&
+    selectedSupplier.value !== null
+  ) {
+    const success = await fetchData({
+      paloxId: selectedPalox.value.id,
+      stockColumnSlotId: selectedStockColumnSlot.value.slot_id,
+      productId: selectedProduct.value.id,
+      supplierId: selectedSupplier.value.id,
+      customerId: selectedCustomer.value?.id,
+    });
+    if (success) {
+      presentToast(
+        `Paloxe ${selectedPalox.value.display_name} in ${selectedStockColumnSlot.value.display_name} erfolgreich eingelagert!`,
+        "success"
+      );
+      currentStep.value++;
+    } else {
+      const errorMessage =
+        error.value?.message || "Ein unbekannter Fehler ist aufgetreten.";
+      presentToast(errorMessage, "danger", 10000);
+      error.value = null;
+    }
+  } else {
+    currentStep.value++;
+  }
+};
 const prevStep = () => currentStep.value > 1 && currentStep.value--;
 </script>

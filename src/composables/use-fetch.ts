@@ -11,8 +11,10 @@ export function useFetch<T, Args extends any[]>(
     error.value = null;
     try {
       data.value = await fetcher(...args);
+      return true;
     } catch (e: unknown) {
       error.value = e instanceof Error ? e : new Error("Unbekannter Fehler.");
+      return false;
     } finally {
       isLoading.value = false;
     }

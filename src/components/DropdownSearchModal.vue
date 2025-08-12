@@ -4,7 +4,7 @@
       <ion-toolbar>
         <ion-title>{{ title }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button @click="close">Schließen</ion-button>
+          <ion-button @click="close">Schliessen</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -98,7 +98,7 @@ const { data, isLoading, error, fetchData } = useFetch(props.fetchMethod);
 
 watch(error, (err) => {
   if (err) {
-    presentToast(err.message, "danger");
+    presentToast(err.message, "danger", 10000);
   }
 });
 

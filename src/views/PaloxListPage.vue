@@ -24,7 +24,7 @@
           <ag-grid-vue
             class="ag-grid"
             style="width: 100%; height: 100%"
-            :rowData="rowData"
+            :rowData="data"
             :columnDefs="columnDefs"
             :defaultColDef="defaultColDef"
             @grid-ready="onGridReady"
@@ -51,12 +51,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { AgGridVue } from "ag-grid-vue3";
 import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
 import { ColDef } from "ag-grid-community";
-import { loadpaloxesForList, paloxes } from "@/services/palox-service";
-import { AgGridPaloxRow } from "@/types/ag-grid-palox-row";
+import { fetchPaloxesInStock } from "@/services/palox-service";
 import { ellipsisVertical, ellipsisHorizontal, archive } from "ionicons/icons";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -78,6 +77,8 @@ import {
   IonFabButton,
   onIonViewWillLeave,
 } from "@ionic/vue";
+import { PaloxesInStockView } from "@/types/generated/paloxes-in-stock-view";
+import { useFetch } from "@/composables/use-fetch";
 
 const gridOptions = {
   localeText: AG_GRID_LOCALE_DE,
@@ -86,14 +87,27 @@ const gridOptions = {
   paginationPageSizeSelector: false,
 };
 
-const rowData = ref<AgGridPaloxRow[]>([]);
+const columnDefs = ref<ColDef<PaloxesInStockView>[]>([
+  { headerName: "Paloxen-Nr", field: "palox_display_name" },
+  { headerName: "Produkt", field: "product_display_name" },
+  { headerName: "Kunde", field: "customer_person_display_name" },
+  { headerName: "Lieferant", field: "supplier_person_display_name" },
+  { headerName: "Lagerplatz", field: "stock_location_display_name" },
+  {
+    headerName: "Eingelagert",
+    field: "stored_at",
+    valueFormatter: (params) => {
+      if (!params.value) {
+        return "";
+      }
 
-const columnDefs = ref<ColDef<AgGridPaloxRow>[]>([
-  { headerName: "Paloxen-Nr", field: "palox_number" },
-  { headerName: "Produkt", field: "product_name" },
-  { headerName: "Kunde", field: "customer_name" },
-  { headerName: "Lieferant", field: "supplier_name" },
-  { headerName: "Lagerplatz", field: "stock_column_row_level" },
+      return params.value.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    },
+  },
 ]);
 
 const defaultColDef = {
@@ -104,10 +118,7 @@ const defaultColDef = {
   minWidth: 100,
 };
 
-onMounted(async () => {
-  await loadpaloxesForList();
-  rowData.value = paloxes.value;
-});
+const { data, error, fetchData } = useFetch(fetchPaloxesInStock);
 
 const gridApi = ref<any>(null);
 
@@ -125,8 +136,15 @@ const handleResize = () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener("resize", handleResize);
+  await fetchData();
+});
+
+watch(error, (err) => {
+  if (err) {
+    presentToast(err.message, "danger", 10000);
+  }
 });
 
 onIonViewWillLeave(() => {
@@ -136,9 +154,9 @@ onIonViewWillLeave(() => {
 function exportAsPDF() {
   if (!gridApi.value) return;
 
-  const filteredSortedData: AgGridPaloxRow[] = [];
+  const filteredSortedData: PaloxesInStockView[] = [];
   gridApi.value.forEachNodeAfterFilterAndSort((node: any) => {
-    filteredSortedData.push(node.data as AgGridPaloxRow);
+    filteredSortedData.push(node.data as PaloxesInStockView);
   });
 
   if (!filteredSortedData.length) {
@@ -155,15 +173,26 @@ function exportAsPDF() {
 
   const displayedColumns: {
     headerName: string;
-    field: keyof AgGridPaloxRow;
+    field: keyof PaloxesInStockView;
   }[] = gridApi.value.getAllDisplayedColumns().map((col: any) => ({
     headerName: col.getColDef().headerName,
-    field: col.getColDef().field as keyof AgGridPaloxRow,
+    field: col.getColDef().field as keyof PaloxesInStockView,
   }));
 
   const headers = displayedColumns.map((c) => c.headerName);
+
   const rows = filteredSortedData.map((row) =>
-    displayedColumns.map((c) => row[c.field] || "")
+    displayedColumns.map((c) => {
+      let value = row[c.field];
+      if (value instanceof Date) {
+        return value.toLocaleDateString("de-DE", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+      }
+      return value === null || value === undefined ? "" : String(value);
+    })
   );
 
   autoTable(doc, {

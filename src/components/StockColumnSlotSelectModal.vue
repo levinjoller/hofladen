@@ -15,9 +15,9 @@
           >
             <div v-for="slot in group.slot" :key="slot.slot_id">
               <ion-card
-                :color="selectedSlotId === slot.slot_id ? 'primary' : ''"
+                :color="modelValue?.slot_id === slot.slot_id ? 'primary' : ''"
                 :disabled="slot.is_full"
-                @click="!slot.is_full && select(slot.slot_id)"
+                @click="!slot.is_full && select(slot)"
               >
                 <ion-card-content>
                   <div>{{ slot.display_name }}</div>
@@ -53,14 +53,15 @@ import { useFetch } from "@/composables/use-fetch";
 import type { CardGridSlot } from "@/types/card-grid-slot";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { presentToast } from "@/services/toast-service";
+import { StockColumnSlotViewModel } from "@/types/stock-column-slot-view-model";
 
 const props = defineProps<{
+  modelValue: StockColumnSlotViewModel | null;
   selectedStock: DropdownSearchItem | null;
-  selectedSlotId: number | null;
 }>();
 
 const emit = defineEmits<{
-  (e: "update:selectedSlotId", val: number | null): void;
+  (e: "update:modelValue", val: StockColumnSlotViewModel | null): void;
 }>();
 
 const { data, isLoading, error, fetchData } = useFetch(fetchStockColumnSlots);
@@ -94,11 +95,11 @@ const slots = computed<CardGridSlot[]>(() => {
   return Array.from(groups.values());
 });
 
-const select = (slotId: number) => {
-  if (slotId === props.selectedSlotId) {
-    emit("update:selectedSlotId", null);
+const select = (slot: StockColumnSlotViewModel) => {
+  if (slot === props.modelValue) {
+    emit("update:modelValue", null);
   } else {
-    emit("update:selectedSlotId", slotId);
+    emit("update:modelValue", slot);
   }
 };
 </script>

@@ -6,81 +6,122 @@ SET session_replication_role = replica;
 
 -- Dumped from database version 17.4
 -- Dumped by pg_dump version 17.4
-
 SET statement_timeout = 0;
+
 SET lock_timeout = 0;
+
 SET idle_in_transaction_session_timeout = 0;
+
 SET transaction_timeout = 0;
+
 SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
+
+SET standard_conforming_strings = ON;
+
 SELECT pg_catalog.set_config('search_path', '', false);
+
 SET check_function_bodies = false;
+
 SET xmloption = content;
+
 SET client_min_messages = warning;
+
 SET row_security = off;
 
 --
 -- Data for Name: persons; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."persons" ("id", "created_at", "display_name") VALUES
-	(1, '2025-07-13 09:18:10.997918+00', 'Hoffmann AG'),
+INSERT INTO "public"."persons" ("id", "created_at", "display_name")
+VALUES (
+		1,
+		'2025-07-13 09:18:10.997918+00',
+		'Hoffmann AG'
+	),
 	(2, '2025-07-13 11:10:24.08498+00', 'Elmiger AG');
-
 
 --
 -- Data for Name: customers; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."customers" ("id", "created_at", "fk_person") VALUES
-	(1, '2025-07-13 12:30:26.957072+00', 1);
-
+INSERT INTO "public"."customers" ("id", "created_at", "fk_person")
+VALUES (1, '2025-07-13 12:30:26.957072+00', 1);
 
 --
 -- Data for Name: palox_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."palox_types" ("id", "created_at", "label_prefix", "display_name", "description", "next_palox_number") VALUES
-	(1, '2025-07-25 09:38:13.09273+00', 'STD', 'Holz', NULL, 2),
-	(2, '2025-07-25 09:38:30.35089+00', 'AGR', 'Plastik', NULL, 2);
-
+INSERT INTO "public"."palox_types" (
+		"id",
+		"created_at",
+		"label_prefix",
+		"display_name",
+		"description",
+		"next_palox_number"
+	)
+VALUES (
+		1,
+		'2025-07-25 09:38:13.09273+00',
+		'STD',
+		'Holz',
+		NULL,
+		2
+	),
+	(
+		2,
+		'2025-07-25 09:38:30.35089+00',
+		'AGR',
+		'Plastik',
+		NULL,
+		2
+	);
 
 --
 -- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."products" ("id", "created_at", "display_name") VALUES
-	(1, '2025-07-11 15:22:06.938267+00', 'Äpfel Gala'),
+INSERT INTO "public"."products" ("id", "created_at", "display_name")
+VALUES (1, '2025-07-11 15:22:06.938267+00', 'Äpfel Gala'),
 	(2, '2025-07-12 12:57:14.273863+00', 'Karotten'),
 	(4, '2025-07-12 13:53:44.658582+00', 'Salat'),
 	(5, '2025-07-12 14:02:43.722838+00', 'Bohnen');
-
 
 --
 -- Data for Name: stocks; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."stocks" ("id", "created_at", "stock") VALUES
-	(1, '2025-07-13 17:46:32.35945+00', 1);
-
+INSERT INTO "public"."stocks" ("id", "created_at", "stock")
+VALUES (1, '2025-07-13 17:46:32.35945+00', 1);
 
 --
 -- Data for Name: stock_columns; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."stock_columns" ("id", "created_at", "display_name", "fk_stock", "column") VALUES
-	(1, '2025-07-13 17:47:16.036281+00', 'A', 1, 1),
+INSERT INTO "public"."stock_columns" (
+		"id",
+		"created_at",
+		"display_name",
+		"fk_stock",
+		"column"
+	)
+VALUES (1, '2025-07-13 17:47:16.036281+00', 'A', 1, 1),
 	(2, '2025-07-15 13:54:19.013483+00', 'B', 1, 2),
 	(3, '2025-07-15 13:54:52.762284+00', 'C', 1, 3),
 	(4, '2025-07-15 13:55:17.637164+00', 'D', 1, 4);
-
 
 --
 -- Data for Name: stock_column_slots; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."stock_column_slots" ("id", "created_at", "fk_stock_column", "current_taken_levels", "max_level", "slot") VALUES
-	(5, '2025-07-15 13:58:31.974871+00', 2, 0, 1, 1),
+INSERT INTO "public"."stock_column_slots" (
+		"id",
+		"created_at",
+		"fk_stock_column",
+		"current_taken_levels",
+		"max_level",
+		"slot"
+	)
+VALUES (5, '2025-07-15 13:58:31.974871+00', 2, 0, 1, 1),
 	(9, '2025-07-15 13:59:49.837629+00', 3, 0, 1, 1),
 	(13, '2025-07-15 14:01:05.081254+00', 4, 0, 1, 1),
 	(2, '2025-07-15 13:56:49.913288+00', 1, 0, 2, 2),
@@ -97,56 +138,90 @@ INSERT INTO "public"."stock_column_slots" ("id", "created_at", "fk_stock_column"
 	(16, '2025-07-15 14:01:55.463444+00', 4, 0, 1, 4),
 	(1, '2025-07-13 17:49:22.848254+00', 1, 2, 2, 1);
 
-
 --
 -- Data for Name: stock_column_slot_levels; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."stock_column_slot_levels" ("id", "created_at", "fk_stock_column_slot", "is_taken", "level") VALUES
-	(1, '2025-07-13 17:49:57.929309+00', 1, true, 1),
-	(2, '2025-07-14 15:11:13.055369+00', 1, true, 2),
+INSERT INTO "public"."stock_column_slot_levels" (
+		"id",
+		"created_at",
+		"fk_stock_column_slot",
+		"is_taken",
+		"level"
+	)
+VALUES (1, '2025-07-13 17:49:57.929309+00', 1, TRUE, 1),
+	(2, '2025-07-14 15:11:13.055369+00', 1, TRUE, 2),
 	(3, '2025-07-15 14:04:15.8248+00', 2, false, 1),
 	(4, '2025-07-15 14:04:39.294914+00', 2, false, 2);
-
 
 --
 -- Data for Name: suppliers; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."suppliers" ("id", "created_at", "fk_person") VALUES
-	(3, '2025-07-13 09:18:34.100992+00', 1),
+INSERT INTO "public"."suppliers" ("id", "created_at", "fk_person")
+VALUES (3, '2025-07-13 09:18:34.100992+00', 1),
 	(4, '2025-07-13 11:10:39.209126+00', 2);
-
 
 --
 -- Data for Name: paloxes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."paloxes" ("id", "created_at", "fk_customer", "fk_product", "fk_supplier", "fk_stock_column_slot_level", "updated_at", "fk_palox_type", "number_per_type") VALUES
-	(2, '2025-07-24 12:45:24.055213+00', NULL, 2, 4, 2, '2025-07-24 12:45:24.055213', 2, 1),
-	(3, '2025-07-28 09:31:49.315028+00', NULL, 4, 4, NULL, '2025-07-28 09:31:49.315028', 1, 2),
-	(1, '2025-07-24 12:44:42.073579+00', 1, 1, 3, 1, '2025-07-24 12:44:42.073579', 1, 1);
-
+INSERT INTO "public"."paloxes" (
+		"id",
+		"created_at",
+		"fk_customer",
+		"fk_product",
+		"fk_supplier",
+		"fk_stock_column_slot_level",
+		"fk_palox_type",
+		"number_per_type"
+	)
+VALUES (
+		2,
+		'2025-07-24 12:45:24.055213+00',
+		NULL,
+		2,
+		4,
+		2,
+		2,
+		1
+	),
+	(
+		3,
+		'2025-07-28 09:31:49.315028+00',
+		NULL,
+		4,
+		4,
+		NULL,
+		1,
+		2
+	),
+	(
+		1,
+		'2025-07-24 12:44:42.073579+00',
+		1,
+		1,
+		3,
+		1,
+		1,
+		1
+	);
 
 --
 -- Data for Name: palox_histories; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-
-
 --
 -- Name: column_spots_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."column_spots_id_seq"', 16, true);
-
+SELECT pg_catalog.setval('"public"."column_spots_id_seq"', 16, TRUE);
 
 --
 -- Name: customers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."customers_id_seq"', 1, true);
-
+SELECT pg_catalog.setval('"public"."customers_id_seq"', 1, TRUE);
 
 --
 -- Name: palox_histories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -154,62 +229,53 @@ SELECT pg_catalog.setval('"public"."customers_id_seq"', 1, true);
 
 SELECT pg_catalog.setval('"public"."palox_histories_id_seq"', 1, false);
 
-
 --
 -- Name: palox_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."palox_types_id_seq"', 2, true);
-
+SELECT pg_catalog.setval('"public"."palox_types_id_seq"', 2, TRUE);
 
 --
 -- Name: paloxes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."paloxes_id_seq"', 3, true);
-
+SELECT pg_catalog.setval('"public"."paloxes_id_seq"', 3, TRUE);
 
 --
 -- Name: person_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."person_id_seq"', 2, true);
-
+SELECT pg_catalog.setval('"public"."person_id_seq"', 2, TRUE);
 
 --
 -- Name: product_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."product_id_seq"', 5, true);
-
+SELECT pg_catalog.setval('"public"."product_id_seq"', 5, TRUE);
 
 --
 -- Name: rows_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."rows_id_seq"', 4, true);
-
+SELECT pg_catalog.setval('"public"."rows_id_seq"', 4, TRUE);
 
 --
 -- Name: slot_levels_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."slot_levels_id_seq"', 4, true);
-
+SELECT pg_catalog.setval('"public"."slot_levels_id_seq"', 4, TRUE);
 
 --
 -- Name: suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."suppliers_id_seq"', 4, true);
-
+SELECT pg_catalog.setval('"public"."suppliers_id_seq"', 4, TRUE);
 
 --
 -- Name: warehouse_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."warehouse_id_seq"', 1, true);
-
+SELECT pg_catalog.setval('"public"."warehouse_id_seq"', 1, TRUE);
 
 --
 -- PostgreSQL database dump complete

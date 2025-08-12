@@ -13,10 +13,10 @@
     "update-dependencies": "ncu -u",
     "reinstall-dependencies": "rd /s /q node_modules && npm cache clean --force && npm install",
     "db:first-initialization": "npm run db:start && npx supabase db pull && npx supabase migration up && npm run db:reset && npm run db:generate-types",
-    "db:generate-view-zod": "npx tsx ./scripts/schema-generate.ts",
+    "db:generate-types-and-zod": "npx tsx ./scripts/schema-generate.ts && npx tsx ./scripts/post-schema-generate.ts",
     "db:generate-types": "npx supabase gen types typescript --local > src/types/database.types.ts",
     "db:dump": "npx supabase db dump --data-only --schema public --file supabase/seed.sql",
-    "db:reset": "npx supabase db reset && npm run db:generate-types && npm run db:generate-view-zod",
+    "db:reset": "npx supabase db reset && npm run db:generate-types && npm run db:generate-types-and-zod",
     "db:dump-reset": "npm run db:dump && npm run db:reset",
     "db:start": "npx supabase start",
     "db:stop": "npx supabase stop"

@@ -9,6 +9,16 @@ export interface ColumnMeta {
   enum_values: string[] | null;
 }
 
+type ZodTypeInput = Partial<ColumnMeta> & {
+  column_name?: string;
+  param_name?: string;
+  data_type: string;
+  enum_values: string[] | null;
+  is_nullable?: string | null;
+  character_maximum_length?: number | null;
+  check_constraint?: string | null;
+};
+
 export function toPascalCase(str: string): string {
   return str
     .split("_")
@@ -27,7 +37,7 @@ export function toSingular(str: string): string {
   return str;
 }
 
-export function getZodType(col: ColumnMeta): string {
+export function getZodType(col: ZodTypeInput): string {
   let zodType = "z.any()";
 
   if (col.enum_values) {
@@ -42,14 +52,17 @@ export function getZodType(col: ColumnMeta): string {
       case "text":
       case "character varying":
       case "bpchar":
-        if (col.column_name.includes("email")) {
+        if (col.column_name?.includes("email")) {
           zodType = "z.string().email()";
-        } else if (col.column_name.includes("url")) {
+        } else if (col.column_name?.includes("url")) {
           zodType = "z.string().url()";
         } else {
           zodType = "z.string()";
         }
         break;
+      case "int4":
+      case "int2":
+      case "int8":
       case "integer":
       case "smallint":
       case "bigint":
@@ -61,12 +74,16 @@ export function getZodType(col: ColumnMeta): string {
         zodType = "z.number()";
         break;
       case "boolean":
+      case "bool":
         zodType = "z.boolean()";
         break;
       case "timestamp with time zone":
       case "date":
       case "timestamp without time zone":
-        zodType = "z.date()";
+        zodType = `z.preprocess(
+          (val) => (typeof val === "string" ? new Date(val) : val),
+          z.date()
+        )`;
         break;
     }
   }
