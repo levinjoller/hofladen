@@ -78,7 +78,7 @@ import {
   onIonViewWillLeave,
 } from "@ionic/vue";
 import { PaloxesInStockView } from "@/types/generated/paloxes-in-stock-view";
-import { useFetch } from "@/composables/use-fetch";
+import { useDbAction } from "@/composables/use-db-action";
 
 const gridOptions = {
   localeText: AG_GRID_LOCALE_DE,
@@ -118,7 +118,7 @@ const defaultColDef = {
   minWidth: 100,
 };
 
-const { data, error, fetchData } = useFetch(fetchPaloxesInStock);
+const { data, error, execute } = useDbAction(fetchPaloxesInStock);
 
 const gridApi = ref<any>(null);
 
@@ -138,7 +138,7 @@ const handleResize = () => {
 
 onMounted(async () => {
   window.addEventListener("resize", handleResize);
-  await fetchData();
+  await execute();
 });
 
 watch(error, (err) => {

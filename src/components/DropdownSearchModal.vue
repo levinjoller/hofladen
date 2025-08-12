@@ -65,7 +65,7 @@ import {
 } from "@ionic/vue";
 import { ref, computed, watch } from "vue";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
-import { useFetch } from "@/composables/use-fetch";
+import { useDbAction } from "@/composables/use-db-action";
 import { presentToast } from "@/services/toast-service";
 
 const props = defineProps<{
@@ -80,21 +80,22 @@ const emit = defineEmits<{
   (e: "update:selected", value: DropdownSearchItem): void;
 }>();
 
+const searchTerm = ref("");
+
+const { data, isLoading, error, execute } = useDbAction(props.fetchMethod);
+
 const isOpen = ref(props.modelValue);
+
 watch(
   () => props.modelValue,
-  (val) => {
+  async (val) => {
     isOpen.value = val;
     if (val) {
       searchTerm.value = "";
-      fetchData();
+      await execute();
     }
   }
 );
-
-const searchTerm = ref("");
-
-const { data, isLoading, error, fetchData } = useFetch(props.fetchMethod);
 
 watch(error, (err) => {
   if (err) {

@@ -86,7 +86,7 @@
       </div>
 
       <div v-else-if="currentStep === 2">
-        <StockColumnSlotSelectModal
+        <StockColumnSlotSelectPage
           v-model="selectedStockColumnSlot"
           :selectedStock="selectedStock"
         />
@@ -147,12 +147,12 @@ import {
 const DropdownSearchModal = defineAsyncComponent(
   () => import("@/components/DropdownSearchModal.vue")
 );
-const StockColumnSlotSelectModal = defineAsyncComponent(
-  () => import("@/components/StockColumnSlotSelectModal.vue")
+const StockColumnSlotSelectPage = defineAsyncComponent(
+  () => import("@/components/StockColumnSlotSelectPage.vue")
 );
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { closeCircleOutline } from "ionicons/icons";
-import { useFetch } from "@/composables/use-fetch";
+import { useDbAction } from "@/composables/use-db-action";
 import { presentToast } from "@/services/toast-service";
 import { StockColumnSlotViewModel } from "@/types/stock-column-slot-view-model";
 
@@ -186,7 +186,7 @@ const canProceed = computed(() => {
   return false;
 });
 
-const { isLoading, error, fetchData } = useFetch(assignPaloxToSlot);
+const { isLoading, error, execute } = useDbAction(assignPaloxToSlot);
 
 const nextStep = async () => {
   if (
@@ -196,7 +196,7 @@ const nextStep = async () => {
     selectedProduct.value !== null &&
     selectedSupplier.value !== null
   ) {
-    const success = await fetchData({
+    const success = await execute({
       paloxId: selectedPalox.value.id,
       stockColumnSlotId: selectedStockColumnSlot.value.slot_id,
       productId: selectedProduct.value.id,

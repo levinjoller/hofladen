@@ -49,7 +49,7 @@ import {
 } from "@ionic/vue";
 import { watch, computed } from "vue";
 import { fetchStockColumnSlots } from "@/services/palox-create-service";
-import { useFetch } from "@/composables/use-fetch";
+import { useDbAction } from "@/composables/use-db-action";
 import type { CardGridSlot } from "@/types/card-grid-slot";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { presentToast } from "@/services/toast-service";
@@ -64,13 +64,13 @@ const emit = defineEmits<{
   (e: "update:modelValue", val: StockColumnSlotViewModel | null): void;
 }>();
 
-const { data, isLoading, error, fetchData } = useFetch(fetchStockColumnSlots);
+const { data, isLoading, error, execute } = useDbAction(fetchStockColumnSlots);
 
 watch(
   () => props.selectedStock,
-  (newStock) => {
+  async (newStock) => {
     if (newStock?.id) {
-      fetchData(newStock.id);
+      await execute(newStock.id);
     }
   },
   { immediate: true }

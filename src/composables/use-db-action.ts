@@ -1,12 +1,12 @@
 import { ref } from "vue";
 
-export function useFetch<T, Args extends any[]>(
+export function useDbAction<T, Args extends any[]>(
   fetcher: (...args: Args) => Promise<T>
 ) {
   const data = ref<T | null>(null);
   const isLoading = ref(false);
   const error = ref<Error | null>(null);
-  const fetchData = async (...args: Args) => {
+  const execute = async (...args: Args) => {
     isLoading.value = true;
     error.value = null;
     try {
@@ -23,6 +23,6 @@ export function useFetch<T, Args extends any[]>(
     data,
     isLoading,
     error,
-    fetchData,
+    execute,
   };
 }
