@@ -64,7 +64,9 @@ const emit = defineEmits<{
   (e: "update:modelValue", val: StockColumnSlotViewModel | null): void;
 }>();
 
-const { data, isLoading, error, execute } = useDbAction(fetchStockColumnSlots);
+const { data, isLoading, errorMessage, execute } = useDbAction(
+  fetchStockColumnSlots
+);
 
 watch(
   () => props.selectedStock,
@@ -76,9 +78,9 @@ watch(
   { immediate: true }
 );
 
-watch(error, (newError) => {
+watch(errorMessage, (newError) => {
   if (newError) {
-    presentToast(newError.message, "danger", 6000);
+    presentToast(newError, "danger", 6000);
   }
 });
 

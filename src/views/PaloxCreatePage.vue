@@ -186,7 +186,7 @@ const canProceed = computed(() => {
   return false;
 });
 
-const { isLoading, error, execute } = useDbAction(assignPaloxToSlot);
+const { isLoading, errorMessage, execute } = useDbAction(assignPaloxToSlot);
 
 const nextStep = async () => {
   if (
@@ -203,18 +203,17 @@ const nextStep = async () => {
       supplierId: selectedSupplier.value.id,
       customerId: selectedCustomer.value?.id,
     });
-    if (success) {
-      presentToast(
-        `Paloxe ${selectedPalox.value.display_name} in ${selectedStockColumnSlot.value.display_name} erfolgreich eingelagert!`,
-        "success"
-      );
-      currentStep.value++;
-    } else {
-      const errorMessage =
-        error.value?.message || "Ein unbekannter Fehler ist aufgetreten.";
-      presentToast(errorMessage, "danger", 10000);
-      error.value = null;
+    if (!success) {
+      if (errorMessage.value) {
+        presentToast(errorMessage.value, "danger", 10000);
+      }
+      return;
     }
+    presentToast(
+      `Paloxe ${selectedPalox.value.display_name} in ${selectedStockColumnSlot.value.display_name} erfolgreich zuoberst eingelagert!`,
+      "success"
+    );
+    currentStep.value++;
   } else {
     currentStep.value++;
   }

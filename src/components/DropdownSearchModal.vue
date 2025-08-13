@@ -82,7 +82,9 @@ const emit = defineEmits<{
 
 const searchTerm = ref("");
 
-const { data, isLoading, error, execute } = useDbAction(props.fetchMethod);
+const { data, isLoading, errorMessage, execute } = useDbAction(
+  props.fetchMethod
+);
 
 const isOpen = ref(props.modelValue);
 
@@ -97,9 +99,9 @@ watch(
   }
 );
 
-watch(error, (err) => {
+watch(errorMessage, (err) => {
   if (err) {
-    presentToast(err.message, "danger", 10000);
+    presentToast(err, "danger", 10000);
   }
 });
 

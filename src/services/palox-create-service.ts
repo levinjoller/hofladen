@@ -15,19 +15,14 @@ export async function fetchPaloxes(): Promise<DropdownSearchItem[]> {
     .select()
     .order("palox_types_label_prefix", { ascending: true });
   if (error) {
-    throw new Error(`Fehler beim Laden der Paloxen: ${error.message}`);
+    throw error;
   }
   if (!data) {
     return [];
   }
   const validationResult = PaloxesPaloxTypesViewArraySchema.safeParse(data);
   if (!validationResult.success) {
-    const zodErrorMessage = createZodErrorMessage(
-      validationResult.error.issues
-    );
-    throw new Error(
-      `Die Daten der Paloxen entsprechen nicht dem erwarteten Format: ${zodErrorMessage}`
-    );
+    throw validationResult.error;
   }
   return validationResult.data.map((item) => ({
     id: item.id,
@@ -43,19 +38,14 @@ export async function fetchSuppliers(): Promise<DropdownSearchItem[]> {
     .select()
     .order("person_display_name", { ascending: true });
   if (error) {
-    throw new Error(`Fehler beim Laden der Lieferanten: ${error.message}`);
+    throw error;
   }
   if (!data) {
     return [];
   }
   const validationResult = SuppliersPersonsViewArraySchema.safeParse(data);
   if (!validationResult.success) {
-    const zodErrorMessage = createZodErrorMessage(
-      validationResult.error.issues
-    );
-    throw new Error(
-      `Die Daten der Lieferanten entsprechen nicht dem erwarteten Format: ${zodErrorMessage}`
-    );
+    throw validationResult.error;
   }
   return validationResult.data.map((item) => ({
     id: item.id,
@@ -69,19 +59,14 @@ export async function fetchCustomers(): Promise<DropdownSearchItem[]> {
     .select()
     .order("person_display_name", { ascending: true });
   if (error) {
-    throw new Error(`Fehler beim Laden der Kunden: ${error.message}`);
+    throw error;
   }
   if (!data) {
     return [];
   }
   const validationResult = CustomersPersonsViewArraySchema.safeParse(data);
   if (!validationResult.success) {
-    const zodErrorMessage = createZodErrorMessage(
-      validationResult.error.issues
-    );
-    throw new Error(
-      `Die Daten der Kunden entsprechen nicht dem erwarteten Format: ${zodErrorMessage}`
-    );
+    throw validationResult.error;
   }
   return validationResult.data.map((item) => ({
     id: item.id,
@@ -95,19 +80,14 @@ export async function fetchProducts(): Promise<DropdownSearchItem[]> {
     .select()
     .order("display_name", { ascending: true });
   if (error) {
-    throw new Error(`Fehler beim Laden der Produkte: ${error.message}`);
+    throw error;
   }
   if (!data) {
     return [];
   }
   const validationResult = ProductsViewArraySchema.safeParse(data);
   if (!validationResult.success) {
-    const zodErrorMessage = createZodErrorMessage(
-      validationResult.error.issues
-    );
-    throw new Error(
-      `Die Daten der Produkte entsprechen nicht dem erwarteten Format: ${zodErrorMessage}`
-    );
+    throw validationResult.error;
   }
   return validationResult.data.map((item) => ({
     id: item.id,
@@ -121,19 +101,14 @@ export async function fetchStocks(): Promise<DropdownSearchItem[]> {
     .select()
     .order("stock", { ascending: true });
   if (error) {
-    throw new Error(`Fehler beim Laden der Lager: ${error.message}`);
+    throw error;
   }
   if (!data) {
     return [];
   }
   const validationResult = StocksViewArraySchema.safeParse(data);
   if (!validationResult.success) {
-    const zodErrorMessage = createZodErrorMessage(
-      validationResult.error.issues
-    );
-    throw new Error(
-      `Die Daten der Lager entsprechen nicht dem erwarteten Format: ${zodErrorMessage}`
-    );
+    throw validationResult.error;
   }
   return validationResult.data.map((item) => ({
     id: item.id,
@@ -151,7 +126,7 @@ export async function fetchStockColumnSlots(
     .order("stock_column_number", { ascending: true })
     .order("stock_slot_number", { ascending: true });
   if (error) {
-    throw new Error(`Fehler beim Laden der Lagerplätze: ${error.message}`);
+    throw error;
   }
   if (!data) {
     return [];
@@ -159,12 +134,7 @@ export async function fetchStockColumnSlots(
   const validationResult =
     StockColumnSlotsColumnsViewArraySchema.safeParse(data);
   if (!validationResult.success) {
-    const zodErrorMessage = createZodErrorMessage(
-      validationResult.error.issues
-    );
-    throw new Error(
-      `Die Daten der Lagerplätze entsprechen nicht dem erwarteten Format: ${zodErrorMessage}`
-    );
+    throw validationResult.error;
   }
   return validationResult.data.map((item) => {
     return {
@@ -193,10 +163,7 @@ export const assignPaloxToSlot = async (params: {
       p_customer_id: params.customerId,
     });
   if (!validatedParams.success) {
-    const zodErrorMessage = createZodErrorMessage(validatedParams.error.issues);
-    throw new Error(
-      `Die zu speichernden Daten entsprechen nicht dem erwarteten Format: ${zodErrorMessage}`
-    );
+    throw validatedParams.error;
   }
   const { data, error } = await supabase.rpc(
     "assign_palox_to_next_free_level_in_slot_fnc",
@@ -206,13 +173,7 @@ export const assignPaloxToSlot = async (params: {
     }
   );
   if (error) {
-    throw new Error(`Fehler bei der Einlagerung: ${error.message}`);
+    throw error;
   }
   return data;
 };
-
-function createZodErrorMessage(issues: any[]): string {
-  return issues
-    .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
-    .join(", ");
-}

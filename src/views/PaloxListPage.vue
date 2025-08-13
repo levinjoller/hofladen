@@ -118,7 +118,7 @@ const defaultColDef = {
   minWidth: 100,
 };
 
-const { data, error, execute } = useDbAction(fetchPaloxesInStock);
+const { data, errorMessage, execute } = useDbAction(fetchPaloxesInStock);
 
 const gridApi = ref<any>(null);
 
@@ -141,9 +141,9 @@ onMounted(async () => {
   await execute();
 });
 
-watch(error, (err) => {
+watch(errorMessage, (err) => {
   if (err) {
-    presentToast(err.message, "danger", 10000);
+    presentToast(err, "danger", 10000);
   }
 });
 
