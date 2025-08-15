@@ -1,7 +1,7 @@
 {
   "schemas": [
     {
-      "file": "paloxes-in-stock-view.ts",
+      "file": "views/paloxes-in-stock-view.ts",
       "replacements": [
         {
           "from": "customer_person_display_name: z.string()",

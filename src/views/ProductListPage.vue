@@ -10,32 +10,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="ion-padding">
-        <ion-card>
-          <ion-card-content>
-            <ion-list v-if="!productsLoading && products.length > 0">
-              <ion-item v-for="product in products" :key="product.id">
-                <ion-label>
-                  <h2>{{ product.display_name }}</h2>
-                  <p>
-                    Erstellt am:
-                    {{ new Date(product.created_at).toLocaleDateString() }}
-                  </p>
-                </ion-label>
-              </ion-item>
-            </ion-list>
-            <p
-              v-else-if="!productsLoading && products.length === 0"
-              class="ion-text-center"
-            >
-              Keine Produkte gefunden.
-            </p>
-            <div v-else="loading" class="ion-padding ion-text-center">
-              <ion-spinner name="crescent"></ion-spinner>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </div>
+      <AgGridWrapper :rowData="data" :columnDefs="columnDefs" />
     </ion-content>
   </ion-page>
 </template>
@@ -48,39 +23,35 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonList,
-  IonItem,
-  IonLabel,
   IonMenuButton,
-  onIonViewWillEnter,
-  IonSpinner,
 } from "@ionic/vue";
-import {
-  products,
-  productsLoading,
-  loadProductsForList,
-} from "@/services/product-service";
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
+import AgGridWrapper from "@/components/AgGridWrapper.vue";
+import { ColDef } from "ag-grid-community";
+import { toLocaleDate } from "@/utils/date-formatters";
+import { useDbFetch } from "@/composables/use-db-action";
+import { presentToast } from "@/services/toast-service";
+import { Product } from "@/types/generated/tables/products";
+import { fetchProducts } from "@/services/product-service";
 
-const loadProducts = async () => {
-  await loadProductsForList(true);
-};
+const columnDefs: ColDef<Product>[] = [
+  { headerName: "Bezeichnung", field: "display_name" },
+  {
+    headerName: "Erstellt am",
+    field: "created_at",
+    valueFormatter: toLocaleDate,
+  },
+];
 
-onIonViewWillEnter(() => {
-  loadProducts();
+const { data, errorMessage, execute } = useDbFetch(fetchProducts);
+
+onMounted(async () => {
+  await execute();
 });
 
-onMounted(() => {
-  loadProducts();
+watch(errorMessage, (err) => {
+  if (err) {
+    presentToast(err, "danger", 10000);
+  }
 });
 </script>
-
-<style scoped>
-.loading-spinner,
-.error-message {
-  text-align: center;
-  padding: 20px;
-}
-</style>

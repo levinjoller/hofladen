@@ -30,11 +30,14 @@ export function toKebabCase(str: string): string {
   return str.replace(/_/g, "-");
 }
 
-export function toSingular(str: string): string {
-  if (str.endsWith("s")) {
-    return str.slice(0, -1);
+export function toSingular(plural: string): string {
+  if (plural.endsWith("es")) {
+    return plural.slice(0, -2);
   }
-  return str;
+  if (plural.endsWith("s")) {
+    return plural.slice(0, -1);
+  }
+  return plural;
 }
 
 export function getZodType(col: ZodTypeInput): string {

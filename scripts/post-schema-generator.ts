@@ -6,10 +6,10 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const schemasDir = path.resolve(__dirname, "../src/types/generated");
+const schemasDir = path.resolve(__dirname, "../src/types/generated/");
 const configFile = path.resolve(
   __dirname,
-  "./post-schema-generate.config.json"
+  "./post-schema-generator.config.json"
 );
 
 function postProcessSchemas() {

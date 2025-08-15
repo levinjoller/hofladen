@@ -2,7 +2,7 @@ import { supabase } from "@/supabase";
 import {
   PaloxesInStockView,
   PaloxesInStockViewArraySchema,
-} from "@/types/generated/paloxes-in-stock-view";
+} from "@/types/generated/views/paloxes-in-stock-view";
 
 export async function fetchPaloxesInStock(): Promise<PaloxesInStockView[]> {
   const { data, error } = await supabase

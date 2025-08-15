@@ -91,14 +91,14 @@ export type Database = {
             foreignKeyName: "palox_histories_fk_palox_fkey"
             columns: ["fk_palox"]
             isOneToOne: false
-            referencedRelation: "paloxes_in_stock_view"
+            referencedRelation: "paloxes_full_display_name_view"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "palox_histories_fk_palox_fkey"
             columns: ["fk_palox"]
             isOneToOne: false
-            referencedRelation: "paloxes_palox_types_view"
+            referencedRelation: "paloxes_in_stock_view"
             referencedColumns: ["id"]
           },
           {
@@ -180,13 +180,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "paloxes_fk_customer_fkey"
-            columns: ["fk_customer"]
-            isOneToOne: false
-            referencedRelation: "customers_persons_view"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "paloxes_fk_palox_type_fkey"
             columns: ["fk_palox_type"]
             isOneToOne: false
@@ -201,13 +194,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "paloxes_fk_product_fkey"
-            columns: ["fk_product"]
-            isOneToOne: false
-            referencedRelation: "products_view"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "paloxes_fk_stock_column_slot_level_fkey"
             columns: ["fk_stock_column_slot_level"]
             isOneToOne: true
@@ -219,13 +205,6 @@ export type Database = {
             columns: ["fk_supplier"]
             isOneToOne: false
             referencedRelation: "suppliers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "paloxes_fk_supplier_fkey"
-            columns: ["fk_supplier"]
-            isOneToOne: false
-            referencedRelation: "suppliers_persons_view"
             referencedColumns: ["id"]
           },
         ]
@@ -377,13 +356,6 @@ export type Database = {
             referencedRelation: "stocks"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "stock_columns_fk_stock_fkey"
-            columns: ["fk_stock"]
-            isOneToOne: false
-            referencedRelation: "stocks_view"
-            referencedColumns: ["id"]
-          },
         ]
       }
       stocks: {
@@ -432,10 +404,10 @@ export type Database = {
       }
     }
     Views: {
-      customers_persons_view: {
+      paloxes_full_display_name_view: {
         Row: {
+          display_name: string | null
           id: number | null
-          person_display_name: string | null
         }
         Relationships: []
       }
@@ -448,29 +420,6 @@ export type Database = {
           stock_location_display_name: string | null
           stored_at: string | null
           supplier_person_display_name: string | null
-        }
-        Relationships: []
-      }
-      paloxes_palox_types_view: {
-        Row: {
-          id: number | null
-          number_per_type: number | null
-          palox_types_label_prefix: string | null
-        }
-        Relationships: []
-      }
-      products_view: {
-        Row: {
-          display_name: string | null
-          id: number | null
-        }
-        Insert: {
-          display_name?: string | null
-          id?: number | null
-        }
-        Update: {
-          display_name?: string | null
-          id?: number | null
         }
         Relationships: []
       }
@@ -493,36 +442,7 @@ export type Database = {
             referencedRelation: "stocks"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "stock_columns_fk_stock_fkey"
-            columns: ["fk_stock"]
-            isOneToOne: false
-            referencedRelation: "stocks_view"
-            referencedColumns: ["id"]
-          },
         ]
-      }
-      stocks_view: {
-        Row: {
-          id: number | null
-          stock: number | null
-        }
-        Insert: {
-          id?: number | null
-          stock?: number | null
-        }
-        Update: {
-          id?: number | null
-          stock?: number | null
-        }
-        Relationships: []
-      }
-      suppliers_persons_view: {
-        Row: {
-          id: number | null
-          person_display_name: string | null
-        }
-        Relationships: []
       }
     }
     Functions: {

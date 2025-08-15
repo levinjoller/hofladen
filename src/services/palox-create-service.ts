@@ -1,83 +1,18 @@
 import { supabase } from "@/supabase";
 import { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { StockColumnSlotViewModel } from "@/types/stock-column-slot-view-model";
-import { PaloxesPaloxTypesViewArraySchema } from "@/types/generated/paloxes-palox-types-view";
-import { StockColumnSlotsColumnsViewArraySchema } from "@/types/generated/stock-column-slots-columns-view";
-import { SuppliersPersonsViewArraySchema } from "@/types/generated/suppliers-persons-view";
-import { CustomersPersonsViewArraySchema } from "@/types/generated/customers-persons-view";
-import { ProductsViewArraySchema } from "@/types/generated/products-view";
-import { StocksViewArraySchema } from "@/types/generated/stocks-view";
+import { StockColumnSlotsColumnsViewArraySchema } from "@/types/generated/views/stock-column-slots-columns-view";
 import { AssignPaloxToNextFreeLevelInSlotFncParamsSchema } from "@/types/generated/assign-palox-to-next-free-level-in-slot-fnc-params";
+import { ProductNameArraySchema } from "@/types/schemas/product-name-schema";
+import { StockNameArraySchema } from "@/types/schemas/stock-name-schema";
+import { CustomerNameArraySchema } from "@/types/schemas/customer-name-schema";
+import { SupplierNameArraySchema } from "@/types/schemas/supplier-name-schema";
+import { PaloxesFullDisplayNameViewArraySchema } from "@/types/generated/views/paloxes-full-display-name-view";
 
 export async function fetchPaloxes(): Promise<DropdownSearchItem[]> {
   const { data, error } = await supabase
-    .from("paloxes_palox_types_view")
-    .select()
-    .order("palox_types_label_prefix", { ascending: true });
-  if (error) {
-    throw error;
-  }
-  if (!data) {
-    return [];
-  }
-  const validationResult = PaloxesPaloxTypesViewArraySchema.safeParse(data);
-  if (!validationResult.success) {
-    throw validationResult.error;
-  }
-  return validationResult.data.map((item) => ({
-    id: item.id,
-    display_name: `${item.palox_types_label_prefix}-${item.number_per_type
-      .toString()
-      .padStart(3, "0")}`,
-  }));
-}
-
-export async function fetchSuppliers(): Promise<DropdownSearchItem[]> {
-  const { data, error } = await supabase
-    .from("suppliers_persons_view")
-    .select()
-    .order("person_display_name", { ascending: true });
-  if (error) {
-    throw error;
-  }
-  if (!data) {
-    return [];
-  }
-  const validationResult = SuppliersPersonsViewArraySchema.safeParse(data);
-  if (!validationResult.success) {
-    throw validationResult.error;
-  }
-  return validationResult.data.map((item) => ({
-    id: item.id,
-    display_name: item.person_display_name,
-  }));
-}
-
-export async function fetchCustomers(): Promise<DropdownSearchItem[]> {
-  const { data, error } = await supabase
-    .from("customers_persons_view")
-    .select()
-    .order("person_display_name", { ascending: true });
-  if (error) {
-    throw error;
-  }
-  if (!data) {
-    return [];
-  }
-  const validationResult = CustomersPersonsViewArraySchema.safeParse(data);
-  if (!validationResult.success) {
-    throw validationResult.error;
-  }
-  return validationResult.data.map((item) => ({
-    id: item.id,
-    display_name: item.person_display_name,
-  }));
-}
-
-export async function fetchProducts(): Promise<DropdownSearchItem[]> {
-  const { data, error } = await supabase
-    .from("products_view")
-    .select()
+    .from("paloxes_full_display_name_view")
+    .select(`id, display_name`)
     .order("display_name", { ascending: true });
   if (error) {
     throw error;
@@ -85,20 +20,96 @@ export async function fetchProducts(): Promise<DropdownSearchItem[]> {
   if (!data) {
     return [];
   }
-  const validationResult = ProductsViewArraySchema.safeParse(data);
+  const validationResult =
+    PaloxesFullDisplayNameViewArraySchema.safeParse(data);
   if (!validationResult.success) {
     throw validationResult.error;
   }
-  return validationResult.data.map((item) => ({
-    id: item.id,
-    display_name: item.display_name,
+  return validationResult.data.map(({ id, display_name }) => ({
+    id,
+    display_name,
+  }));
+}
+
+export async function fetchSuppliers(): Promise<DropdownSearchItem[]> {
+  const { data, error } = await supabase.from("suppliers").select(
+    `
+      id,
+      person:fk_person (
+        display_name
+      )
+    `
+  );
+  if (error) {
+    throw error;
+  }
+  if (!data) {
+    return [];
+  }
+  const validationResult = SupplierNameArraySchema.safeParse(data);
+  if (!validationResult.success) {
+    throw validationResult.error;
+  }
+  return validationResult.data
+    .map((item) => ({
+      id: item.id,
+      display_name: item.person.display_name,
+    }))
+    .sort((a, b) => a.display_name.localeCompare(b.display_name));
+}
+
+export async function fetchCustomers(): Promise<DropdownSearchItem[]> {
+  const { data, error } = await supabase.from("customers").select(
+    `
+      id,
+      person:fk_person (
+        display_name
+      )
+    `
+  );
+  if (error) {
+    throw error;
+  }
+  if (!data) {
+    return [];
+  }
+  const validationResult = CustomerNameArraySchema.safeParse(data);
+  if (!validationResult.success) {
+    throw validationResult.error;
+  }
+  return validationResult.data
+    .map((item) => ({
+      id: item.id,
+      display_name: item.person.display_name,
+    }))
+    .sort((a, b) => a.display_name.localeCompare(b.display_name));
+}
+
+export async function fetchProducts(): Promise<DropdownSearchItem[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, display_name")
+    .order("display_name", { ascending: true });
+  if (error) {
+    throw error;
+  }
+  if (!data) {
+    return [];
+  }
+  const validationResult = ProductNameArraySchema.safeParse(data);
+  if (!validationResult.success) {
+    throw validationResult.error;
+  }
+  return validationResult.data.map(({ id, display_name }) => ({
+    id,
+    display_name,
   }));
 }
 
 export async function fetchStocks(): Promise<DropdownSearchItem[]> {
   const { data, error } = await supabase
-    .from("stocks_view")
-    .select()
+    .from("stocks")
+    .select("id, stock")
     .order("stock", { ascending: true });
   if (error) {
     throw error;
@@ -106,7 +117,7 @@ export async function fetchStocks(): Promise<DropdownSearchItem[]> {
   if (!data) {
     return [];
   }
-  const validationResult = StocksViewArraySchema.safeParse(data);
+  const validationResult = StockNameArraySchema.safeParse(data);
   if (!validationResult.success) {
     throw validationResult.error;
   }

@@ -10,78 +10,48 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="ion-padding">
-        <ion-card>
-          <ion-card-content>
-            <ion-list v-if="!suppliersLoading && suppliers.length > 0">
-              <ion-item v-for="supplier in suppliers" :key="supplier.id">
-                <ion-label>
-                  <h2>{{ supplier.person_name }}</h2>
-                  <p>
-                    Erstellt am:
-                    {{
-                      new Date(supplier.created_at).toLocaleDateString("de-DE")
-                    }}
-                  </p>
-                </ion-label>
-              </ion-item>
-            </ion-list>
-            <p
-              v-else-if="!suppliersLoading && suppliers.length === 0"
-              class="ion-text-center"
-            >
-              Keine Lieferanten gefunden.
-            </p>
-            <p
-              v-else-if="suppliersError"
-              class="ion-text-center ion-text-danger"
-            >
-              {{ suppliersError }}
-            </p>
-            <div v-else="loading" class="ion-padding ion-text-center">
-              <ion-spinner name="crescent"></ion-spinner>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </div>
+      <AgGridWrapper :rowData="data" :columnDefs="columnDefs" />
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import {
-  IonContent,
-  IonHeader,
   IonPage,
-  IonTitle,
+  IonHeader,
   IonToolbar,
+  IonTitle,
+  IonContent,
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonList,
-  IonItem,
-  IonLabel,
   IonMenuButton,
-  onIonViewWillEnter,
-  IonSpinner,
 } from "@ionic/vue";
-import {
-  suppliers,
-  suppliersLoading,
-  suppliersError,
-  loadSuppliersForList,
-} from "@/services/supplier-service";
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
+import { ColDef } from "ag-grid-community";
+import { useDbFetch } from "@/composables/use-db-action";
+import { presentToast } from "@/services/toast-service";
+import AgGridWrapper from "@/components/AgGridWrapper.vue";
+import { toLocaleDate } from "@/utils/date-formatters";
+import { SupplierList } from "@/types/schemas/supplier-list-schema";
+import { fetchSuppliersWithPerson } from "@/services/supplier-service";
 
-const loadSuppliers = async () => {
-  await loadSuppliersForList(true);
-};
+const columnDefs: ColDef<SupplierList>[] = [
+  { headerName: "Name", field: "person.display_name" },
+  {
+    headerName: "Erstellt am",
+    field: "created_at",
+    valueFormatter: toLocaleDate,
+  },
+];
 
-onIonViewWillEnter(() => {
-  loadSuppliers();
+const { data, errorMessage, execute } = useDbFetch(fetchSuppliersWithPerson);
+
+onMounted(async () => {
+  await execute();
 });
 
-onMounted(() => {
-  loadSuppliers();
+watch(errorMessage, (err) => {
+  if (err) {
+    presentToast(err, "danger", 10000);
+  }
 });
 </script>

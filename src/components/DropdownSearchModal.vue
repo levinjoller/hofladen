@@ -15,7 +15,11 @@
         placeholder="Suchen..."
       ></ion-searchbar>
 
-      <ion-list v-if="filteredOptions.length > 0">
+      <div v-if="isLoading" class="ion-padding ion-text-center">
+        <ion-spinner name="crescent" />
+      </div>
+
+      <ion-list v-else-if="filteredOptions.length > 0">
         <ion-item
           v-for="option in filteredOptions"
           :key="option.id"
@@ -25,10 +29,6 @@
           <ion-label>{{ option.display_name }}</ion-label>
         </ion-item>
       </ion-list>
-
-      <div v-if="isLoading" class="ion-padding ion-text-center">
-        <ion-spinner name="crescent" />
-      </div>
 
       <ion-text
         v-else-if="filteredOptions.length === 0 && searchTerm === ''"
@@ -65,7 +65,7 @@ import {
 } from "@ionic/vue";
 import { ref, computed, watch } from "vue";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
-import { useDbAction } from "@/composables/use-db-action";
+import { useDbFetch } from "@/composables/use-db-action";
 import { presentToast } from "@/services/toast-service";
 
 const props = defineProps<{
@@ -82,7 +82,7 @@ const emit = defineEmits<{
 
 const searchTerm = ref("");
 
-const { data, isLoading, errorMessage, execute } = useDbAction(
+const { data, isLoading, errorMessage, execute } = useDbFetch(
   props.fetchMethod
 );
 
