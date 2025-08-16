@@ -1,0 +1,1 @@
+System.register(["./use-db-action-legacy-d45YdfPE.js"],function(e,t){"use strict";var s,a,i,n,r,c;return{setters:[e=>{s=e.o,a=e.s,i=e.p,n=e.d,r=e.i,c=e.a}],execute:function(){const t=e("a",s({id:r(),created_at:i(e=>"string"==typeof e?new Date(e):e,n()),display_name:a()}));e("P",c(t))}}});

@@ -1,0 +1,1 @@
+import{o as s,s as t,p as r,d as e,i as o,a as c}from"./use-db-action-DmQTIvcq.js";const d=s({id:o(),created_at:r(a=>typeof a=="string"?new Date(a):a,e()),display_name:t()}),n=c(d);export{n as P,d as a};
