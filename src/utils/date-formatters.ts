@@ -7,7 +7,7 @@ export function toLocaleDate(params: ValueFormatterParams): string {
 
   const date = new Date(params.value);
 
-  return date.toLocaleDateString("de-DE", {
+  return date.toLocaleDateString("de-CH", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

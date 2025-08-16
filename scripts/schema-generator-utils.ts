@@ -80,6 +80,10 @@ export function getZodType(col: ZodTypeInput): string {
       case "bool":
         zodType = "z.boolean()";
         break;
+      case "jsonb":
+      case "json":
+        zodType = "z.any()";
+        break;
       case "timestamp with time zone":
       case "date":
       case "timestamp without time zone":

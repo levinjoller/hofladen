@@ -4,16 +4,20 @@
       <ion-spinner name="crescent" />
     </div>
 
-    <div v-else-if="slots.length > 0">
+    <div v-else-if="!isLoading && data && data.length === 0">
+      <p>Keine Daten verfügbar.</p>
+    </div>
+
+    <div v-else>
       <h2>Lager {{ selectedStock?.display_name }} - Lagerplatz wählen</h2>
       <ion-grid>
         <ion-row>
           <ion-col
-            v-for="group in slots"
-            :key="group.column_number"
+            v-for="column in data"
+            :key="column.column_number"
             class="ion-text-center"
           >
-            <div v-for="slot in group.slot" :key="slot.slot_id">
+            <div v-for="slot in column.slots" :key="slot.slot_id">
               <ion-card
                 :color="modelValue?.slot_id === slot.slot_id ? 'primary' : ''"
                 :disabled="slot.is_full"
@@ -47,25 +51,24 @@ import {
   IonCardContent,
   IonSpinner,
 } from "@ionic/vue";
-import { watch, computed } from "vue";
-import { fetchStockColumnSlots } from "@/services/palox-create-service";
-import { useDbAction } from "@/composables/use-db-action";
-import type { CardGridSlot } from "@/types/card-grid-slot";
-import type { DropdownSearchItem } from "@/types/dropdown-search-item";
+import { watch } from "vue";
+import { fetchStockColumnSlotsByColumn } from "@/services/palox-create-service";
+import { useDbFetch } from "@/composables/use-db-action";
+import { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { presentToast } from "@/services/toast-service";
-import { StockColumnSlotViewModel } from "@/types/stock-column-slot-view-model";
+import { SlotContent } from "@/types/schemas/slot-content-schema";
 
 const props = defineProps<{
-  modelValue: StockColumnSlotViewModel | null;
+  modelValue: SlotContent | null;
   selectedStock: DropdownSearchItem | null;
 }>();
 
 const emit = defineEmits<{
-  (e: "update:modelValue", val: StockColumnSlotViewModel | null): void;
+  (e: "update:modelValue", val: SlotContent | null): void;
 }>();
 
-const { data, isLoading, errorMessage, execute } = useDbAction(
-  fetchStockColumnSlots
+const { data, isLoading, errorMessage, execute } = useDbFetch(
+  fetchStockColumnSlotsByColumn
 );
 
 watch(
@@ -84,20 +87,7 @@ watch(errorMessage, (newError) => {
   }
 });
 
-const slots = computed<CardGridSlot[]>(() => {
-  if (!data.value) return [];
-  const groups = new Map<number, CardGridSlot>();
-  for (const slot of data.value) {
-    const col = slot.column_number;
-    if (!groups.has(col)) {
-      groups.set(col, { column_number: col, slot: [] });
-    }
-    groups.get(col)!.slot.push(slot);
-  }
-  return Array.from(groups.values());
-});
-
-const select = (slot: StockColumnSlotViewModel) => {
+const select = (slot: SlotContent) => {
   if (slot === props.modelValue) {
     emit("update:modelValue", null);
   } else {

@@ -154,7 +154,7 @@ import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { closeCircleOutline } from "ionicons/icons";
 import { useDbAction } from "@/composables/use-db-action";
 import { presentToast } from "@/services/toast-service";
-import { StockColumnSlotViewModel } from "@/types/stock-column-slot-view-model";
+import { SlotContent } from "@/types/schemas/slot-content-schema";
 
 const isPaloxModalOpen = ref(false);
 const isSupplierModalOpen = ref(false);
@@ -167,7 +167,7 @@ const selectedSupplier = ref<DropdownSearchItem | null>(null);
 const selectedCustomer = ref<DropdownSearchItem | null>(null);
 const selectedProduct = ref<DropdownSearchItem | null>(null);
 const selectedStock = ref<DropdownSearchItem | null>(null);
-const selectedStockColumnSlot = ref<StockColumnSlotViewModel | null>(null);
+const selectedStockColumnSlot = ref<SlotContent | null>(null);
 
 const currentStep = ref(1);
 

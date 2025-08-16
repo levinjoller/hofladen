@@ -275,13 +275,6 @@ export type Database = {
             referencedRelation: "stock_column_slots"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "stock_column_slot_levels_fk_stock_column_slot_fkey"
-            columns: ["fk_stock_column_slot"]
-            isOneToOne: false
-            referencedRelation: "stock_column_slots_columns_view"
-            referencedColumns: ["stock_column_slot_id"]
-          },
         ]
       }
       stock_column_slots: {
@@ -314,7 +307,7 @@ export type Database = {
             foreignKeyName: "stock_column_slots_fk_stock_column_fkey"
             columns: ["fk_stock_column"]
             isOneToOne: false
-            referencedRelation: "stock_column_slots_columns_view"
+            referencedRelation: "stock_column_slots_by_column_view"
             referencedColumns: ["stock_column_id"]
           },
           {
@@ -423,16 +416,12 @@ export type Database = {
         }
         Relationships: []
       }
-      stock_column_slots_columns_view: {
+      stock_column_slots_by_column_view: {
         Row: {
+          column_number: number | null
           fk_stock: number | null
-          free_levels: number | null
-          is_full: boolean | null
-          stock_column_display_name: string | null
+          slots: Json | null
           stock_column_id: number | null
-          stock_column_number: number | null
-          stock_column_slot_id: number | null
-          stock_slot_number: number | null
         }
         Relationships: [
           {

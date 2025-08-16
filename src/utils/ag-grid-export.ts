@@ -16,7 +16,15 @@ export function exportDataAsPDF<T extends object>(
   columnDefs: ColDef<T, any>[],
   fileNamePrefix: string
 ) {
+  const now = new Date();
   const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text(
+    `${fileNamePrefix}übersicht vom ${now.toLocaleString("de-CH")}`,
+    14,
+    20
+  );
 
   const headers = columnDefs.map((col) => col.headerName ?? col.field ?? "");
 
@@ -41,7 +49,14 @@ export function exportDataAsPDF<T extends object>(
   autoTable(doc, {
     head: [headers],
     body,
+    startY: 30,
   });
 
-  doc.save(`${fileNamePrefix}_${Date.now()}.pdf`);
+  doc.save(
+    `${fileNamePrefix}_${now.toLocaleString("de-CH", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    })}.pdf`
+  );
 }

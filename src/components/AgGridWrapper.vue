@@ -1,7 +1,7 @@
 <template>
   <div class="grid-container">
     <ag-grid-vue
-      class="ag-grid full-screen"
+      class="ag-theme-alpine ag-grid full-screen"
       :rowData="rowData"
       :columnDefs="columnDefs"
       :defaultColDef="defaultColDef"
@@ -18,13 +18,15 @@ import { ColDef, GridApi, GridOptions } from "ag-grid-community";
 import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
 
 export type AgGridWrapperExposed<T> = {
-  getApi: () => GridApi | null;
+  getApi: () => GridApi<T> | null;
 };
 
-defineProps<{
+interface AgGridWrapperProps<T> {
   rowData: T[];
   columnDefs: ColDef<T>[];
-}>();
+}
+
+defineProps<AgGridWrapperProps<T>>();
 
 const gridApi = ref<GridApi | null>(null);
 
@@ -47,11 +49,9 @@ function onGridReady(params: { api: GridApi }) {
   gridApi.value = params.api;
 }
 
-function getApi() {
-  return gridApi.value;
-}
-
-defineExpose({ getApi });
+defineExpose<AgGridWrapperExposed<T>>({
+  getApi: () => gridApi.value,
+});
 </script>
 
 <style scoped>

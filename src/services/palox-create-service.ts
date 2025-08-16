@@ -1,13 +1,15 @@
 import { supabase } from "@/supabase";
 import { DropdownSearchItem } from "@/types/dropdown-search-item";
-import { StockColumnSlotViewModel } from "@/types/stock-column-slot-view-model";
-import { StockColumnSlotsColumnsViewArraySchema } from "@/types/generated/views/stock-column-slots-columns-view";
 import { AssignPaloxToNextFreeLevelInSlotFncParamsSchema } from "@/types/generated/assign-palox-to-next-free-level-in-slot-fnc-params";
 import { ProductNameArraySchema } from "@/types/schemas/product-name-schema";
 import { StockNameArraySchema } from "@/types/schemas/stock-name-schema";
 import { CustomerNameArraySchema } from "@/types/schemas/customer-name-schema";
 import { SupplierNameArraySchema } from "@/types/schemas/supplier-name-schema";
 import { PaloxesFullDisplayNameViewArraySchema } from "@/types/generated/views/paloxes-full-display-name-view";
+import {
+  StockColumnSlotsByColumnView,
+  StockColumnSlotsByColumnViewArraySchema,
+} from "@/types/generated/views/stock-column-slots-by-column-view";
 
 export async function fetchPaloxes(): Promise<DropdownSearchItem[]> {
   const { data, error } = await supabase
@@ -127,15 +129,14 @@ export async function fetchStocks(): Promise<DropdownSearchItem[]> {
   }));
 }
 
-export async function fetchStockColumnSlots(
+export async function fetchStockColumnSlotsByColumn(
   stockId: number
-): Promise<StockColumnSlotViewModel[]> {
+): Promise<StockColumnSlotsByColumnView[]> {
   const { data, error } = await supabase
-    .from("stock_column_slots_columns_view")
+    .from("stock_column_slots_by_column_view")
     .select()
     .eq("fk_stock", stockId)
-    .order("stock_column_number", { ascending: true })
-    .order("stock_slot_number", { ascending: true });
+    .order("column_number", { ascending: true });
   if (error) {
     throw error;
   }
@@ -143,19 +144,11 @@ export async function fetchStockColumnSlots(
     return [];
   }
   const validationResult =
-    StockColumnSlotsColumnsViewArraySchema.safeParse(data);
+    StockColumnSlotsByColumnViewArraySchema.safeParse(data);
   if (!validationResult.success) {
     throw validationResult.error;
   }
-  return validationResult.data.map((item) => {
-    return {
-      slot_id: item.stock_column_slot_id,
-      display_name: `${item.stock_column_display_name}.${item.stock_slot_number}`,
-      column_number: item.stock_column_number,
-      free_levels: item.free_levels,
-      is_full: item.is_full,
-    };
-  });
+  return validationResult.data;
 }
 
 export const assignPaloxToSlot = async (params: {

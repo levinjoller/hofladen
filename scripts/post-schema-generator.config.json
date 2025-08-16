@@ -10,6 +10,19 @@
       ]
     },
     {
+      "file": "views/stock-column-slots-by-column-view.ts",
+      "replacements": [
+        {
+          "from": "slots: z.any()",
+          "to": "slots: SlotContentArraySchema"
+        },
+        {
+          "from": "import { z } from \"zod\";",
+          "to": "import { z } from \"zod\";\nimport { SlotContentArraySchema } from \"@/types/schemas/slot-content-schema\";"
+        }
+      ]
+    },
+    {
       "file": "assign-palox-to-next-free-level-in-slot-fnc-params.ts",
       "replacements": [
         {
