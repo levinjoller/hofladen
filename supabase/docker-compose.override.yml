@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  db:
+    ports:
+      - "54322:5432"
+
+  kong:
+    ports:
+      - "54321:8000"
+      - "54321:8000/udp"
+
+  studio:
+    ports:
+      - "54323:3000"
+
+  auth:
+    ports:
+      - "54325:9999"
+
+  realtime:
+    ports:
+      - "54326:4000"
+
+  storage:
+    ports:
+      - "54327:5000"
