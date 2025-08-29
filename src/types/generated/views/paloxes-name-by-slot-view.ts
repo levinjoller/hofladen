@@ -8,6 +8,7 @@ export const PaloxesNameBySlotViewSchema = z.object({
   slot_id: z.int(),
   slot_display_name: z.string(),
   slot: z.int(),
+  max_level: z.int(),
   levels: LevelContentArraySchema,
 });
 

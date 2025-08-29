@@ -91,22 +91,8 @@ export type Database = {
             foreignKeyName: "palox_histories_fk_palox_fkey"
             columns: ["fk_palox"]
             isOneToOne: false
-            referencedRelation: "paloxes_full_display_name_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "palox_histories_fk_palox_fkey"
-            columns: ["fk_palox"]
-            isOneToOne: false
             referencedRelation: "paloxes_in_stock_view"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "palox_histories_fk_palox_fkey"
-            columns: ["fk_palox"]
-            isOneToOne: false
-            referencedRelation: "paloxes_name_by_slot_view"
-            referencedColumns: ["palox_id"]
           },
           {
             foreignKeyName: "palox_histories_fk_stock_column_slot_level_fkey"
@@ -123,6 +109,7 @@ export type Database = {
           description: number | null
           display_name: string
           id: number
+          is_default: boolean
           label_prefix: string
           next_palox_number: number
         }
@@ -131,6 +118,7 @@ export type Database = {
           description?: number | null
           display_name: string
           id?: number
+          is_default?: boolean
           label_prefix: string
           next_palox_number: number
         }
@@ -139,6 +127,7 @@ export type Database = {
           description?: number | null
           display_name?: string
           id?: number
+          is_default?: boolean
           label_prefix?: string
           next_palox_number?: number
         }
@@ -404,13 +393,6 @@ export type Database = {
       }
     }
     Views: {
-      paloxes_full_display_name_view: {
-        Row: {
-          display_name: string | null
-          id: number | null
-        }
-        Relationships: []
-      }
       paloxes_in_stock_view: {
         Row: {
           customer_person_display_name: string | null
@@ -425,9 +407,10 @@ export type Database = {
       }
       paloxes_name_by_slot_view: {
         Row: {
-          display_name: string | null
-          level: number | null
-          palox_id: number | null
+          levels: Json | null
+          max_level: number | null
+          slot: number | null
+          slot_display_name: string | null
           slot_id: number | null
         }
         Relationships: [
