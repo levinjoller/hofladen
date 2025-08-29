@@ -24,7 +24,8 @@ FROM paloxes p
 WHERE p.fk_stock_column_slot_level IS NOT NULL
 GROUP BY scsl.fk_stock_column_slot,
     sc.display_name,
-    scs.slot;
+    scs.slot,
+    scs.max_level;
 
 DROP VIEW IF EXISTS public.stock_column_slots_by_column_view;
 
