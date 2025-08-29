@@ -9,7 +9,7 @@ export function getUserFriendlyErrorMessage(err: KnownError): string {
     const zodErrorMessage = err.issues
       .map((i) => `${i.path.join(".")}: ${i.message}`)
       .join(", ");
-    return `Ungültige Eingabedaten: ${zodErrorMessage}`;
+    return `Ungültiges Datenformat: ${zodErrorMessage}`;
   }
 
   if (isPostgrestError(err)) {

@@ -1,27 +1,50 @@
 <template>
-  <ion-modal :is-open="isOpen" @didDismiss="close">
+  <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ title }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="close">Schliessen</ion-button>
+        <ion-buttons slot="start">
+          <ion-button @click="closeModal">
+            <ion-icon :icon="chevronBackOutline"></ion-icon>
+          </ion-button>
         </ion-buttons>
+        <ion-title>Suchen nach {{ title }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content>
+    <ion-content class="ion-padding">
       <ion-searchbar
-        v-model="searchTerm"
-        placeholder="Suchen..."
-      ></ion-searchbar>
+        v-if="isSearchable"
+        ref="searchbarRef"
+        :placeholder="
+          searchType === 'numeric'
+            ? 'Nummer eintippen...'
+            : 'Min. 3 Zeichen eintippen...'
+        "
+        :inputmode="searchType === 'numeric' ? 'numeric' : 'text'"
+        :debounce="300"
+        @ionInput="handleSearchInput"
+        @keydown.enter="handleEnter"
+        @keydown="searchType === 'numeric' ? handleKeydown : undefined"
+      />
 
-      <div v-if="isLoading" class="ion-padding ion-text-center">
-        <ion-spinner name="crescent" />
+      <div v-if="isLoading" class="ion-text-center loading-spinner-container">
+        <ion-spinner name="crescent"></ion-spinner>
+      </div>
+      <div
+        v-else-if="
+          !isLoading &&
+          data.length === 0 &&
+          (searchType === 'numeric'
+            ? searchTerm.length > 0
+            : searchTerm.length >= 3)
+        "
+      >
+        <p class="ion-text-center">Kein/e {{ title }} gefunden.</p>
       </div>
 
-      <ion-list v-else-if="filteredOptions.length > 0">
+      <ion-list v-else-if="data.length > 0">
         <ion-item
-          v-for="option in filteredOptions"
+          v-for="option in data"
           :key="option.id"
           button
           @click="selectOption(option)"
@@ -29,96 +52,104 @@
           <ion-label>{{ option.display_name }}</ion-label>
         </ion-item>
       </ion-list>
-
-      <ion-text
-        v-else-if="filteredOptions.length === 0 && searchTerm === ''"
-        class="ion-padding"
-      >
-        Keine Daten verfügbar.
-      </ion-text>
-
-      <ion-text
-        v-else-if="filteredOptions.length === 0 && searchTerm !== ''"
-        class="ion-padding"
-      >
-        Keine Suchergebnisse.
-      </ion-text>
     </ion-content>
-  </ion-modal>
+  </ion-page>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, nextTick, Ref, watch } from "vue";
 import {
-  IonModal,
+  IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
+  IonContent,
   IonButtons,
   IonButton,
+  IonIcon,
   IonSearchbar,
   IonList,
   IonItem,
   IonLabel,
-  IonContent,
-  IonText,
   IonSpinner,
+  modalController,
 } from "@ionic/vue";
-import { ref, computed, watch } from "vue";
+import { chevronBackOutline } from "ionicons/icons";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { useDbFetch } from "@/composables/use-db-action";
-import { presentToast } from "@/services/toast-service";
 
 const props = defineProps<{
-  modelValue: boolean;
-  selected: DropdownSearchItem | null;
-  fetchMethod: () => Promise<DropdownSearchItem[]>;
-  title?: string;
+  title: string;
+  fetchMethod: (searchTerm?: number | string) => Promise<DropdownSearchItem[]>;
+  isSearchable?: boolean;
+  searchType?: "numeric" | "text";
 }>();
 
-const emit = defineEmits<{
-  (e: "update:modelValue", value: boolean): void;
-  (e: "update:selected", value: DropdownSearchItem): void;
-}>();
-
+const { data, isLoading, execute } = useDbFetch(props.fetchMethod);
+const searchbarRef: Ref<InstanceType<typeof IonSearchbar> | null> = ref(null);
 const searchTerm = ref("");
 
-const { data, isLoading, errorMessage, execute } = useDbFetch(
-  props.fetchMethod
-);
-
-const isOpen = ref(props.modelValue);
+onMounted(async () => {
+  if (!props.isSearchable) {
+    await execute();
+  }
+});
 
 watch(
-  () => props.modelValue,
-  async (val) => {
-    isOpen.value = val;
-    if (val) {
-      searchTerm.value = "";
-      await execute();
+  () => props.isSearchable,
+  async (newVal) => {
+    if (newVal) {
+      await nextTick(() => {
+        setTimeout(() => {
+          if (searchbarRef.value) {
+            searchbarRef.value.$el.setFocus();
+          }
+        }, 100);
+      });
     }
-  }
+  },
+  { immediate: true }
 );
 
-watch(errorMessage, (err) => {
-  if (err) {
-    presentToast(err, "danger", 10000);
+const handleSearchInput = async (event: Event) => {
+  const value = (event.target as HTMLInputElement).value;
+  searchTerm.value = value;
+
+  const isNumeric = props.searchType === "numeric";
+  const cleaned = isNumeric ? value.replace(/\D/g, "") : value;
+
+  if (isNumeric) {
+    const num = parseInt(cleaned);
+    if (!cleaned || isNaN(num)) return (data.value = []);
+    await execute(num);
+  } else {
+    if (cleaned.length >= 3) {
+      await execute(cleaned);
+    } else {
+      data.value = [];
+    }
   }
-});
+};
 
-const filteredOptions = computed(() => {
-  const list = data.value || [];
-  const term = searchTerm.value.toLowerCase();
-  return term
-    ? list.filter((o) => o.display_name?.toLowerCase().includes(term))
-    : list;
-});
+const handleKeydown = (event: KeyboardEvent) => {
+  const allowed = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
+  const isDigit = /^[0-9]$/.test(event.key);
+  if (!isDigit && !allowed.includes(event.key)) {
+    event.preventDefault();
+  }
+};
 
-function selectOption(option: DropdownSearchItem) {
-  emit("update:selected", option);
-  close();
-}
-function close() {
-  isOpen.value = false;
-  emit("update:modelValue", false);
+const handleEnter = () => {
+  if (data.value.length > 0) {
+    selectOption(data.value[0]);
+  }
+};
+
+const selectOption = (option: DropdownSearchItem) => {
+  modalController.dismiss(option);
+};
+
+function closeModal() {
+  modalController.dismiss();
 }
 </script>

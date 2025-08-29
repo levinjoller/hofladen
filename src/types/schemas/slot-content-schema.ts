@@ -5,6 +5,7 @@ export const SlotContentSchema = z.object({
   display_name: z.string(),
   is_full: z.boolean(),
   free_levels: z.int(),
+  current_taken_levels: z.int(),
 });
 
 export const SlotContentArraySchema = z.array(SlotContentSchema);

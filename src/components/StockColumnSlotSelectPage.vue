@@ -60,7 +60,7 @@ import { SlotContent } from "@/types/schemas/slot-content-schema";
 
 const props = defineProps<{
   modelValue: SlotContent | null;
-  selectedStock: DropdownSearchItem | null;
+  selectedStock: DropdownSearchItem;
 }>();
 
 const emit = defineEmits<{

@@ -102,6 +102,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "palox_histories_fk_palox_fkey"
+            columns: ["fk_palox"]
+            isOneToOne: false
+            referencedRelation: "paloxes_name_by_slot_view"
+            referencedColumns: ["palox_id"]
+          },
+          {
             foreignKeyName: "palox_histories_fk_stock_column_slot_level_fkey"
             columns: ["fk_stock_column_slot_level"]
             isOneToOne: false
@@ -415,6 +422,23 @@ export type Database = {
           supplier_person_display_name: string | null
         }
         Relationships: []
+      }
+      paloxes_name_by_slot_view: {
+        Row: {
+          display_name: string | null
+          level: number | null
+          palox_id: number | null
+          slot_id: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_column_slot_levels_fk_stock_column_slot_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "stock_column_slots"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stock_column_slots_by_column_view: {
         Row: {

@@ -52,6 +52,10 @@ function postProcessSchemas() {
   }
 
   console.log("🏁 Post-Processing abgeschlossen.");
+  console.log(`Bitte passe das post-schema-generator-config.json an, wenn: 
+    \n- db-views Spalten neu von optionale Daten stammen
+    \n- jsonb Definitionen geändert wurden
+    \n- jsonb ts-typen umbenannt wurden`);
 }
 
 function escapeRegExp(string: string) {

@@ -42,12 +42,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/PaloxListPage.vue"),
     meta: { requiresAuth: true },
   },
-  {
-    path: "/palox/new",
-    name: "PaloxCreate",
-    component: () => import("@/views/PaloxCreatePage.vue"),
-    meta: { requiresAuth: true },
-  },
 ];
 
 const router = createRouter({

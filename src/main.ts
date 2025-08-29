@@ -35,11 +35,14 @@ import "@ionic/vue/css/palettes/dark.system.css";
 import "./theme/variables.css";
 
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import { supabase } from "./supabase";
+import { createPinia } from "pinia";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const app = createApp(App).use(IonicVue).use(router);
+const app = createApp(App);
+const pinia = createPinia();
+
+app.use(IonicVue).use(router).use(pinia);
 
 router.isReady().then(() => {
   app.mount("#app");

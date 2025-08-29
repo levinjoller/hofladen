@@ -5,43 +5,64 @@ import { ProductNameArraySchema } from "@/types/schemas/product-name-schema";
 import { StockNameArraySchema } from "@/types/schemas/stock-name-schema";
 import { CustomerNameArraySchema } from "@/types/schemas/customer-name-schema";
 import { SupplierNameArraySchema } from "@/types/schemas/supplier-name-schema";
-import { PaloxesFullDisplayNameViewArraySchema } from "@/types/generated/views/paloxes-full-display-name-view";
 import {
   StockColumnSlotsByColumnView,
   StockColumnSlotsByColumnViewArraySchema,
 } from "@/types/generated/views/stock-column-slots-by-column-view";
+import {
+  PaloxesNameBySlotView,
+  PaloxesNameBySlotViewArraySchema,
+} from "@/types/generated/views/paloxes-name-by-slot-view";
+import { PaloxTypeNameArraySchema } from "@/types/schemas/palox-type-name-schema";
+import { PaloxNumberPerTypeArraySchema } from "@/types/schemas/palox-number-per-type-schema";
 
-export async function fetchPaloxes(): Promise<DropdownSearchItem[]> {
-  const { data, error } = await supabase
-    .from("paloxes_full_display_name_view")
-    .select(`id, display_name`)
-    .order("display_name", { ascending: true });
+export async function fetchPaloxes(
+  paloxNumber: number,
+  paloxTypeId: number
+): Promise<DropdownSearchItem[]> {
+  let query = supabase
+    .from("paloxes")
+    .select(`id, number_per_type`)
+    .eq("fk_palox_type", paloxTypeId)
+    .eq("number_per_type", paloxNumber)
+    .is("fk_stock_column_slot_level", null)
+    .order("number_per_type", { ascending: true })
+    .limit(5);
+  const { data, error } = await query;
   if (error) {
     throw error;
   }
   if (!data) {
     return [];
   }
-  const validationResult =
-    PaloxesFullDisplayNameViewArraySchema.safeParse(data);
+  const validationResult = PaloxNumberPerTypeArraySchema.safeParse(data);
   if (!validationResult.success) {
     throw validationResult.error;
   }
-  return validationResult.data.map(({ id, display_name }) => ({
-    id,
-    display_name,
+  return validationResult.data.map((item) => ({
+    id: item.id,
+    display_name: item.number_per_type.toString(),
   }));
 }
 
-export async function fetchSuppliers(): Promise<DropdownSearchItem[]> {
-  const { data, error } = await supabase.from("suppliers").select(
+export async function fetchSuppliers(
+  searchTerm: string = ""
+): Promise<DropdownSearchItem[]> {
+  let query = supabase.from("suppliers").select(
     `
       id,
-      person:fk_person (
+      person:fk_person!inner (
         display_name
       )
     `
   );
+  let transformedSearchTerm = searchTerm.trim();
+  if (transformedSearchTerm) {
+    query = query
+      .ilike("person.display_name", `%${transformedSearchTerm}%`)
+      .limit(5);
+  }
+  const { data, error } = await query;
   if (error) {
     throw error;
   }
@@ -60,15 +81,24 @@ export async function fetchSuppliers(): Promise<DropdownSearchItem[]> {
     .sort((a, b) => a.display_name.localeCompare(b.display_name));
 }
 
-export async function fetchCustomers(): Promise<DropdownSearchItem[]> {
-  const { data, error } = await supabase.from("customers").select(
+export async function fetchCustomers(
+  searchTerm: string = ""
+): Promise<DropdownSearchItem[]> {
+  let query = supabase.from("customers").select(
     `
       id,
-      person:fk_person (
+      person:fk_person!inner (
         display_name
       )
     `
   );
+  let transformedSearchTerm = searchTerm.trim();
+  if (transformedSearchTerm) {
+    query = query
+      .ilike("person.display_name", `%${transformedSearchTerm}%`)
+      .limit(5);
+  }
+  const { data, error } = await query;
   if (error) {
     throw error;
   }
@@ -87,11 +117,18 @@ export async function fetchCustomers(): Promise<DropdownSearchItem[]> {
     .sort((a, b) => a.display_name.localeCompare(b.display_name));
 }
 
-export async function fetchProducts(): Promise<DropdownSearchItem[]> {
-  const { data, error } = await supabase
+export async function fetchProducts(
+  searchTerm: string = ""
+): Promise<DropdownSearchItem[]> {
+  let query = supabase
     .from("products")
     .select("id, display_name")
     .order("display_name", { ascending: true });
+  let transformedSearchTerm = searchTerm.trim();
+  if (transformedSearchTerm) {
+    query = query.ilike("display_name", `%${transformedSearchTerm}%`).limit(5);
+  }
+  const { data, error } = await query;
   if (error) {
     throw error;
   }
@@ -126,6 +163,34 @@ export async function fetchStocks(): Promise<DropdownSearchItem[]> {
   return validationResult.data.map((item) => ({
     id: item.id,
     display_name: item.stock.toString(),
+  }));
+}
+
+export async function fetchPaloxTypes(
+  defaultOnly?: boolean
+): Promise<DropdownSearchItem[]> {
+  let query = supabase
+    .from("palox_types")
+    .select("id, label_prefix, display_name, is_default")
+    .order("is_default", { ascending: false })
+    .order("label_prefix", { ascending: true });
+  if (defaultOnly) {
+    query = query.eq("is_default", true).limit(1);
+  }
+  const { data, error } = await query;
+  if (error) {
+    throw error;
+  }
+  if (!data) {
+    return [];
+  }
+  const validationResult = PaloxTypeNameArraySchema.safeParse(data);
+  if (!validationResult.success) {
+    throw validationResult.error;
+  }
+  return validationResult.data.map((item) => ({
+    id: item.id,
+    display_name: `${item.label_prefix} (${item.display_name})`,
   }));
 }
 
@@ -181,3 +246,29 @@ export const assignPaloxToSlot = async (params: {
   }
   return data;
 };
+
+export async function fetchPaloxesNameBySlot(
+  slotIds: number | number[]
+): Promise<PaloxesNameBySlotView[]> {
+  let query = supabase
+    .from("paloxes_name_by_slot_view")
+    .select()
+    .order("slot", { ascending: true });
+  if (Array.isArray(slotIds)) {
+    query = query.in("slot_id", slotIds);
+  } else {
+    query = query.eq("slot_id", slotIds);
+  }
+  const { data, error } = await query;
+  if (error) {
+    throw error;
+  }
+  if (!data) {
+    return [];
+  }
+  const validationResult = PaloxesNameBySlotViewArraySchema.safeParse(data);
+  if (!validationResult.success) {
+    throw validationResult.error;
+  }
+  return validationResult.data;
+}

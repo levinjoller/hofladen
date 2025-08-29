@@ -13,6 +13,7 @@ export const PaloxTypSchema = z.object({
   display_name: z.string(),
   description: z.int().nullable(),
   next_palox_number: z.int(),
+  is_default: z.boolean(),
 });
 
 export type PaloxTyp = z.infer<typeof PaloxTypSchema>;

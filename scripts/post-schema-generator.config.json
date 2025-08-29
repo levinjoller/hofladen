@@ -23,6 +23,19 @@
       ]
     },
     {
+      "file": "views/paloxes-name-by-slot-view.ts",
+      "replacements": [
+        {
+          "from": "levels: z.any()",
+          "to": "levels: LevelContentArraySchema"
+        },
+        {
+          "from": "import { z } from \"zod\";",
+          "to": "import { z } from \"zod\";\nimport { LevelContentArraySchema } from \"@/types/schemas/level-content-schema\";"
+        }
+      ]
+    },
+    {
       "file": "assign-palox-to-next-free-level-in-slot-fnc-params.ts",
       "replacements": [
         {
