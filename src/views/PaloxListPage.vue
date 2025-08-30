@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, defineAsyncComponent } from "vue";
-import { ColDef } from "ag-grid-community";
+import { ColDef, ValueGetterParams } from "ag-grid-community";
 import { archive, ellipsisHorizontal, ellipsisVertical } from "ionicons/icons";
 import { isPlatform, modalController } from "@ionic/vue";
 import {
@@ -72,9 +72,18 @@ const PaloxIntoStockStepperModal = defineAsyncComponent({
   delay: 200,
 });
 
+const getProductCellValue = (params: ValueGetterParams<PaloxesInStockView>) => {
+  const typeEmoji = params.data?.product_type_emoji ?? "";
+  const productDisplayName = params.data?.product_display_name ?? "";
+  return `${typeEmoji} ${productDisplayName}`;
+};
+
 const columnDefs: ColDef<PaloxesInStockView>[] = [
   { headerName: "Paloxen-Nr", field: "palox_display_name" },
-  { headerName: "Produkt", field: "product_display_name" },
+  {
+    headerName: "Produkt",
+    valueGetter: getProductCellValue,
+  },
   { headerName: "Kunde", field: "customer_person_display_name" },
   { headerName: "Lieferant", field: "supplier_person_display_name" },
   { headerName: "Lagerplatz", field: "stock_location_display_name" },

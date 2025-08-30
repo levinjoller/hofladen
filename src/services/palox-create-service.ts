@@ -1,7 +1,7 @@
 import { supabase } from "@/supabase";
 import { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { AssignPaloxToNextFreeLevelInSlotFncParamsSchema } from "@/types/generated/assign-palox-to-next-free-level-in-slot-fnc-params";
-import { ProductNameArraySchema } from "@/types/schemas/product-name-schema";
+import { ProductWithTypeEmojiArraySchema } from "@/types/schemas/product-with-type-emoji-schema";
 import { StockNameArraySchema } from "@/types/schemas/stock-name-schema";
 import { CustomerNameArraySchema } from "@/types/schemas/customer-name-schema";
 import { SupplierNameArraySchema } from "@/types/schemas/supplier-name-schema";
@@ -122,7 +122,15 @@ export async function fetchProducts(
 ): Promise<DropdownSearchItem[]> {
   let query = supabase
     .from("products")
-    .select("id, display_name")
+    .select(
+      `
+      id, 
+      display_name,
+      type:fk_product_type (
+        emoji
+      )
+      `
+    )
     .order("display_name", { ascending: true });
   let transformedSearchTerm = searchTerm.trim();
   if (transformedSearchTerm) {
@@ -135,13 +143,13 @@ export async function fetchProducts(
   if (!data) {
     return [];
   }
-  const validationResult = ProductNameArraySchema.safeParse(data);
+  const validationResult = ProductWithTypeEmojiArraySchema.safeParse(data);
   if (!validationResult.success) {
     throw validationResult.error;
   }
-  return validationResult.data.map(({ id, display_name }) => ({
-    id,
-    display_name,
+  return validationResult.data.map((item) => ({
+    id: item.id,
+    display_name: `${item.type.emoji} ${item.display_name}`,
   }));
 }
 

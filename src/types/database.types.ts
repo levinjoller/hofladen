@@ -223,23 +223,55 @@ export type Database = {
         }
         Relationships: []
       }
-      products: {
+      product_types: {
         Row: {
           created_at: string
           display_name: string
+          emoji: string
           id: number
         }
         Insert: {
           created_at?: string
           display_name: string
+          emoji: string
           id?: number
         }
         Update: {
           created_at?: string
           display_name?: string
+          emoji?: string
           id?: number
         }
         Relationships: []
+      }
+      products: {
+        Row: {
+          created_at: string
+          display_name: string
+          fk_product_type: number
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          fk_product_type: number
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          fk_product_type?: number
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_fk_product_type_fkey"
+            columns: ["fk_product_type"]
+            isOneToOne: false
+            referencedRelation: "product_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stock_column_slot_levels: {
         Row: {
@@ -399,6 +431,7 @@ export type Database = {
           id: number | null
           palox_display_name: string | null
           product_display_name: string | null
+          product_type_emoji: string | null
           stock_location_display_name: string | null
           stored_at: string | null
           supplier_person_display_name: string | null

@@ -27,15 +27,25 @@ import {
 } from "@ionic/vue";
 import { onMounted, watch } from "vue";
 import AgGridWrapper from "@/components/AgGridWrapper.vue";
-import { ColDef } from "ag-grid-community";
+import { ColDef, ValueGetterParams } from "ag-grid-community";
 import { toLocaleDate } from "@/utils/date-formatters";
 import { useDbFetch } from "@/composables/use-db-action";
 import { presentToast } from "@/services/toast-service";
-import { Product } from "@/types/generated/tables/products";
 import { fetchProducts } from "@/services/product-service";
+import { ProductList } from "@/types/schemas/product-list-schema";
 
-const columnDefs: ColDef<Product>[] = [
+const getProductCellValue = (params: ValueGetterParams<ProductList>) => {
+  const emoji = params.data?.type?.emoji ?? "";
+  const typeDisplayName = params.data?.type?.display_name ?? "";
+  return `${emoji} ${typeDisplayName}`;
+};
+
+const columnDefs: ColDef<ProductList>[] = [
   { headerName: "Bezeichnung", field: "display_name" },
+  {
+    headerName: "Kategorie",
+    valueGetter: getProductCellValue,
+  },
   {
     headerName: "Erstellt am",
     field: "created_at",

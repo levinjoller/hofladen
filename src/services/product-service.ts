@@ -1,10 +1,23 @@
 import { supabase } from "@/supabase";
-import { Product, ProductArraySchema } from "@/types/generated/tables/products";
+import {
+  ProductList,
+  ProductListArraySchema,
+} from "@/types/schemas/product-list-schema";
 
-export async function fetchProducts(): Promise<Product[]> {
+export async function fetchProducts(): Promise<ProductList[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("id, created_at, display_name")
+    .select(
+      `
+      id, 
+      display_name,
+      created_at,
+      type:fk_product_type (
+        display_name,  
+        emoji
+      )
+      `
+    )
     .order("display_name", { ascending: true });
   if (error) {
     throw error;
@@ -12,7 +25,7 @@ export async function fetchProducts(): Promise<Product[]> {
   if (!data) {
     return [];
   }
-  const validationResult = ProductArraySchema.safeParse(data);
+  const validationResult = ProductListArraySchema.safeParse(data);
   if (!validationResult.success) {
     throw validationResult.error;
   }

@@ -12,6 +12,7 @@ export const PaloxesInStockViewSchema = z.object({
   palox_display_name: z.string(),
   customer_person_display_name: z.string().nullable(),
   product_display_name: z.string(),
+  product_type_emoji: z.string(),
   supplier_person_display_name: z.string(),
   stock_location_display_name: z.string(),
 });

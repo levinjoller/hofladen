@@ -3,16 +3,16 @@
  */
 import { z } from "zod";
 
-export const ProductSchema = z.object({
+export const ProductTypSchema = z.object({
   id: z.int(),
   created_at: z.preprocess(
           (val) => (typeof val === "string" ? new Date(val) : val),
           z.date()
         ),
   display_name: z.string(),
-  fk_product_type: z.int(),
+  emoji: z.string(),
 });
 
-export type Product = z.infer<typeof ProductSchema>;
+export type ProductTyp = z.infer<typeof ProductTypSchema>;
 
-export const ProductArraySchema = z.array(ProductSchema);
+export const ProductTypArraySchema = z.array(ProductTypSchema);
