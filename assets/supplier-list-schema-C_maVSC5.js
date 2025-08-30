@@ -1,0 +1,1 @@
+import{o as a,i as s,p as t,d as o,a as r}from"./use-db-action-BPVItz-N.js";import{P as i}from"./persons-5eRxf_L9.js";const p=a({id:s(),created_at:t(e=>typeof e=="string"?new Date(e):e,o()),fk_person:s()});r(p);const c=a({...p.omit({fk_person:!0}).shape,person:a({...i.pick({display_name:!0}).shape})}),S=r(c);export{S,c as a};
