@@ -122,7 +122,7 @@ const openPaloxIntoStockStepperModal = async () => {
 
 const actionIcon = isPlatform("ios") ? ellipsisHorizontal : ellipsisVertical;
 
-function onExportClick() {
+async function onExportClick() {
   const api = gridRef.value?.getApi();
   if (!api) return;
 
@@ -130,8 +130,15 @@ function onExportClick() {
   api.forEachNodeAfterFilterAndSort((node) => {
     if (node.data) rows.push(node.data);
   });
-
-  exportDataAsPDF(rows, columnDefs, "Paloxen");
+  try {
+    await exportDataAsPDF(rows, columnDefs, "Paloxen");
+    presentToast(
+      "Pdf erfolgreich generiert und zum Download bereit.",
+      "success"
+    );
+  } catch (error) {
+    presentToast(`Pdf-Export fehlgeschlagen: ${error}`, "danger", 10000);
+  }
 }
 </script>
 

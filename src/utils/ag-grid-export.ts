@@ -8,18 +8,22 @@ import type {
 import { TDocumentDefinitions } from "pdfmake/interfaces";
 import { PaloxesInStockView } from "@/types/generated/views/paloxes-in-stock-view";
 
-const FONTS = {
-  NotoSans: {
-    normal: "NotoSans.ttf",
-    bold: "NotoSans.ttf",
-  },
-  NotoEmoji: {
-    normal: "NotoEmoji.ttf",
-  },
-};
+const loadFonts = async () => {
+  const { pdfVFS } = await import("@/assets/vfs_fonts");
 
-pdfMake.vfs = pdfVFS;
-pdfMake.fonts = FONTS;
+  const FONTS = {
+    NotoSans: {
+      normal: "NotoSans.ttf",
+      bold: "NotoSans.ttf",
+    },
+    NotoEmoji: {
+      normal: "NotoEmoji.ttf",
+    },
+  };
+
+  pdfMake.vfs = pdfVFS;
+  pdfMake.fonts = FONTS;
+};
 
 function getNestedValue<T extends object>(row: T, field?: string) {
   if (!field) return "";
@@ -47,11 +51,12 @@ function splitTextByEmoji(text: string) {
   return result;
 }
 
-export function exportDataAsPDF(
+export async function exportDataAsPDF(
   data: PaloxesInStockView[],
   columnDefs: ColDef<PaloxesInStockView>[],
   fileNamePrefix: string
 ) {
+  await loadFonts();
   const now = new Date();
   const headers = columnDefs.map((col) => ({
     text: col.headerName ?? col.field ?? "",
