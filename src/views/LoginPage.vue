@@ -7,20 +7,33 @@
     </ion-header>
     <ion-content class="ion-padding">
       <ion-item>
-        <ion-label position="floating">E-Mail</ion-label>
-        <ion-input type="email" v-model="email"></ion-input>
+        <ion-input
+          label="E-Mail"
+          label-placement="floating"
+          type="email"
+          v-model="email"
+        ></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label position="floating">Passwort</ion-label>
-        <ion-input type="password" v-model="password"></ion-input>
+        <ion-input
+          label="Passwort"
+          label-placement="floating"
+          type="password"
+          v-model="password"
+        ></ion-input>
       </ion-item>
-      <ion-button expand="block" @click="handleLogin">Login</ion-button>
+      <ion-button
+        expand="block"
+        :disabled="!isFormFilledOut"
+        @click="handleLogin"
+        >Login</ion-button
+      >
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import {
   IonPage,
   IonHeader,
@@ -28,7 +41,6 @@ import {
   IonTitle,
   IonContent,
   IonItem,
-  IonLabel,
   IonInput,
   IonButton,
 } from "@ionic/vue";
@@ -41,6 +53,10 @@ const router = useRouter();
 const email = ref("");
 const password = ref("");
 
+const isFormFilledOut = computed(() => {
+  return email.value.trim() !== "" && password.value.trim().length >= 6;
+});
+
 const handleLogin = async () => {
   const success = await login(email.value, password.value);
 
@@ -49,11 +65,3 @@ const handleLogin = async () => {
   }
 };
 </script>
-
-<style scoped>
-.error-message {
-  color: red;
-  margin-top: 10px;
-  text-align: center;
-}
-</style>
