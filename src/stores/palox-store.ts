@@ -1,19 +1,18 @@
 import { defineStore } from "pinia";
 import { assignPaloxToSlot } from "@/services/palox-create-service";
 import { PaloxStoreState } from "@/types/stores/palox-state";
-import { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { useDbAction } from "@/composables/use-db-action";
 
 const { errorMessage, isLoading, execute } = useDbAction(assignPaloxToSlot);
 
 const getInitialState = (): PaloxStoreState => ({
   currentStep: 1,
-  selectedPalox: null,
+  selectedPaloxType: null,
+  selectedPaloxNumber: null,
   selectedSupplier: null,
   selectedCustomer: null,
   selectedProduct: null,
   selectedStock: null,
-  _selectedPaloxType: null,
   selectedStockColumnSlot: null,
 });
 
@@ -21,9 +20,6 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
   state: () => getInitialState(),
 
   getters: {
-    getSelectedPaloxType(state) {
-      return state._selectedPaloxType;
-    },
     isActionLoading(): boolean {
       return isLoading.value;
     },
@@ -34,7 +30,8 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
       switch (state.currentStep) {
         case 1:
           return Boolean(
-            state.selectedPalox &&
+            state.selectedPaloxType &&
+              state.selectedPaloxNumber &&
               state.selectedSupplier &&
               state.selectedProduct &&
               state.selectedStock
@@ -53,15 +50,10 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
   },
 
   actions: {
-    setSelectedPaloxType(type: DropdownSearchItem | null) {
-      if (type?.id !== this._selectedPaloxType?.id) {
-        this.selectedPalox = null;
-        this._selectedPaloxType = type;
-      }
-    },
     async submitStepTwo() {
       return await execute({
-        paloxId: this.selectedPalox!.id,
+        paloxTypeId: this.selectedPaloxType!.id,
+        paloxNumber: this.selectedPaloxNumber,
         stockColumnSlotId: this.selectedStockColumnSlot!.slot_id,
         productId: this.selectedProduct!.id,
         supplierId: this.selectedSupplier!.id,

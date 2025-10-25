@@ -478,7 +478,8 @@ export type Database = {
       assign_palox_to_next_free_level_in_slot_fnc: {
         Args: {
           p_customer_id?: number
-          p_palox_id: number
+          p_palox_number: number
+          p_palox_type_id: number
           p_product_id: number
           p_stock_column_slot_id: number
           p_supplier_id: number

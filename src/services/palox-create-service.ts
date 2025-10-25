@@ -225,7 +225,8 @@ export async function fetchStockColumnSlotsByColumn(
 }
 
 export const assignPaloxToSlot = async (params: {
-  paloxId: number;
+  paloxTypeId: number;
+  paloxNumber: number;
   stockColumnSlotId: number;
   productId: number;
   supplierId: number;
@@ -233,7 +234,8 @@ export const assignPaloxToSlot = async (params: {
 }): Promise<void> => {
   const validatedParams =
     AssignPaloxToNextFreeLevelInSlotFncParamsSchema.safeParse({
-      p_palox_id: params.paloxId,
+      p_palox_type_id: params.paloxTypeId,
+      p_palox_number: params.paloxNumber,
       p_stock_column_slot_id: params.stockColumnSlotId,
       p_product_id: params.productId,
       p_supplier_id: params.supplierId,

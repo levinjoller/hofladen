@@ -41,6 +41,10 @@
         {
           "from": "p_customer_id: z.int()",
           "to": "p_customer_id: z.int().nullable().optional()"
+        },
+        {
+          "from": "p_palox_number: z.int()",
+          "to": "p_palox_number: z.int().min(1).max(9999)"
         }
       ]
     }

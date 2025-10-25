@@ -14,7 +14,7 @@ export function getUserFriendlyErrorMessage(err: KnownError): string {
 
   if (isPostgrestError(err)) {
     const map: Record<string, string> = {
-      YY001: "Die angegebene Paloxe wurde nicht gefunden.",
+      YY001: "Der angegebene Paloxentyp wurde nicht gefunden.",
       YY002: "Das angegebene Produkt wurde nicht gefunden.",
       YY003: "Der angegebene Lieferant wurde nicht gefunden.",
       YY004: "Der angegebene Kunde wurde nicht gefunden.",

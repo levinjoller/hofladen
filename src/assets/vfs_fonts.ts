@@ -1,5 +1,5 @@
-// https://fontsource.org/fonts/noto-emoji
-// https://fontsource.org/fonts/noto-sans
+// https://fontsource.org/fonts/noto-emoji noto-emoji-emoji-400-normal.ttf
+// https://fontsource.org/fonts/noto-sans noto-sans-latin-400-normal.ttf
 
 export const pdfVFS = {
   "NotoEmoji.ttf":

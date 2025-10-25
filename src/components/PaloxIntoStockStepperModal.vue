@@ -21,21 +21,30 @@
         <ion-list>
           <ModalSelectItem
             title="Paloxenart"
-            v-model="paloxType"
+            v-model="selectedPaloxType"
             :component="DropdownSearchModal"
             :fetchMethod="fetchPaloxTypes"
             :isSearchable="false"
             :isParentLoadingDefault="isLoading"
           />
-          <ModalSelectItem
-            title="Paloxennummer"
-            v-model="selectedPalox"
-            :component="DropdownSearchModal"
-            :fetchMethod="fetchPaloxesWithPaloxType"
-            :isSearchable="true"
-            :searchType="'numeric'"
-            :disabled="!paloxType"
-          />
+          <ion-item>
+            <ion-label position="fixed">Paloxen-Nr.</ion-label>
+            <ion-input
+              class="ion-text-right"
+              v-model.number="selectedPaloxNumber"
+              type="text"
+              inputmode="numeric"
+              placeholder="0000"
+              pattern="[0-9]*"
+              min="1"
+              max="9999"
+              @keydown="digitsOnly"
+              @paste.prevent
+              @drop.prevent
+              :maxlength="4"
+              :disabled="!selectedPaloxType"
+            ></ion-input>
+          </ion-item>
           <ModalSelectItem
             title="Lieferant"
             v-model="selectedSupplier"
@@ -116,12 +125,14 @@ import {
   IonSpinner,
   modalController,
   IonList,
+  IonItem,
+  IonLabel,
+  IonInput,
 } from "@ionic/vue";
 import { closeOutline, chevronBackOutline, warning } from "ionicons/icons";
-import { computed, defineAsyncComponent, onMounted, warn } from "vue";
+import { defineAsyncComponent, onMounted } from "vue";
 import {
   fetchCustomers,
-  fetchPaloxes,
   fetchPaloxTypes,
   fetchProducts,
   fetchStocks,
@@ -132,6 +143,7 @@ import { presentToast } from "@/services/toast-service";
 import { useDbFetch } from "@/composables/use-db-action";
 import { storeToRefs } from "pinia";
 import LoadingSpinner from "./LoadingSpinner.vue";
+import { isNumericKey } from "@/utils/is-numeric-key";
 const DropdownSearchModal = defineAsyncComponent({
   loader: () => import("@/components/DropdownSearchModal.vue"),
   loadingComponent: LoadingSpinner,
@@ -152,15 +164,21 @@ const DroppableSlotContentPage = defineAsyncComponent({
   loadingComponent: LoadingSpinner,
   delay: 200,
 });
+
+function digitsOnly(event: KeyboardEvent) {
+  !isNumericKey(event) && event.preventDefault();
+}
+
 const paloxStore = usePaloxStore();
-const { nextStep, prevStep, setSelectedPaloxType } = paloxStore;
+const { nextStep, prevStep } = paloxStore;
 
 const {
   canProceed,
   currentStep,
   isActionLoading,
   actionErrorMessage,
-  selectedPalox,
+  selectedPaloxType,
+  selectedPaloxNumber,
   selectedSupplier,
   selectedCustomer,
   selectedProduct,
@@ -168,29 +186,12 @@ const {
   selectedStockColumnSlot,
 } = storeToRefs(paloxStore);
 
-const paloxType = computed({
-  get() {
-    return paloxStore.getSelectedPaloxType;
-  },
-  set(newValue) {
-    paloxStore.setSelectedPaloxType(newValue);
-  },
-});
-
-async function fetchPaloxesWithPaloxType(searchTerm: number) {
-  if (paloxType.value) {
-    return await fetchPaloxes(searchTerm, paloxType.value.id);
-  }
-  presentToast("Fehlender Paloxtyp verhindert das Laden der Paloxen.", warning);
-  return [];
-}
-
 async function handleNext() {
   const { success, showSuccessToast, closeModal } = await nextStep();
   if (success) {
     if (showSuccessToast) {
       presentToast(
-        `Die Paloxe ${selectedPalox.value?.display_name} wurde erfolgreich zuoberst auf den Stapel ${selectedStockColumnSlot.value?.display_name} eingelagert!`,
+        `Die Paloxe (${selectedPaloxNumber.value}) wurde erfolgreich zuoberst auf den Stapel ${selectedStockColumnSlot.value?.display_name} eingelagert!`,
         "success",
         6000
       );
@@ -214,7 +215,7 @@ const { data, isLoading, execute } = useDbFetch(fetchPaloxTypes);
 onMounted(async () => {
   await execute(true);
   if (data.value && data.value.length > 0) {
-    setSelectedPaloxType(data.value[0]);
+    selectedPaloxType.value = data.value[0];
   } else {
     presentToast(
       "Es wurde keinen Standardwert für die Paloxenart gefunden.",
