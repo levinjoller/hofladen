@@ -10,7 +10,11 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <AgGridWrapper :rowData="data" :columnDefs="columnDefs" />
+      <AgGridWrapper
+        :rowData="data"
+        :columnDefs="columnDefs"
+        :isParentLoading="isLoading"
+      />
     </ion-content>
   </ion-page>
 </template>
@@ -43,7 +47,9 @@ const columnDefs: ColDef<CustomerList>[] = [
   },
 ];
 
-const { data, errorMessage, execute } = useDbFetch(fetchCustomersWithPerson);
+const { data, isLoading, errorMessage, execute } = useDbFetch(
+  fetchCustomersWithPerson
+);
 
 onMounted(async () => {
   await execute();

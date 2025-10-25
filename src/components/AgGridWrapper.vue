@@ -6,6 +6,7 @@
       :columnDefs="columnDefs"
       :defaultColDef="defaultColDef"
       :gridOptions="gridOptions"
+      :loading="isParentLoading"
       @grid-ready="onGridReady"
     />
   </div>
@@ -24,6 +25,7 @@ export type AgGridWrapperExposed<T> = {
 interface AgGridWrapperProps<T> {
   rowData: T[];
   columnDefs: ColDef<T>[];
+  isParentLoading?: boolean;
 }
 
 defineProps<AgGridWrapperProps<T>>();
@@ -43,6 +45,7 @@ const gridOptions: GridOptions = {
   pagination: true,
   paginationPageSize: 20,
   paginationPageSizeSelector: false,
+  suppressMovableColumns: true,
 };
 
 function onGridReady(params: { api: GridApi }) {

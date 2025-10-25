@@ -15,7 +15,12 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <AgGridWrapper ref="gridRef" :rowData="data" :columnDefs="columnDefs" />
+      <AgGridWrapper
+        ref="gridRef"
+        :rowData="data"
+        :columnDefs="columnDefs"
+        :isParentLoading="isLoading"
+      />
 
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
         <ion-fab-button @click="openPaloxIntoStockStepperModal">
@@ -94,10 +99,11 @@ const columnDefs: ColDef<PaloxesInStockView>[] = [
   },
 ];
 
-const { data, errorMessage, execute } = useDbFetch(fetchPaloxesInStock);
+const { data, isLoading, errorMessage, execute } =
+  useDbFetch(fetchPaloxesInStock);
 
-onMounted(() => {
-  execute();
+onMounted(async () => {
+  await execute();
 });
 
 watch(errorMessage, (err) => {
