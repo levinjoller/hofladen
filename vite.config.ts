@@ -1,26 +1,33 @@
-/// <reference types="vitest" />
-
-import legacy from "@vitejs/plugin-legacy";
+import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
-import path from "path";
-import { defineConfig } from "vite";
+import legacy from "@vitejs/plugin-legacy";
+import { fileURLToPath, URL } from "node:url";
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [vue(), legacy()],
-  base:
-    process.env.NODE_ENV === "production"
-      ? process.env.VUE_APP_BRANCH === "dev"
-        ? "/hofladen/dev/"
-        : "/hofladen/"
-      : "/",
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+// https://vite.dev/config/
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  const isProd = mode === "production";
+  const isDevBranch = env.VITE_APP_BRANCH === "dev";
+  return {
+    plugins: [
+      vue(),
+      legacy({
+        targets: ["defaults", "not IE 11"],
+      }),
+    ],
+    base: isProd ? (isDevBranch ? "/hofladen/dev/" : "/hofladen/") : "/",
+    resolve: {
+      alias: {
+        "@": fileURLToPath(new URL("./src", import.meta.url)),
+      },
     },
-  },
-  test: {
-    globals: true,
-    environment: "jsdom",
-  },
+    build: {
+      target: "esnext",
+      sourcemap: !isProd,
+    },
+    test: {
+      globals: true,
+      environment: "jsdom",
+    },
+  };
 });
