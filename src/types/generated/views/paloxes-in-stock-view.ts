@@ -14,6 +14,8 @@ export const PaloxesInStockViewSchema = z.object({
   product_display_name: z.string(),
   product_type_emoji: z.string(),
   supplier_person_display_name: z.string(),
+  stock_id: z.int(),
+  slot_level_id: z.int(),
   stock_location_display_name: z.string(),
 });
 

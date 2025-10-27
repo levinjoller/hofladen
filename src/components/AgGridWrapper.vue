@@ -17,18 +17,12 @@ import { ref } from "vue";
 import { AgGridVue } from "ag-grid-vue3";
 import { ColDef, GridApi, GridOptions } from "ag-grid-community";
 import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
+import {
+  AgGridWrapperExposed,
+  AgGridWrapperProps,
+} from "@/types/ag-grid-wrapper";
 
-export type AgGridWrapperExposed<T> = {
-  getApi: () => GridApi<T> | null;
-};
-
-interface AgGridWrapperProps<T> {
-  rowData: T[];
-  columnDefs: ColDef<T>[];
-  isParentLoading?: boolean;
-}
-
-defineProps<AgGridWrapperProps<T>>();
+const props = defineProps<AgGridWrapperProps<T>>();
 
 const gridApi = ref<GridApi | null>(null);
 
@@ -46,6 +40,7 @@ const gridOptions: GridOptions = {
   paginationPageSize: 20,
   paginationPageSizeSelector: false,
   suppressMovableColumns: true,
+  components: props.customComponents,
 };
 
 function onGridReady(params: { api: GridApi }) {

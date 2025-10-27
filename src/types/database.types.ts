@@ -98,6 +98,13 @@ export type Database = {
             foreignKeyName: "palox_histories_fk_stock_column_slot_level_fkey"
             columns: ["fk_stock_column_slot_level"]
             isOneToOne: false
+            referencedRelation: "paloxes_in_stock_view"
+            referencedColumns: ["slot_level_id"]
+          },
+          {
+            foreignKeyName: "palox_histories_fk_stock_column_slot_level_fkey"
+            columns: ["fk_stock_column_slot_level"]
+            isOneToOne: false
             referencedRelation: "stock_column_slot_levels"
             referencedColumns: ["id"]
           },
@@ -188,6 +195,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paloxes_fk_stock_column_slot_level_fkey"
+            columns: ["fk_stock_column_slot_level"]
+            isOneToOne: true
+            referencedRelation: "paloxes_in_stock_view"
+            referencedColumns: ["slot_level_id"]
           },
           {
             foreignKeyName: "paloxes_fk_stock_column_slot_level_fkey"
@@ -374,6 +388,13 @@ export type Database = {
             foreignKeyName: "stock_columns_fk_stock_fkey"
             columns: ["fk_stock"]
             isOneToOne: false
+            referencedRelation: "paloxes_in_stock_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "stock_columns_fk_stock_fkey"
+            columns: ["fk_stock"]
+            isOneToOne: false
             referencedRelation: "stocks"
             referencedColumns: ["id"]
           },
@@ -432,6 +453,8 @@ export type Database = {
           palox_display_name: string | null
           product_display_name: string | null
           product_type_emoji: string | null
+          slot_level_id: number | null
+          stock_id: number | null
           stock_location_display_name: string | null
           stored_at: string | null
           supplier_person_display_name: string | null
@@ -468,6 +491,13 @@ export type Database = {
             foreignKeyName: "stock_columns_fk_stock_fkey"
             columns: ["fk_stock"]
             isOneToOne: false
+            referencedRelation: "paloxes_in_stock_view"
+            referencedColumns: ["stock_id"]
+          },
+          {
+            foreignKeyName: "stock_columns_fk_stock_fkey"
+            columns: ["fk_stock"]
+            isOneToOne: false
             referencedRelation: "stocks"
             referencedColumns: ["id"]
           },
@@ -485,6 +515,15 @@ export type Database = {
           p_supplier_id: number
         }
         Returns: undefined
+      }
+      get_taken_level_coordinates_fnc: {
+        Args: { p_stock_id: number }
+        Returns: {
+          slot_level_id: number
+          x_column: number
+          y_level: number
+          z_slot: number
+        }[]
       }
       update_taken_level_flags_counts_fnc: {
         Args: { p_is_taken: boolean; p_slot_level_id: number }

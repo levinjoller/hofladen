@@ -20,6 +20,7 @@
         :rowData="data"
         :columnDefs="columnDefs"
         :isParentLoading="isLoading"
+        :customComponents="customComponents"
       />
 
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
@@ -59,10 +60,6 @@ import {
   IonFab,
   IonFabButton,
 } from "@ionic/vue";
-
-import AgGridWrapper, {
-  AgGridWrapperExposed,
-} from "@/components/AgGridWrapper.vue";
 import { fetchPaloxesInStock } from "@/services/palox-service";
 import { useDbFetch } from "@/composables/use-db-action";
 import { PaloxesInStockView } from "@/types/generated/views/paloxes-in-stock-view";
@@ -70,12 +67,25 @@ import { toLocaleDate } from "@/utils/date-formatters";
 import { presentToast } from "@/services/toast-service";
 import { exportDataAsPDF } from "@/utils/ag-grid-export";
 import { usePaloxStore } from "@/stores/palox-store";
+import { AgGridWrapperExposed } from "@/types/ag-grid-wrapper";
+import AgGridWrapper from "@/components/AgGridWrapper.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+
 const PaloxIntoStockStepperModal = defineAsyncComponent({
   loader: () => import("@/components/PaloxIntoStockStepperModal.vue"),
   loadingComponent: LoadingSpinner,
   delay: 200,
 });
+
+const StockMapButtonAsync = defineAsyncComponent({
+  loader: () => import("@/components/StockMapButton.vue"),
+  loadingComponent: LoadingSpinner,
+  delay: 200,
+});
+
+const customComponents = {
+  StockMapButton: StockMapButtonAsync,
+};
 
 const getProductCellValue = (params: ValueGetterParams<PaloxesInStockView>) => {
   const typeEmoji = params.data?.product_type_emoji ?? "";
@@ -96,6 +106,16 @@ const columnDefs: ColDef<PaloxesInStockView>[] = [
     headerName: "Eingelagert",
     field: "stored_at",
     valueFormatter: toLocaleDate,
+  },
+  {
+    headerName: "Info",
+    field: "id",
+    pinned: "right",
+    width: 100,
+    cellRenderer: "StockMapButton",
+    sortable: false,
+    filter: false,
+    resizable: false,
   },
 ];
 
@@ -136,8 +156,11 @@ async function onExportClick() {
   api.forEachNodeAfterFilterAndSort((node) => {
     if (node.data) rows.push(node.data);
   });
+  const exportColumnDefs = columnDefs.filter((colDef) => {
+    return colDef.headerName !== "Info";
+  });
   try {
-    await exportDataAsPDF(rows, columnDefs, "Paloxen");
+    await exportDataAsPDF(rows, exportColumnDefs, "Paloxen");
     presentToast(
       "Pdf erfolgreich generiert und zum Download bereit.",
       "success"
