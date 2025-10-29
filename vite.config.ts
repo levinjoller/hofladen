@@ -10,7 +10,12 @@ export default defineConfig(({ mode }) => {
   const isProd = mode === "production";
   const isDevBranch = env.VITE_APP_BRANCH === "dev";
   return {
-    plugins: [vue({ ...templateCompilerOptions }), legacy()],
+    plugins: [
+      vue({ ...templateCompilerOptions }),
+      legacy({
+        targets: ["defaults", "not IE 11"],
+      }),
+    ],
     base: isProd ? (isDevBranch ? "/hofladen/dev/" : "/hofladen/") : "/",
     resolve: {
       alias: {

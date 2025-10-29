@@ -23,12 +23,6 @@
         :customComponents="customComponents"
       />
 
-      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-fab-button @click="openPaloxIntoStockStepperModal">
-          <ion-icon :icon="archive" />
-        </ion-fab-button>
-      </ion-fab>
-
       <ion-popover trigger="menu-action-trigger">
         <ion-content class="ion-padding">
           <ion-item button lines="none" @click="onExportClick">
@@ -37,14 +31,15 @@
         </ion-content>
       </ion-popover>
     </ion-content>
+    <PaloxTabsAsync @refetchParentData="refetchData" />
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch, defineAsyncComponent } from "vue";
 import { ColDef, ValueGetterParams } from "ag-grid-community";
-import { archive, ellipsisHorizontal, ellipsisVertical } from "ionicons/icons";
-import { isPlatform, modalController } from "@ionic/vue";
+import { ellipsisHorizontal, ellipsisVertical } from "ionicons/icons";
+import { isPlatform } from "@ionic/vue";
 import {
   IonPage,
   IonHeader,
@@ -57,8 +52,6 @@ import {
   IonPopover,
   IonButton,
   IonItem,
-  IonFab,
-  IonFabButton,
 } from "@ionic/vue";
 import { fetchPaloxesInStock } from "@/services/palox-service";
 import { useDbFetch } from "@/composables/use-db-action";
@@ -66,13 +59,12 @@ import { PaloxesInStockView } from "@/types/generated/views/paloxes-in-stock-vie
 import { toLocaleDate } from "@/utils/date-formatters";
 import { presentToast } from "@/services/toast-service";
 import { exportDataAsPDF } from "@/utils/ag-grid-export";
-import { usePaloxStore } from "@/stores/palox-store";
 import { AgGridWrapperExposed } from "@/types/ag-grid-wrapper";
 import AgGridWrapper from "@/components/AgGridWrapper.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
-const PaloxIntoStockStepperModal = defineAsyncComponent({
-  loader: () => import("@/components/PaloxIntoStockStepperModal.vue"),
+const PaloxTabsAsync = defineAsyncComponent({
+  loader: () => import("@/components/PaloxTabs.vue"),
   loadingComponent: LoadingSpinner,
   delay: 200,
 });
@@ -132,18 +124,8 @@ watch(errorMessage, (err) => {
 
 const gridRef = ref<AgGridWrapperExposed<PaloxesInStockView> | null>(null);
 
-const paloxStore = usePaloxStore();
-
-const openPaloxIntoStockStepperModal = async () => {
-  paloxStore.$reset();
-  const modal = await modalController.create({
-    component: PaloxIntoStockStepperModal,
-  });
-  await modal.present();
-  const { data: requiresReload } = await modal.onDidDismiss<Boolean>();
-  if (requiresReload) {
-    await execute();
-  }
+const refetchData = async () => {
+  await execute();
 };
 
 const actionIcon = isPlatform("ios") ? ellipsisHorizontal : ellipsisVertical;
@@ -170,9 +152,3 @@ async function onExportClick() {
   }
 }
 </script>
-
-<style scoped>
-.grid-container {
-  padding-bottom: 80px;
-}
-</style>

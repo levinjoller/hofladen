@@ -36,13 +36,14 @@ import "./theme/variables.css";
 
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { createPinia } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const app = createApp(App);
 const pinia = createPinia();
 
-app.use(IonicVue).use(router).use(pinia);
+app.use(IonicVue).use(router).use(pinia.use(piniaPluginPersistedstate));
 
 router.isReady().then(() => {
   app.mount("#app");

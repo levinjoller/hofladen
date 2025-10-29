@@ -1,7 +1,6 @@
-import { KnownError } from "@/types/errors";
 import { isPostgrestError, isZodError } from "./type-guards";
 
-export function getUserFriendlyErrorMessage(err: KnownError): string {
+export function getUserFriendlyErrorMessage(err: unknown): string {
   const defaultMessage =
     "Es ist ein unbekannter Fehler aufgetreten. Bitte versuchen Sie es später erneut.";
 
@@ -26,5 +25,9 @@ export function getUserFriendlyErrorMessage(err: KnownError): string {
     return map[err.code] || defaultMessage;
   }
 
-  return err.message || defaultMessage;
+  if (err instanceof Error) {
+    return err.message || defaultMessage;
+  }
+
+  return defaultMessage;
 }

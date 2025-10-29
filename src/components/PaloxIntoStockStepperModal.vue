@@ -32,7 +32,7 @@
             <ion-input
               class="ion-text-right"
               v-model.number="selectedPaloxNumber"
-              type="text"
+              type="number"
               inputmode="numeric"
               placeholder="0000"
               pattern="[0-9]*"
@@ -130,7 +130,7 @@ import {
   IonInput,
 } from "@ionic/vue";
 import { closeOutline, chevronBackOutline, warning } from "ionicons/icons";
-import { defineAsyncComponent, onMounted } from "vue";
+import { defineAsyncComponent, onMounted, watch } from "vue";
 import {
   fetchCustomers,
   fetchPaloxTypes,
@@ -185,6 +185,14 @@ const {
   selectedStock,
   selectedStockColumnSlot,
 } = storeToRefs(paloxStore);
+
+function setNumberInRange(val: number): number {
+  return Math.min(Math.max(val, 0), 9999);
+}
+
+watch(selectedPaloxNumber, (val) => {
+  if (val != null) selectedPaloxNumber.value = setNumberInRange(val);
+});
 
 async function handleNext() {
   const { success, showSuccessToast, closeModal } = await nextStep();

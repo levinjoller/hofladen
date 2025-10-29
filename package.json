@@ -41,6 +41,7 @@
     "ionicons": "^8.0.13",
     "pdfmake": "^0.2.20",
     "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.5.0",
     "stats-gl": "^3.6.0",
     "three": "^0.180.0",
     "vue": "^3.5.22",

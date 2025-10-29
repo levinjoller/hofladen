@@ -24,7 +24,7 @@
         :debounce="300"
         @ionInput="handleSearchInput"
         @keydown.enter="handleEnter"
-        @keydown="searchType === 'numeric' ? handleKeydown : undefined"
+        @keydown="searchType === 'numeric' ? isNumericKey : undefined"
       />
 
       <div v-if="isLoading" class="ion-text-center loading-spinner-container">
@@ -77,6 +77,7 @@ import {
 import { chevronBackOutline } from "ionicons/icons";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { useDbFetch } from "@/composables/use-db-action";
+import { isNumericKey } from "@/utils/is-numeric-key";
 
 const props = defineProps<{
   title: string;
@@ -131,13 +132,9 @@ const handleSearchInput = async (event: Event) => {
   }
 };
 
-const handleKeydown = (event: KeyboardEvent) => {
-  const allowed = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
-  const isDigit = /^[0-9]$/.test(event.key);
-  if (!isDigit && !allowed.includes(event.key)) {
-    event.preventDefault();
-  }
-};
+function digitsOnly(event: KeyboardEvent) {
+  !isNumericKey(event) && event.preventDefault();
+}
 
 const handleEnter = () => {
   if (data.value.length > 0) {
