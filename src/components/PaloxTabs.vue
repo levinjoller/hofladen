@@ -1,68 +1,86 @@
 <template>
-  <ion-footer>
-    <ion-toolbar>
-      <div class="equal-spacing">
-        <ion-chip @click="openStockModal()">
-          <ion-icon :icon="homeOutline"></ion-icon>
-          <ion-label>{{
-            stockStore.getCurrentStockItem?.display_name || "-"
-          }}</ion-label>
-        </ion-chip>
-        <div
-          class="ion-activatable ripple-parent"
-          @click="openPaloxIntoStockStepperModal"
+  <IonFooter>
+    <IonToolbar>
+      <div class="toolbar-content">
+        <IonChip
+          @click="openStockModal"
+          @contextmenu.prevent="presentPopover"
+          @pointerdown.stop
+          @mousedown.stop
+          @touchstart.stop
         >
-          <ion-icon :src="IconBox" size="large" />
-          <ion-ripple-effect></ion-ripple-effect>
-        </div>
+          <IonIcon :icon="homeOutline" />
+          <IonLabel>{{ currentStockName }}</IonLabel>
+        </IonChip>
 
-        <div class="ion-activatable ripple-parent" @click="openPaloxSortModal">
-          <ion-icon :src="IconSortAscending" size="large" />
-          <ion-ripple-effect></ion-ripple-effect>
-        </div>
-
-        <div class="ion-activatable ripple-parent" @click="openPaloxMoveModal">
-          <ion-icon :src="IconReorder" size="large" />
-          <ion-ripple-effect></ion-ripple-effect>
-        </div>
-
-        <div class="ion-activatable ripple-parent" @click="openPaloxSwapModal">
-          <ion-icon :src="IconReplace" size="large" />
-          <ion-ripple-effect></ion-ripple-effect>
-        </div>
-        <div class="ion-activatable ripple-parent" @click="openPaloxExitModal">
-          <ion-icon :src="IconBoxOff" size="large" />
-          <ion-ripple-effect></ion-ripple-effect>
-        </div>
+        <template v-for="action in actions" :key="action.label">
+          <div
+            class="ion-activatable ripple-parent"
+            @click="action.handler"
+            :aria-label="action.label"
+          >
+            <IonIcon :src="action.icon" size="large" />
+            <IonRippleEffect />
+          </div>
+        </template>
       </div>
-    </ion-toolbar>
-  </ion-footer>
+    </IonToolbar>
+  </IonFooter>
+
+  <IonPopover
+    :is-open="isPopoverOpen"
+    :event="popoverEvent"
+    @did-dismiss="closePopover"
+    :keep-contents-mounted="true"
+  >
+    <IonContent class="ion-padding">
+      <p>Standardlager zurücksetzen?</p>
+      <div class="popover-buttons">
+        <IonButton
+          color="medium"
+          fill="outline"
+          expand="block"
+          @click="closePopover"
+        >
+          Nein
+        </IonButton>
+        <IonButton color="primary" expand="block" @click="resetStockStore">
+          Ja
+        </IonButton>
+      </div>
+    </IonContent>
+  </IonPopover>
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from "vue";
+import { defineAsyncComponent, ref, computed } from "vue";
 import { modalController } from "@ionic/vue";
-import { usePaloxStore } from "@/stores/palox-store";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import IconBoxOff from "@/assets/icons/IconBoxOff.svg";
-import IconReplace from "@/assets/icons/IconReplace.svg";
-import IconBox from "@/assets/icons/IconBox.svg";
-import IconSortAscending from "@/assets/icons/IconSortAscending.svg";
-import IconReorder from "@/assets/icons/IconReorder.svg";
 import { homeOutline } from "ionicons/icons";
 import {
   IonFooter,
   IonToolbar,
-  IonIcon,
-  IonRippleEffect,
   IonChip,
+  IonIcon,
   IonLabel,
+  IonRippleEffect,
+  IonPopover,
+  IonContent,
+  IonButton,
 } from "@ionic/vue";
+
+import { usePaloxStore } from "@/stores/palox-store";
 import { useStockStore } from "@/stores/stock-store";
 import { fetchStocks } from "@/services/palox-create-service";
 import { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { presentToast } from "@/services/toast-service";
 import { getUserFriendlyErrorMessage } from "@/utils/get-user-friendly-error-message";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+
+import IconBox from "@/assets/icons/IconBox.svg";
+import IconBoxOff from "@/assets/icons/IconBoxOff.svg";
+import IconReplace from "@/assets/icons/IconReplace.svg";
+import IconSortAscending from "@/assets/icons/IconSortAscending.svg";
+import IconReorder from "@/assets/icons/IconReorder.svg";
 
 const DropdownSearchAsyncModal = defineAsyncComponent({
   loader: () => import("@/components/DropdownSearchModal.vue"),
@@ -79,7 +97,32 @@ const PaloxIntoStockStepperAsyncModal = defineAsyncComponent({
 const paloxStore = usePaloxStore();
 const stockStore = useStockStore();
 
-const openStockModal = async () => {
+const isPopoverOpen = ref(false);
+const popoverEvent = ref<Event | null>(null);
+
+const currentStockName = computed(
+  () => stockStore.getCurrentStockItem?.display_name || "-"
+);
+
+const emit = defineEmits<{ (e: "refetch-parent-data"): void }>();
+
+function closePopover() {
+  isPopoverOpen.value = false;
+}
+
+function presentPopover(event: Event) {
+  event.preventDefault();
+  popoverEvent.value = event;
+  isPopoverOpen.value = true;
+}
+
+function resetStockStore() {
+  stockStore.$reset();
+  closePopover();
+  presentToast("Standardlager erfolgreich zurückgesetzt.", "success", 3000);
+}
+
+async function openStockModal() {
   const modal = await modalController.create({
     component: DropdownSearchAsyncModal,
     componentProps: {
@@ -90,43 +133,52 @@ const openStockModal = async () => {
     },
   });
   await modal.present();
+
   const { data: selectedStock } =
     await modal.onDidDismiss<DropdownSearchItem>();
-  if (selectedStock) {
-    try {
-      stockStore.setCurrentStockItem(selectedStock);
-    } catch (error: unknown) {
-      presentToast(getUserFriendlyErrorMessage(error), "danger", 10000);
-    }
+  if (!selectedStock) return;
+
+  try {
+    stockStore.setCurrentStockItem(selectedStock);
+  } catch (error) {
+    presentToast(getUserFriendlyErrorMessage(error), "danger", 10000);
   }
-};
+}
 
-const openPaloxSortModal = () => {};
-const openPaloxSwapModal = () => {};
-const openPaloxMoveModal = () => {};
-const openPaloxExitModal = () => {};
-
-const emit = defineEmits<{
-  (e: "refetch-parent-data"): void;
-}>();
-
-const openPaloxIntoStockStepperModal = async () => {
+async function openPaloxIntoStockStepperModal() {
   paloxStore.$reset();
   const modal = await modalController.create({
     component: PaloxIntoStockStepperAsyncModal,
   });
   await modal.present();
-  const { data: requiresReload } = await modal.onDidDismiss<Boolean>();
-  if (requiresReload) {
-    emit("refetch-parent-data");
-  }
-};
+
+  const { data: requiresReload } = await modal.onDidDismiss<boolean>();
+  if (requiresReload) emit("refetch-parent-data");
+}
+
+function openPaloxSortModal() {}
+function openPaloxSwapModal() {}
+function openPaloxMoveModal() {}
+function openPaloxExitModal() {}
+
+const actions = [
+  {
+    label: "Einlagern",
+    icon: IconBox,
+    handler: openPaloxIntoStockStepperModal,
+  },
+  { label: "Sortieren", icon: IconSortAscending, handler: openPaloxSortModal },
+  { label: "Verschieben", icon: IconReorder, handler: openPaloxMoveModal },
+  { label: "Tauschen", icon: IconReplace, handler: openPaloxSwapModal },
+  { label: "Auslagern", icon: IconBoxOff, handler: openPaloxExitModal },
+];
 </script>
 
 <style scoped>
-.equal-spacing {
+.toolbar-content {
   display: flex;
   justify-content: space-around;
+  align-items: center;
 }
 
 .ripple-parent {
@@ -138,7 +190,12 @@ const openPaloxIntoStockStepperModal = async () => {
   justify-content: center;
   height: 56px;
   cursor: pointer;
-  background: transparent;
-  border-radius: 0;
+}
+
+.popover-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
 }
 </style>
