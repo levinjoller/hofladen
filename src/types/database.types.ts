@@ -516,6 +516,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      do_update_taken_levels_fnc: {
+        Args: { p_affected_level_ids: number[] }
+        Returns: undefined
+      }
       get_taken_level_coordinates_fnc: {
         Args: { p_stock_id: number }
         Returns: {
@@ -524,10 +528,6 @@ export type Database = {
           y_level: number
           z_slot: number
         }[]
-      }
-      update_taken_level_flags_counts_fnc: {
-        Args: { p_is_taken: boolean; p_slot_level_id: number }
-        Returns: undefined
       }
     }
     Enums: {
