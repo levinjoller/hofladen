@@ -1,0 +1,1 @@
+import{o as s,i as a,s as e,p as r,d as o,a as p}from"./use-db-action-CqLjSPSZ.js";const c=s({id:a(),created_at:r(t=>typeof t=="string"?new Date(t):t,o()),display_name:e(),fk_product_type:a()});p(c);const d=s({id:a(),created_at:r(t=>typeof t=="string"?new Date(t):t,o()),display_name:e(),emoji:e()});p(d);export{c as P,d as a};
