@@ -7,7 +7,7 @@
             <ion-icon :icon="chevronBackOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>Paloxe einlagern - {{ currentStep }} / 3</ion-title>
+        <ion-title>Paloxe einlagern - {{ currentStep }} / 2</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="closeStepperModal(false)">
             <ion-icon :icon="closeOutline"></ion-icon>
@@ -86,13 +86,6 @@
           :selectedStock="selectedStock"
         />
       </div>
-
-      <div v-else-if="currentStep === 3">
-        <DroppableSlotContentPage
-          v-if="selectedStockColumnSlot"
-          :slot="selectedStockColumnSlot"
-        ></DroppableSlotContentPage>
-      </div>
     </ion-content>
 
     <ion-footer>
@@ -156,11 +149,6 @@ const ModalSelectItem = defineAsyncComponent({
 });
 const StockColumnSlotSelectPage = defineAsyncComponent({
   loader: () => import("@/components/StockColumnSlotSelectPage.vue"),
-  loadingComponent: LoadingSpinner,
-  delay: 200,
-});
-const DroppableSlotContentPage = defineAsyncComponent({
-  loader: () => import("@/components/DroppableSlotContentPage.vue"),
   loadingComponent: LoadingSpinner,
   delay: 200,
 });

@@ -38,14 +38,9 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
           );
         case 2:
           return Boolean(state.selectedStockColumnSlot);
-        case 3:
-          return true;
         default:
           return false;
       }
-    },
-    shouldCloseModal(state) {
-      return state.selectedStockColumnSlot?.current_taken_levels === 0;
     },
   },
 
@@ -64,15 +59,12 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
       if (!this.canProceed) {
         return { success: false, showSuccessToast: false, closeModal: false };
       }
-      if (this.currentStep === 2) {
-        const success = await this.submitStepTwo();
-        if (success && !this.shouldCloseModal) {
-          this.currentStep++;
-        }
+      if (this.currentStep >= 2) {
+        const isSuccessful = await this.submitStepTwo();
         return {
-          success,
-          showSuccessToast: success,
-          closeModal: this.shouldCloseModal,
+          success: isSuccessful,
+          showSuccessToast: isSuccessful,
+          closeModal: true,
         };
       }
       this.currentStep++;
