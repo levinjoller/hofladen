@@ -134,7 +134,7 @@ export async function fetchProducts(
     .order("display_name", { ascending: true });
   let transformedSearchTerm = searchTerm.trim();
   if (transformedSearchTerm) {
-    query = query.ilike("display_name", `%${transformedSearchTerm}%`).limit(5);
+    query = query.ilike("display_name", `%${transformedSearchTerm}%`).limit(15);
   }
   const { data, error } = await query;
   if (error) {
