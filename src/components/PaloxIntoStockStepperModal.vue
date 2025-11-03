@@ -82,8 +82,9 @@
       <div v-else-if="currentStep === 2">
         <StockColumnSlotSelectPage
           v-if="selectedStock"
-          v-model="selectedStockColumnSlot"
+          v-model="singleSlotAsArray"
           :selectedStock="selectedStock"
+          :activeStrategy="activeStrategy"
         />
       </div>
     </ion-content>
@@ -123,7 +124,7 @@ import {
   IonInput,
 } from "@ionic/vue";
 import { closeOutline, chevronBackOutline, warning } from "ionicons/icons";
-import { defineAsyncComponent, onMounted, watch } from "vue";
+import { computed, defineAsyncComponent, onMounted, watch } from "vue";
 import {
   fetchCustomers,
   fetchPaloxTypes,
@@ -137,6 +138,8 @@ import { useDbFetch } from "@/composables/use-db-action";
 import { storeToRefs } from "pinia";
 import LoadingSpinner from "./LoadingSpinner.vue";
 import { isNumericKey } from "@/utils/is-numeric-key";
+import { SlotSelectionStrategy } from "@/types/slot-selection-strategy";
+import { SlotContent } from "@/types/schemas/slot-content-schema";
 const DropdownSearchModal = defineAsyncComponent({
   loader: () => import("@/components/DropdownSearchModal.vue"),
   loadingComponent: LoadingSpinner,
@@ -152,6 +155,10 @@ const StockColumnSlotSelectPage = defineAsyncComponent({
   loadingComponent: LoadingSpinner,
   delay: 200,
 });
+
+defineProps<{
+  activeStrategy: SlotSelectionStrategy;
+}>();
 
 function digitsOnly(event: KeyboardEvent) {
   !isNumericKey(event) && event.preventDefault();
@@ -173,6 +180,16 @@ const {
   selectedStock,
   selectedStockColumnSlot,
 } = storeToRefs(paloxStore);
+
+const singleSlotAsArray = computed({
+  get: () =>
+    selectedStockColumnSlot.value ? [selectedStockColumnSlot.value] : null,
+  set: (newArray: SlotContent[] | null) => {
+    paloxStore.setSelectedSlot(
+      newArray && newArray.length > 0 ? newArray[0] : null
+    );
+  },
+});
 
 function setNumberInRange(val: number): number {
   return Math.min(Math.max(val, 0), 9999);

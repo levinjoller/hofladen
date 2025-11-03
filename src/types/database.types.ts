@@ -314,6 +314,13 @@ export type Database = {
             foreignKeyName: "stock_column_slot_levels_fk_stock_column_slot_fkey"
             columns: ["fk_stock_column_slot"]
             isOneToOne: false
+            referencedRelation: "paloxes_name_by_slot_view"
+            referencedColumns: ["slot_id"]
+          },
+          {
+            foreignKeyName: "stock_column_slot_levels_fk_stock_column_slot_fkey"
+            columns: ["fk_stock_column_slot"]
+            isOneToOne: false
             referencedRelation: "stock_column_slots"
             referencedColumns: ["id"]
           },
@@ -469,15 +476,7 @@ export type Database = {
           slot_display_name: string | null
           slot_id: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "stock_column_slot_levels_fk_stock_column_slot_fkey"
-            columns: ["slot_id"]
-            isOneToOne: false
-            referencedRelation: "stock_column_slots"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       stock_column_slots_by_column_view: {
         Row: {
@@ -529,12 +528,21 @@ export type Database = {
           z_slot: number
         }[]
       }
+      update_palox_order_batch_fnc: {
+        Args: {
+          p_slot_orders: Database["public"]["CompositeTypes"]["slot_palox_order_data"][]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
     }
     CompositeTypes: {
-      [_ in never]: never
+      slot_palox_order_data: {
+        slot_id: number | null
+        ordered_palox_ids: number[] | null
+      }
     }
   }
 }

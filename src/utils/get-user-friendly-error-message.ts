@@ -20,6 +20,9 @@ export function getUserFriendlyErrorMessage(err: unknown): string {
       YY005: "Diese Paloxe ist bereits in einem Lagerplatz.",
       YY006: "Kein freier Lagerplatz für diese Position gefunden.",
       YY007: "Die angegebene Lagerplatz-Ebene wurde nicht gefunden.",
+      YY008: "Mindestens eine Paloxe war zuvor nicht in einem der Lagerplätze.",
+      YY009: "Die maximale Stapelhöhe ist nicht gesetzt oder nicht auffindbar.",
+      YY010: "Die maximale Stapelhöhe wurde überschritten.",
     };
     if (err.hint) console.debug("DB-Hint:", err.hint);
     return map[err.code] || defaultMessage;

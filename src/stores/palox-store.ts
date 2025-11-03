@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { assignPaloxToSlot } from "@/services/palox-create-service";
 import { PaloxStoreState } from "@/types/stores/palox-state";
 import { useDbAction } from "@/composables/use-db-action";
+import { SlotContent } from "@/types/schemas/slot-content-schema";
 
 const { errorMessage, isLoading, execute } = useDbAction(assignPaloxToSlot);
 
@@ -43,8 +44,10 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
       }
     },
   },
-
   actions: {
+    setSelectedSlot(slot: SlotContent | null) {
+      this.selectedStockColumnSlot = slot;
+    },
     async submitStepTwo() {
       return await execute({
         paloxTypeId: this.selectedPaloxType!.id,

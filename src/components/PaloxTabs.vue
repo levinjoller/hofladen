@@ -4,7 +4,7 @@
       <div class="toolbar-content">
         <IonChip
           @click="openStockModal"
-          @contextmenu.prevent="presentPopover"
+          @contextmenu.prevent="togglePopover"
           @pointerdown.stop
           @mousedown.stop
           @touchstart.stop
@@ -12,7 +12,6 @@
           <IonIcon :icon="homeOutline" />
           <IonLabel>{{ currentStockName }}</IonLabel>
         </IonChip>
-
         <template v-for="action in actions" :key="action.label">
           <div
             class="ion-activatable ripple-parent"
@@ -26,7 +25,6 @@
       </div>
     </IonToolbar>
   </IonFooter>
-
   <IonPopover
     :is-open="isPopoverOpen"
     :event="popoverEvent"
@@ -41,19 +39,18 @@
           fill="outline"
           expand="block"
           @click="closePopover"
+          >Nein</IonButton
         >
-          Nein
-        </IonButton>
-        <IonButton color="primary" expand="block" @click="resetStockStore">
-          Ja
-        </IonButton>
+        <IonButton color="primary" expand="block" @click="resetStockStore"
+          >Ja</IonButton
+        >
       </div>
     </IonContent>
   </IonPopover>
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent, ref, computed } from "vue";
+import { ref, computed, defineAsyncComponent } from "vue";
 import { modalController } from "@ionic/vue";
 import { homeOutline } from "ionicons/icons";
 import {
@@ -82,18 +79,10 @@ import IconReplace from "@/assets/icons/IconReplace.svg";
 import IconSortAscending from "@/assets/icons/IconSortAscending.svg";
 import IconReorder from "@/assets/icons/IconReorder.svg";
 
-const DropdownSearchAsyncModal = defineAsyncComponent({
-  loader: () => import("@/components/DropdownSearchModal.vue"),
-  loadingComponent: LoadingSpinner,
-  delay: 200,
-});
+import { ModiConstants, type Modi } from "@/types/modi";
+import { useSlotStrategy } from "@/composables/use-slot-strategy";
 
-const PaloxIntoStockStepperAsyncModal = defineAsyncComponent({
-  loader: () => import("@/components/PaloxIntoStockStepperModal.vue"),
-  loadingComponent: LoadingSpinner,
-  delay: 200,
-});
-
+const emit = defineEmits<{ (e: "refetch-parent-data"): void }>();
 const paloxStore = usePaloxStore();
 const stockStore = useStockStore();
 
@@ -104,16 +93,42 @@ const currentStockName = computed(
   () => stockStore.getCurrentStockItem?.display_name || "-"
 );
 
-const emit = defineEmits<{ (e: "refetch-parent-data"): void }>();
+function createAsyncModal(loader: () => Promise<any>) {
+  return defineAsyncComponent({
+    loader,
+    loadingComponent: LoadingSpinner,
+    delay: 200,
+  });
+}
+
+const DropdownSearchAsyncModal = createAsyncModal(
+  () => import("@/components/DropdownSearchModal.vue")
+);
+const PaloxIntoStockStepperAsyncModal = createAsyncModal(
+  () => import("@/components/PaloxIntoStockStepperModal.vue")
+);
+const SlotSortAsyncModal = createAsyncModal(
+  () => import("@/components/SlotSortModal.vue")
+);
+
+async function openModal<T>(
+  component: any,
+  componentProps: Record<string, unknown>
+): Promise<T | undefined> {
+  const modal = await modalController.create({ component, componentProps });
+  await modal.present();
+  const { data } = await modal.onDidDismiss<T>();
+  return data;
+}
+
+function togglePopover(event?: Event) {
+  if (event) event.preventDefault();
+  isPopoverOpen.value = !isPopoverOpen.value;
+  popoverEvent.value = event || null;
+}
 
 function closePopover() {
   isPopoverOpen.value = false;
-}
-
-function presentPopover(event: Event) {
-  event.preventDefault();
-  popoverEvent.value = event;
-  isPopoverOpen.value = true;
 }
 
 function resetStockStore() {
@@ -123,21 +138,16 @@ function resetStockStore() {
 }
 
 async function openStockModal() {
-  const modal = await modalController.create({
-    component: DropdownSearchAsyncModal,
-    componentProps: {
+  const selectedStock = await openModal<DropdownSearchItem>(
+    DropdownSearchAsyncModal,
+    {
       title: "Standardlager",
       fetchMethod: fetchStocks,
       isSearchable: false,
       searchType: "numeric",
-    },
-  });
-  await modal.present();
-
-  const { data: selectedStock } =
-    await modal.onDidDismiss<DropdownSearchItem>();
+    }
+  );
   if (!selectedStock) return;
-
   try {
     stockStore.setCurrentStockItem(selectedStock);
   } catch (error) {
@@ -146,20 +156,30 @@ async function openStockModal() {
 }
 
 async function openPaloxIntoStockStepperModal() {
+  const currentModi = ref<Modi>(ModiConstants.INSERT);
+  const activeStrategy = useSlotStrategy(currentModi);
   paloxStore.$reset();
-  const modal = await modalController.create({
-    component: PaloxIntoStockStepperAsyncModal,
-  });
-  await modal.present();
-
-  const { data: requiresReload } = await modal.onDidDismiss<boolean>();
+  const requiresReload = await openModal<boolean>(
+    PaloxIntoStockStepperAsyncModal,
+    { activeStrategy: activeStrategy.value }
+  );
   if (requiresReload) emit("refetch-parent-data");
 }
 
-function openPaloxSortModal() {}
-function openPaloxSwapModal() {}
-function openPaloxMoveModal() {}
-function openPaloxExitModal() {}
+async function openSlotSortModal(modi: Modi = ModiConstants.REORDER) {
+  const currentModi = ref<Modi>(modi);
+  const activeStrategy = useSlotStrategy(currentModi);
+  const requiresReload = await openModal<boolean>(SlotSortAsyncModal, {
+    title: "Paloxenstapel sortieren",
+    currentStock: stockStore.getCurrentStockItem,
+    activeStrategy: activeStrategy.value,
+  });
+  if (requiresReload) emit("refetch-parent-data");
+}
+
+const openPaloxMoveModal = () => openSlotSortModal(ModiConstants.MOVE);
+const openPaloxSwapModal = () => {};
+const openPaloxExitModal = () => {};
 
 const actions = [
   {
@@ -167,7 +187,11 @@ const actions = [
     icon: IconBox,
     handler: openPaloxIntoStockStepperModal,
   },
-  { label: "Sortieren", icon: IconSortAscending, handler: openPaloxSortModal },
+  {
+    label: "Sortieren",
+    icon: IconSortAscending,
+    handler: () => openSlotSortModal(ModiConstants.REORDER),
+  },
   { label: "Verschieben", icon: IconReorder, handler: openPaloxMoveModal },
   { label: "Tauschen", icon: IconReplace, handler: openPaloxSwapModal },
   { label: "Auslagern", icon: IconBoxOff, handler: openPaloxExitModal },

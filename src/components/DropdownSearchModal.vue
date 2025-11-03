@@ -24,7 +24,7 @@
         :debounce="300"
         @ionInput="handleSearchInput"
         @keydown.enter="handleEnter"
-        @keydown="searchType === 'numeric' ? isNumericKey : undefined"
+        @keydown="searchType === 'numeric' ? digitsOnly : undefined"
       />
 
       <div v-if="isLoading" class="ion-text-center loading-spinner-container">

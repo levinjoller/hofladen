@@ -2,49 +2,86 @@
   <div v-if="isLoading" class="ion-padding ion-text-center">
     <ion-spinner name="crescent" />
   </div>
-  <div v-else-if="data.length > 0">
-    <h2>Paloxenreihenfolge ändern</h2>
+
+  <div v-else-if="localData.length">
+    <h2>Lager {{ selectedStock.display_name }} - Paloxenreihenfolge ändern</h2>
     <div class="container">
-      <div
-        v-for="slotData in data"
+      <SlotDraggableAsync
+        v-for="slotData in localData"
         :key="slotData.slot_id"
-        class="list-wrapper"
-      >
-        <h3>{{ slotData.slot_display_name }}</h3>
-        <VueDraggable
-          :options="{ scroll: true }"
-          class="draggable-list"
-          v-model="slotData.levels"
-          group="changedSlots"
-        >
-          <DraggableItem
-            v-for="level in slotData.levels"
-            :key="level.palox_id"
-            :level="level"
-          />
-        </VueDraggable>
-      </div>
+        :slotData="slotData"
+        @slot-change="handleSlotChange"
+      />
     </div>
   </div>
-  <ion-text v-else-if="data.length === 0" class="ion-padding">
-    Keine Daten verfügbar.
-  </ion-text>
+
+  <ion-text v-else class="ion-padding">Keine Daten verfügbar.</ion-text>
 </template>
 
 <script setup lang="ts">
-import { VueDraggable } from "vue-draggable-plus";
+import { ref, onMounted, watch, defineAsyncComponent } from "vue";
 import { IonSpinner, IonText } from "@ionic/vue";
-import DraggableItem from "@/components/DraggableItem.vue";
-import { fetchPaloxesNameBySlot } from "@/services/palox-create-service";
 import { useDbFetch } from "@/composables/use-db-action";
-import { SlotContent } from "@/types/schemas/slot-content-schema";
+import { fetchPaloxesNameBySlot } from "@/services/palox-create-service";
+import type { SlotContent } from "@/types/schemas/slot-content-schema";
+import type { DropdownSearchItem } from "@/types/dropdown-search-item";
+import type { PaloxesNameBySlotView } from "@/types/generated/views/paloxes-name-by-slot-view";
+import type { SlotPaloxOrderData } from "@/types/slot-palox-order-data";
+import LoadingSpinner from "./LoadingSpinner.vue";
+
+const SlotDraggableAsync = defineAsyncComponent({
+  loader: () => import("@/components/SlotDraggable.vue"),
+  loadingComponent: LoadingSpinner,
+  delay: 200,
+});
 
 const props = defineProps<{
-  slot: SlotContent;
+  slot: SlotContent[];
+  selectedStock: DropdownSearchItem;
 }>();
 
-const { data, isLoading, execute } = useDbFetch(fetchPaloxesNameBySlot);
-execute(props.slot.slot_id);
+const emit = defineEmits<{
+  (e: "initial-order", payload: SlotPaloxOrderData): void;
+  (e: "changed-order", payload: SlotPaloxOrderData): void;
+}>();
+
+const { data, isLoading, execute } = useDbFetch<PaloxesNameBySlotView>(
+  fetchPaloxesNameBySlot
+);
+const localData = ref<PaloxesNameBySlotView[]>([]);
+
+onMounted(async () => {
+  const slotIds = props.slot.map((s) => s.slot_id).filter(Boolean);
+  if (!slotIds.length) return;
+  await execute(slotIds);
+});
+
+watch(data, (newData) => {
+  if (!newData) return;
+  const processedData = newData.map((slot) => ({
+    ...slot,
+    levels: [...slot.levels].reverse(),
+  })) as PaloxesNameBySlotView[];
+  processedData.forEach((slot) => emitSlotChange(slot, "initial-order"));
+  localData.value = processedData;
+});
+
+function emitSlotChange(
+  slotData: PaloxesNameBySlotView,
+  event: "initial-order" | "changed-order"
+) {
+  const slotId = slotData.slot_id;
+  const paloxIds = [...slotData.levels].reverse().map((l) => l.palox_id);
+  if (event === "initial-order") {
+    emit("initial-order", { slotId, paloxIds });
+  } else {
+    emit("changed-order", { slotId, paloxIds });
+  }
+}
+
+function handleSlotChange(slotData: PaloxesNameBySlotView) {
+  emitSlotChange(slotData, "changed-order");
+}
 </script>
 
 <style scoped>
@@ -52,34 +89,5 @@ execute(props.slot.slot_id);
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-}
-
-.draggable-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 200px;
-  background: var(--ion-color-step-100);
-  border-radius: 8px;
-  overflow: auto;
-  min-height: 100px;
-  padding: 1rem;
-  border: 2px dashed var(--ion-color-medium);
-}
-.sortable-drag .list-item {
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
-  transition: transform 0.2s ease-in-out;
-}
-
-.sortable-ghost .list-item {
-  opacity: 0.5;
-  background-color: var(--ion-color-step-150);
-}
-
-.placeholder-text {
-  text-align: center;
-  color: var(--ion-color-medium);
-  padding: 1rem;
 }
 </style>

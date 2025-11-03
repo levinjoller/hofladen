@@ -45,6 +45,7 @@
   </ion-app>
 
   <ion-toast
+    position="top"
     :is-open="showToast"
     :message="toastMessage"
     :duration="toastDuration"

@@ -47,6 +47,19 @@
           "to": "p_palox_number: z.int().min(1).max(9999)"
         }
       ]
+    },
+    {
+      "file": "update-palox-order-batch-fnc-params.ts",
+      "replacements": [
+        {
+          "from": "p_slot_orders: z.any()",
+          "to": "p_slot_orders: SlotPaloxOrderDataArraySchema"
+        },
+        {
+          "from": "import { z } from \"zod\";",
+          "to": "import { z } from \"zod\";\nimport { SlotPaloxOrderDataArraySchema } from \"@/types/schemas/slot-palox-order-data-schema\";"
+        }
+      ]
     }
   ]
 }
