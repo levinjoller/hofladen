@@ -96,7 +96,7 @@ const DropdownSearchAsyncModal = defineAsyncComponent({
   delay: 200,
 });
 const ModalSelectAsyncItem = defineAsyncComponent({
-  loader: () => import("@/components/DropdownSearchModal.vue"),
+  loader: () => import("@/components/ModalSelectItem.vue"),
   loadingComponent: LoadingSpinner,
   delay: 200,
 });
