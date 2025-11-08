@@ -162,7 +162,7 @@ GRANT EXECUTE ON FUNCTION public.swap_paloxes_between_slots_fnc(integer []) TO p
 
 GRANT EXECUTE ON FUNCTION public.swap_paloxes_between_slots_fnc(integer []) TO service_role;
 
-CREATE OR REPLACE FUNCTION public.update_stored_at_taken_levels_after_palox_update_trg_fnc() RETURNS TRIGGER LANGUAGE 'plpgsql' COST 100 VOLATILE NOT LEAKPROOF SECURITY DEFINER -- Hinzugefügt: Stellt Superuser-Rechte bereit
+CREATE OR REPLACE FUNCTION public.update_stored_at_taken_levels_after_palox_update_trg_fnc() RETURNS TRIGGER LANGUAGE 'plpgsql' COST 100 VOLATILE NOT LEAKPROOF SECURITY DEFINER
 SET search_path = '' AS $BODY$
 DECLARE v_level_ids BIGINT [];
 
@@ -202,7 +202,8 @@ GRANT EXECUTE ON FUNCTION public.update_stored_at_taken_levels_after_palox_updat
 
 GRANT EXECUTE ON FUNCTION public.update_stored_at_taken_levels_after_palox_update_trg_fnc() TO service_role;
 
-CREATE OR REPLACE FUNCTION public.do_update_taken_levels_fnc(p_affected_level_ids bigint []) RETURNS void LANGUAGE 'plpgsql' COST 100 VOLATILE PARALLEL UNSAFE AS $BODY$
+CREATE OR REPLACE FUNCTION public.do_update_taken_levels_fnc(p_affected_level_ids bigint []) RETURNS void LANGUAGE 'plpgsql' COST 100 VOLATILE PARALLEL UNSAFE SECURITY DEFINER
+SET search_path = '' AS $BODY$
 DECLARE v_affected_slot_ids BIGINT [];
 
 BEGIN
