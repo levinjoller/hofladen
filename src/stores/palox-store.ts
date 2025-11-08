@@ -5,6 +5,7 @@ import { useDbAction } from "@/composables/use-db-action";
 import { SlotContent } from "@/types/schemas/slot-content-schema";
 import { StepResult } from "@/types/step-result";
 import { FAILED_PRECHECK_RESULT } from "@/utils/strategy-helper";
+import { DropdownSearchItem } from "@/types/dropdown-search-item";
 
 const getInitialState = (): PaloxStoreState => ({
   currentStep: 1,
@@ -53,6 +54,18 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
     setActionStatus(isLoading: boolean, errorMessage: string | null) {
       this._isActionLoading = isLoading;
       this.actionErrorMessage = errorMessage;
+    },
+    initializeState(
+      currentStock: DropdownSearchItem | null,
+      defaultPaloxType: DropdownSearchItem[] | null
+    ) {
+      this.$reset();
+      if (currentStock) {
+        this.selectedStock = currentStock;
+      }
+      if (defaultPaloxType) {
+        this.selectedPaloxType = defaultPaloxType[0];
+      }
     },
     async nextStep(): Promise<StepResult> {
       if (!this.canProceed) {

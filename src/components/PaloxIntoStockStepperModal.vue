@@ -7,7 +7,7 @@
             <ion-icon :icon="chevronBackOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>Paloxe einlagern - {{ currentStep }} / 2</ion-title>
+        <ion-title>{{ title }} - {{ currentStep }} / 2</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="closeStepperModal(false)">
             <ion-icon :icon="closeOutline"></ion-icon>
@@ -140,6 +140,7 @@ import LoadingSpinner from "./LoadingSpinner.vue";
 import { isNumericKey } from "@/utils/is-numeric-key";
 import { SlotSelectionStrategy } from "@/types/slot-selection-strategy";
 import { SlotContent } from "@/types/schemas/slot-content-schema";
+import { DropdownSearchItem } from "@/types/dropdown-search-item";
 const DropdownSearchModal = defineAsyncComponent({
   loader: () => import("@/components/DropdownSearchModal.vue"),
   loadingComponent: LoadingSpinner,
@@ -156,8 +157,10 @@ const StockColumnSlotSelectPage = defineAsyncComponent({
   delay: 200,
 });
 
-defineProps<{
+const props = defineProps<{
+  title: string;
   activeStrategy: SlotSelectionStrategy;
+  currentStock: DropdownSearchItem | null;
 }>();
 
 function digitsOnly(event: KeyboardEvent) {
@@ -225,9 +228,8 @@ const { data, isLoading, execute } = useDbFetch(fetchPaloxTypes);
 
 onMounted(async () => {
   await execute(true);
-  if (data.value && data.value.length > 0) {
-    selectedPaloxType.value = data.value[0];
-  } else {
+  paloxStore.initializeState(props.currentStock, data.value);
+  if (!data.value || data.value.length === 0) {
     presentToast(
       "Es wurde keinen Standardwert für die Paloxenart gefunden.",
       warning

@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineAsyncComponent } from "vue";
+import { ref, computed, defineAsyncComponent, Component } from "vue";
 import { modalController } from "@ionic/vue";
 import { homeOutline } from "ionicons/icons";
 import {
@@ -64,8 +64,6 @@ import {
   IonContent,
   IonButton,
 } from "@ionic/vue";
-
-import { usePaloxStore } from "@/stores/palox-store";
 import { useStockStore } from "@/stores/stock-store";
 import { fetchStocks } from "@/services/palox-create-service";
 import { DropdownSearchItem } from "@/types/dropdown-search-item";
@@ -81,9 +79,9 @@ import IconReorder from "@/assets/icons/IconReorder.svg";
 
 import { ModiConstants, type Modi } from "@/types/modi";
 import { useSlotStrategy } from "@/composables/use-slot-strategy";
+import { ToolbarAction } from "@/types/toolbar-action";
 
 const emit = defineEmits<{ (e: "refetch-parent-data"): void }>();
-const paloxStore = usePaloxStore();
 const stockStore = useStockStore();
 
 const isPopoverOpen = ref(false);
@@ -155,33 +153,49 @@ async function openStockModal() {
   }
 }
 
-async function openPaloxIntoStockStepperModal() {
-  const currentModi = ref<Modi>(ModiConstants.INSERT);
-  const activeStrategy = useSlotStrategy(currentModi);
-  paloxStore.$reset();
-  const requiresReload = await openModal<boolean>(
-    PaloxIntoStockStepperAsyncModal,
-    { activeStrategy: activeStrategy.value }
-  );
-  if (requiresReload) emit("refetch-parent-data");
-}
-
-async function openSlotSortModal(modi: Modi = ModiConstants.REORDER) {
-  const currentModi = ref<Modi>(modi);
-  const activeStrategy = useSlotStrategy(currentModi);
-  const requiresReload = await openModal<boolean>(SlotSortAsyncModal, {
-    title: "Paloxen verschieben",
+async function openPaloxActionModal(
+  modi: Modi,
+  modalComponent: Component,
+  title: string
+) {
+  const activeStrategy = useSlotStrategy(ref(modi));
+  const requiresReload = await openModal<boolean>(modalComponent, {
+    title: title,
     currentStock: stockStore.getCurrentStockItem,
     activeStrategy: activeStrategy.value,
   });
-  if (requiresReload) emit("refetch-parent-data");
+  if (requiresReload) {
+    emit("refetch-parent-data");
+  }
 }
 
-const openPaloxMoveModal = () => openSlotSortModal(ModiConstants.MOVE);
-const openPaloxSwapModal = () => openSlotSortModal(ModiConstants.SWAP);
+const openPaloxMoveModal = () =>
+  openPaloxActionModal(
+    ModiConstants.MOVE,
+    SlotSortAsyncModal,
+    "Paloxen verschieben"
+  );
+const openPaloxSwapModal = () =>
+  openPaloxActionModal(
+    ModiConstants.SWAP,
+    SlotSortAsyncModal,
+    "Paloxen tauschen"
+  );
+const openPaloxIntoStockStepperModal = () =>
+  openPaloxActionModal(
+    ModiConstants.INSERT,
+    PaloxIntoStockStepperAsyncModal,
+    "Paloxe einlagern"
+  );
+const openPaloxReorderModal = () =>
+  openPaloxActionModal(
+    ModiConstants.REORDER,
+    SlotSortAsyncModal,
+    "Paloxen sortieren"
+  );
 const openPaloxExitModal = () => {};
 
-const actions = [
+const actions: ToolbarAction[] = [
   {
     label: "Einlagern",
     icon: IconBox,
@@ -190,7 +204,7 @@ const actions = [
   {
     label: "Sortieren",
     icon: IconSortAscending,
-    handler: () => openSlotSortModal(ModiConstants.REORDER),
+    handler: openPaloxReorderModal,
   },
   { label: "Verschieben", icon: IconReorder, handler: openPaloxMoveModal },
   { label: "Tauschen", icon: IconReplace, handler: openPaloxSwapModal },

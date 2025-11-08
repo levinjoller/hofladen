@@ -4,7 +4,7 @@
   </div>
 
   <div v-else-if="localData.length">
-    <h2>Lager {{ selectedStock.display_name }} - Paloxenreihenfolge ändern</h2>
+    <h2>Lager {{ selectedStock.display_name }} - Zuordnung ändern</h2>
     <div class="container">
       <SlotDraggableAsync
         v-for="slotData in localData"
