@@ -4,7 +4,7 @@
 import { z } from "zod";
 
 export const PaloxesInStockViewSchema = z.object({
-  id: z.int(),
+  id: z.number().int(),
   stored_at: z.preprocess(
           (val) => (typeof val === "string" ? new Date(val) : val),
           z.date()
@@ -14,8 +14,8 @@ export const PaloxesInStockViewSchema = z.object({
   product_display_name: z.string(),
   product_type_emoji: z.string(),
   supplier_person_display_name: z.string(),
-  stock_id: z.int(),
-  slot_level_id: z.int(),
+  stock_id: z.number().int(),
+  slot_level_id: z.number().int(),
   stock_location_display_name: z.string(),
 });
 

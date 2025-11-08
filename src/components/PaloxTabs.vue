@@ -170,7 +170,7 @@ async function openSlotSortModal(modi: Modi = ModiConstants.REORDER) {
   const currentModi = ref<Modi>(modi);
   const activeStrategy = useSlotStrategy(currentModi);
   const requiresReload = await openModal<boolean>(SlotSortAsyncModal, {
-    title: "Paloxenstapel sortieren",
+    title: "Paloxen verschieben",
     currentStock: stockStore.getCurrentStockItem,
     activeStrategy: activeStrategy.value,
   });

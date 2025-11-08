@@ -1,5 +1,4 @@
 import pdfMake from "pdfmake/build/pdfmake";
-import { pdfVFS } from "@/assets/vfs_fonts";
 import type {
   ColDef,
   ValueFormatterParams,

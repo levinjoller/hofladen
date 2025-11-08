@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const DropdownSearchItemSchema = z.object({
-  id: z.int(),
+  id: z.number().int(),
   display_name: z.string().nullable(),
 });
 

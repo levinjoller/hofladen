@@ -1,8 +1,8 @@
 import z from "zod";
 
 export const SlotPaloxOrderDataSchema = z.object({
-  slot_id: z.int(),
-  ordered_palox_ids: z.array(z.int()),
+  slot_id: z.number().int(),
+  ordered_palox_ids: z.array(z.number().int()),
 });
 
 export const SlotPaloxOrderDataArraySchema = z.array(SlotPaloxOrderDataSchema);

@@ -5,10 +5,10 @@ import { z } from "zod";
 import { LevelContentArraySchema } from "@/types/schemas/level-content-schema";
 
 export const PaloxesNameBySlotViewSchema = z.object({
-  slot_id: z.int(),
+  slot_id: z.number().int(),
   slot_display_name: z.string(),
-  slot: z.int(),
-  max_level: z.int(),
+  slot: z.number().int(),
+  max_level: z.number().int(),
   levels: LevelContentArraySchema,
 });
 

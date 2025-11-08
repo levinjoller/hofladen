@@ -69,7 +69,7 @@ export function getZodType(col: ZodTypeInput): string {
       case "integer":
       case "smallint":
       case "bigint":
-        zodType = "z.int()";
+        zodType = "z.number().int()";
         break;
       case "numeric":
       case "double precision":
