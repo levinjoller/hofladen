@@ -1,10 +1,14 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { getUserFriendlyErrorMessage } from "@/utils/get-user-friendly-error-message";
 
 type Fetcher<T> = (...args: any[]) => Promise<T>;
 type FetcherArray<T> = (...args: any[]) => Promise<T[]>;
 
-function useDbBase<T>(executor: Fetcher<T>, initialValue: T) {
+function useDbBase<T>(
+  executor: Fetcher<T>,
+  initialValue: T,
+  onStatusChange?: (loading: boolean, errorMessage: string | null) => void
+) {
   const data = ref<T>(initialValue);
   const isLoading = ref(false);
   const error = ref<unknown | null>(null);
@@ -12,30 +16,40 @@ function useDbBase<T>(executor: Fetcher<T>, initialValue: T) {
     error.value ? getUserFriendlyErrorMessage(error.value) : ""
   );
 
-  const execute = async (...args: any[]): Promise<boolean> => {
+  const execute = async (...args: any[]): Promise<T | null> => {
     isLoading.value = true;
     error.value = null;
     try {
       const result = await executor(...args);
       data.value = result ?? initialValue;
-      return true;
+      return result ?? null;
     } catch (err: unknown) {
       error.value = err;
-      return false;
+      return null;
     } finally {
       isLoading.value = false;
     }
   };
-
+  watch([isLoading, errorMessage], () => {
+    if (onStatusChange) {
+      onStatusChange(isLoading.value, errorMessage.value || null);
+    }
+  });
   return { data, isLoading, error, errorMessage, execute };
 }
 
 // For SELECT
-export function useDbFetch<T>(fetcher: FetcherArray<T>) {
-  return useDbBase<T[]>(fetcher, []);
+export function useDbFetch<T>(
+  fetcher: FetcherArray<T>,
+  onStatusChange?: (loading: boolean, errorMessage: string | null) => void
+) {
+  return useDbBase<T[]>(fetcher, [], onStatusChange);
 }
 
 // For POST, PUT, DELETE
-export function useDbAction<T = void>(action: Fetcher<T>) {
-  return useDbBase<T | null>(action, null);
+export function useDbAction<T = void>(
+  action: Fetcher<T>,
+  onStatusChange?: (loading: boolean, errorMessage: string | null) => void
+) {
+  return useDbBase<T | null>(action, null, onStatusChange);
 }

@@ -11,4 +11,7 @@ export interface PaloxStoreState {
   selectedProduct: DropdownSearchItem | null;
   selectedStock: DropdownSearchItem | null;
   selectedStockColumnSlot: SlotContent | null;
+
+  _isActionLoading: boolean;
+  actionErrorMessage: string | null;
 }

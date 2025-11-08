@@ -200,17 +200,15 @@ watch(selectedPaloxNumber, (val) => {
 });
 
 async function handleNext() {
-  const { success, showSuccessToast, closeModal } = await nextStep();
+  const { success, parentReloadRequired, closeModal } = await nextStep();
   if (success) {
-    if (showSuccessToast) {
+    if (closeModal) {
       presentToast(
         `Die Paloxe (${selectedPaloxNumber.value}) wurde erfolgreich zuoberst auf den Stapel ${selectedStockColumnSlot.value?.display_name} eingelagert!`,
         "success",
         6000
       );
-    }
-    if (closeModal) {
-      closeStepperModal(true);
+      closeStepperModal(parentReloadRequired);
     }
   } else {
     if (actionErrorMessage.value) {

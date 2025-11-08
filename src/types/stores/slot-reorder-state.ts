@@ -10,4 +10,6 @@ export interface SlotReorderState {
   selectedStockColumnSlot: SlotContent[];
   originalOrder: SlotPaloxOrderData[];
   newOrder: SlotPaloxOrderData[];
+  _isActionLoading: boolean;
+  actionErrorMessage: string | null;
 }

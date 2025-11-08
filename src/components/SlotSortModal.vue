@@ -57,7 +57,7 @@
             :disabled="!canProceed || isActionLoading"
           >
             <ion-spinner v-if="isActionLoading" name="crescent"></ion-spinner>
-            <span v-else>{{ currentStep > 2 ? "Speichern" : "Weiter" }}</span>
+            <span v-else>{{ isFinalStep ? "Speichern" : "Weiter" }}</span>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -123,6 +123,7 @@ const {
   currentStep,
   canProceed,
   isActionLoading,
+  isFinalStep,
   selectedStock,
   selectedStockColumnSlot,
   actionErrorMessage,

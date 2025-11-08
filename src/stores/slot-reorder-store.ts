@@ -1,18 +1,11 @@
 import { defineStore } from "pinia";
-import { movePaloxesToDifferentLevel } from "@/services/palox-service";
-import { useDbAction } from "@/composables/use-db-action";
 import type { SlotReorderState } from "@/types/stores/slot-reorder-state";
 import type { SlotPaloxOrderData } from "@/types/slot-palox-order-data";
-import type { DbSlotPaloxOrderData } from "@/types/db-slot-palox-order-data";
 import type { SlotSelectionStrategy } from "@/types/slot-selection-strategy";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { StepResult } from "@/types/step-result";
-
-const {
-  errorMessage: dbActionErrorMessage,
-  isLoading: dbActionIsLoading,
-  execute: dbActionExecute,
-} = useDbAction(movePaloxesToDifferentLevel);
+import { findSlotOrder, upsertSlotOrder } from "@/utils/db-payload-helper";
+import { arraysEqual, FAILED_PRECHECK_RESULT } from "@/utils/strategy-helper";
 
 const getInitialState = (): SlotReorderState => ({
   currentStep: 1,
@@ -21,41 +14,22 @@ const getInitialState = (): SlotReorderState => ({
   selectedStockColumnSlot: [],
   originalOrder: [],
   newOrder: [],
+  _isActionLoading: false,
+  actionErrorMessage: null as string | null,
 });
-
-function findSlotOrder(
-  orderArray: SlotPaloxOrderData[],
-  slotId: number
-): SlotPaloxOrderData | undefined {
-  return orderArray.find((item) => item.slotId === slotId);
-}
-
-function upsertSlotOrder(
-  orderArray: SlotPaloxOrderData[],
-  slotId: number,
-  paloxIds: number[]
-): SlotPaloxOrderData[] {
-  const existing = orderArray.find((item) => item.slotId === slotId);
-  if (existing) {
-    existing.paloxIds = [...paloxIds];
-  } else {
-    orderArray.push({ slotId, paloxIds: [...paloxIds] });
-  }
-  return orderArray;
-}
-
-function arraysEqual(a: number[], b: number[]): boolean {
-  return a.length === b.length && a.every((val, i) => val === b[i]);
-}
 
 export const useSlotReorderStore = defineStore("slotReorderStore", {
   state: (): SlotReorderState => getInitialState(),
   getters: {
     isActionLoading(): boolean {
-      return dbActionIsLoading.value;
+      return this._isActionLoading;
     },
-    actionErrorMessage(): string | null {
-      return dbActionErrorMessage.value;
+    getActionErrorMessage(): string | null {
+      return this.actionErrorMessage;
+    },
+    isFinalStep(): boolean {
+      if (!this.selectedStrategy) return false;
+      return this.selectedStrategy.isFinalStep(this.currentStep);
     },
     canProceed(state): boolean {
       if (!state.selectedStrategy || state.currentStep === 1)
@@ -82,7 +56,6 @@ export const useSlotReorderStore = defineStore("slotReorderStore", {
     ) {
       this.$reset();
       this.selectedStrategy = activeStrategy;
-
       if (currentStock) {
         this.selectedStock = currentStock;
         this.currentStep = 2;
@@ -97,44 +70,22 @@ export const useSlotReorderStore = defineStore("slotReorderStore", {
         paloxIds: [...item.paloxIds],
       }));
     },
-    async submitStepTwo(): Promise<boolean> {
-      if (!this.newOrder.length) return false;
-      const dbPayloadArray: DbSlotPaloxOrderData[] = this.newOrder.map(
-        (item) => ({
-          slot_id: item.slotId,
-          ordered_palox_ids: item.paloxIds,
-        })
-      );
-      const payload = { p_slot_orders: dbPayloadArray };
-      return await dbActionExecute(payload);
+    setStrategyActionStatus(isLoading: boolean, errorMessage: string | null) {
+      this._isActionLoading = isLoading;
+      this.actionErrorMessage = errorMessage;
     },
     async nextStep(): Promise<StepResult> {
-      if (!this.canProceed) {
-        return {
-          success: false,
-          parentReloadRequired: false,
-          closeModal: false,
-          isCompleted: false,
-        };
+      if (!this.selectedStrategy || !this.canProceed) {
+        return FAILED_PRECHECK_RESULT;
       }
-      const isFinalStep = this.currentStep >= 3;
-      if (isFinalStep) {
-        if (!this.newOrder.length) {
-          return {
-            success: true,
-            parentReloadRequired: false,
-            closeModal: true,
-            isCompleted: true,
-          };
+      if (this.selectedStrategy.isFinalStep(this.currentStep)) {
+        const { executeFinalAction } = this.selectedStrategy;
+        if (executeFinalAction) {
+          return await executeFinalAction(this);
         }
-        const success = await this.submitStepTwo();
-        return {
-          success,
-          parentReloadRequired: success,
-          closeModal: true,
-          isCompleted: true,
-        };
+        return FAILED_PRECHECK_RESULT;
       }
+
       this.currentStep++;
       return {
         success: true,

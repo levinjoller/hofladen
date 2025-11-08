@@ -3,8 +3,8 @@ import { assignPaloxToSlot } from "@/services/palox-create-service";
 import { PaloxStoreState } from "@/types/stores/palox-state";
 import { useDbAction } from "@/composables/use-db-action";
 import { SlotContent } from "@/types/schemas/slot-content-schema";
-
-const { errorMessage, isLoading, execute } = useDbAction(assignPaloxToSlot);
+import { StepResult } from "@/types/step-result";
+import { FAILED_PRECHECK_RESULT } from "@/utils/strategy-helper";
 
 const getInitialState = (): PaloxStoreState => ({
   currentStep: 1,
@@ -15,6 +15,8 @@ const getInitialState = (): PaloxStoreState => ({
   selectedProduct: null,
   selectedStock: null,
   selectedStockColumnSlot: null,
+  _isActionLoading: false,
+  actionErrorMessage: null as string | null,
 });
 
 export const usePaloxStore = defineStore("paloxIntoStock", {
@@ -22,10 +24,10 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
 
   getters: {
     isActionLoading(): boolean {
-      return isLoading.value;
+      return this._isActionLoading;
     },
-    actionErrorMessage(): string | null {
-      return errorMessage.value;
+    getActionErrorMessage(): string | null {
+      return this.actionErrorMessage;
     },
     canProceed(state) {
       switch (state.currentStep) {
@@ -48,8 +50,27 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
     setSelectedSlot(slot: SlotContent | null) {
       this.selectedStockColumnSlot = slot;
     },
-    async submitStepTwo() {
-      return await execute({
+    setActionStatus(isLoading: boolean, errorMessage: string | null) {
+      this._isActionLoading = isLoading;
+      this.actionErrorMessage = errorMessage;
+    },
+    async nextStep(): Promise<StepResult> {
+      if (!this.canProceed) {
+        return FAILED_PRECHECK_RESULT;
+      }
+      if (this.currentStep < 2) {
+        this.currentStep++;
+        return {
+          success: true,
+          parentReloadRequired: false,
+          closeModal: false,
+          isCompleted: false,
+        };
+      }
+      const { execute } = useDbAction(assignPaloxToSlot, (loading, error) =>
+        this.setActionStatus(loading, error)
+      );
+      await execute({
         paloxTypeId: this.selectedPaloxType!.id,
         paloxNumber: this.selectedPaloxNumber,
         stockColumnSlotId: this.selectedStockColumnSlot!.slot_id,
@@ -57,21 +78,13 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
         supplierId: this.selectedSupplier!.id,
         customerId: this.selectedCustomer?.id,
       });
-    },
-    async nextStep() {
-      if (!this.canProceed) {
-        return { success: false, showSuccessToast: false, closeModal: false };
-      }
-      if (this.currentStep >= 2) {
-        const isSuccessful = await this.submitStepTwo();
-        return {
-          success: isSuccessful,
-          showSuccessToast: isSuccessful,
-          closeModal: true,
-        };
-      }
-      this.currentStep++;
-      return { success: true, showSuccessToast: false, closeModal: false };
+      const success = !this.actionErrorMessage;
+      return {
+        success: success,
+        parentReloadRequired: success,
+        closeModal: success,
+        isCompleted: true,
+      };
     },
     prevStep() {
       if (this.currentStep > 1) {

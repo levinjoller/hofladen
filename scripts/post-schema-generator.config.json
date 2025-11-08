@@ -60,6 +60,15 @@
           "to": "import { z } from \"zod\";\nimport { SlotPaloxOrderDataArraySchema } from \"@/types/schemas/slot-palox-order-data-schema\";"
         }
       ]
+    },
+    {
+      "file": "swap-paloxes-between-slots-fnc-params.ts",
+      "replacements": [
+        {
+          "from": "p_slot_ids: z.any()",
+          "to": "p_slot_ids: z.array(z.number().int()).length(2)"
+        }
+      ]
     }
   ]
 }

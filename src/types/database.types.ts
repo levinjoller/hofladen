@@ -528,6 +528,10 @@ export type Database = {
           z_slot: number
         }[]
       }
+      swap_paloxes_between_slots_fnc: {
+        Args: { p_slot_ids: number[] }
+        Returns: undefined
+      }
       update_palox_order_batch_fnc: {
         Args: {
           p_slot_orders: Database["public"]["CompositeTypes"]["slot_palox_order_data"][]

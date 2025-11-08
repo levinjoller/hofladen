@@ -178,7 +178,7 @@ async function openSlotSortModal(modi: Modi = ModiConstants.REORDER) {
 }
 
 const openPaloxMoveModal = () => openSlotSortModal(ModiConstants.MOVE);
-const openPaloxSwapModal = () => {};
+const openPaloxSwapModal = () => openSlotSortModal(ModiConstants.SWAP);
 const openPaloxExitModal = () => {};
 
 const actions = [
