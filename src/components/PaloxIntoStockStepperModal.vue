@@ -19,13 +19,12 @@
     <ion-content class="ion-padding">
       <div v-if="currentStep === 1">
         <ion-list>
-          <ModalSelectItem
+          <SelectWithSearchAsync
             title="Paloxenart"
             v-model="selectedPaloxType"
-            :component="DropdownSearchModal"
-            :fetchMethod="fetchPaloxTypes"
+            :fetchMethod="() => fetchPaloxTypes(false)"
             :isSearchable="false"
-            :isParentLoadingDefault="isLoading"
+            :isParentLoading="isLoading"
           />
           <ion-item>
             <ion-label position="fixed">Paloxen-Nr.</ion-label>
@@ -42,39 +41,32 @@
               @paste.prevent
               @drop.prevent
               :maxlength="4"
-              :disabled="!selectedPaloxType"
             ></ion-input>
           </ion-item>
-          <ModalSelectItem
+          <SelectWithSearchAsync
             title="Lieferant"
             v-model="selectedSupplier"
-            :component="DropdownSearchModal"
             :fetchMethod="fetchSuppliers"
-            :isSearchable="true"
-            :searchType="'text'"
-          />
-          <ModalSelectItem
-            title="Produkt"
-            v-model="selectedProduct"
-            :component="DropdownSearchModal"
-            :fetchMethod="fetchProducts"
-            :isSearchable="true"
-            :searchType="'text'"
-          />
-          <ModalSelectItem
-            title="Lager"
-            :fetchMethod="fetchStocks"
-            :component="DropdownSearchModal"
-            v-model="selectedStock"
             :isSearchable="false"
           />
-          <ModalSelectItem
+          <SelectWithSearchAsync
+            title="Produkt"
+            v-model="selectedProduct"
+            :fetchMethod="fetchProducts"
+            :isSearchable="true"
+            :searchType="SearchType.Text"
+          />
+          <SelectWithSearchAsync
+            title="Lager"
+            v-model="selectedStock"
+            :fetchMethod="fetchStocks"
+            :isSearchable="false"
+          />
+          <SelectWithSearchAsync
             title="Kunde"
             v-model="selectedCustomer"
-            :component="DropdownSearchModal"
             :fetchMethod="fetchCustomers"
-            :isSearchable="true"
-            :searchType="'text'"
+            :isSearchable="false"
           />
         </ion-list>
       </div>
@@ -141,18 +133,16 @@ import { isNumericKey } from "@/utils/is-numeric-key";
 import { SlotSelectionStrategy } from "@/types/slot-selection-strategy";
 import { SlotContent } from "@/types/schemas/slot-content-schema";
 import { DropdownSearchItem } from "@/types/dropdown-search-item";
-const DropdownSearchModal = defineAsyncComponent({
-  loader: () => import("@/components/DropdownSearchModal.vue"),
-  loadingComponent: LoadingSpinner,
-  delay: 200,
-});
-const ModalSelectItem = defineAsyncComponent({
-  loader: () => import("@/components/ModalSelectItem.vue"),
-  loadingComponent: LoadingSpinner,
-  delay: 200,
-});
+import { SearchType } from "@/types/search-type";
+
 const StockColumnSlotSelectPage = defineAsyncComponent({
   loader: () => import("@/components/StockColumnSlotSelectPage.vue"),
+  loadingComponent: LoadingSpinner,
+  delay: 200,
+});
+
+const SelectWithSearchAsync = defineAsyncComponent({
+  loader: () => import("@/components/SelectWithSearch.vue"),
   loadingComponent: LoadingSpinner,
   delay: 200,
 });
@@ -227,9 +217,11 @@ function closeStepperModal(requiresReload: boolean) {
 const { data, isLoading, execute } = useDbFetch(fetchPaloxTypes);
 
 onMounted(async () => {
+  paloxStore.initializeState(props.currentStock);
   await execute(true);
-  paloxStore.initializeState(props.currentStock, data.value);
-  if (!data.value || data.value.length === 0) {
+  if (Array.isArray(data.value) && data.value.length > 0) {
+    paloxStore.setSelectedPaloxType(data.value[0]);
+  } else {
     presentToast(
       "Es wurde keinen Standardwert für die Paloxenart gefunden.",
       warning
@@ -237,3 +229,9 @@ onMounted(async () => {
   }
 });
 </script>
+<style lang="css" scoped>
+ion-content::part(scroll) {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+</style>

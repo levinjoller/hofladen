@@ -19,11 +19,10 @@
     <ion-content class="ion-padding">
       <div v-if="currentStep === 1">
         <ion-list>
-          <ModalSelectAsyncItem
+          <SelectWithSearchAsync
             title="Lager"
-            :fetchMethod="fetchStocks"
-            :component="DropdownSearchAsyncModal"
             v-model="selectedStock"
+            :fetchMethod="fetchStocks"
             :isSearchable="false"
           />
         </ion-list>
@@ -90,13 +89,8 @@ import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import type { SlotSelectionStrategy } from "@/types/slot-selection-strategy";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
-const DropdownSearchAsyncModal = defineAsyncComponent({
-  loader: () => import("@/components/DropdownSearchModal.vue"),
-  loadingComponent: LoadingSpinner,
-  delay: 200,
-});
-const ModalSelectAsyncItem = defineAsyncComponent({
-  loader: () => import("@/components/ModalSelectItem.vue"),
+const SelectWithSearchAsync = defineAsyncComponent({
+  loader: () => import("@/components/SelectWithSearch.vue"),
   loadingComponent: LoadingSpinner,
   delay: 200,
 });

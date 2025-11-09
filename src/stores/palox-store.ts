@@ -51,20 +51,17 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
     setSelectedSlot(slot: SlotContent | null) {
       this.selectedStockColumnSlot = slot;
     },
+    setSelectedPaloxType(paloxType: DropdownSearchItem | null) {
+      this.selectedPaloxType = paloxType;
+    },
     setActionStatus(isLoading: boolean, errorMessage: string | null) {
       this._isActionLoading = isLoading;
       this.actionErrorMessage = errorMessage;
     },
-    initializeState(
-      currentStock: DropdownSearchItem | null,
-      defaultPaloxType: DropdownSearchItem[] | null
-    ) {
+    initializeState(currentStock: DropdownSearchItem | null) {
       this.$reset();
       if (currentStock) {
         this.selectedStock = currentStock;
-      }
-      if (defaultPaloxType) {
-        this.selectedPaloxType = defaultPaloxType[0];
       }
     },
     async nextStep(): Promise<StepResult> {
