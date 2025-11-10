@@ -44,22 +44,25 @@ import { Coordinate } from "@/types/schemas/coordinate-schema";
 import { defineAsyncComponent, onMounted } from "vue";
 import { useDbFetch } from "@/composables/use-db-action";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { fetchTakenLevelCoordinates } from "@/services/palox-service";
 
 const MatrixGridAsync = defineAsyncComponent({
   loader: () => import("@/components/MatrixGrid.vue"),
   loadingComponent: LoadingSpinner,
   delay: 200,
 });
-
 const props = defineProps<{
   stockId: number;
   slotLevelId: number;
   stockLocationDisplayName: string;
   paloxDisplayName: string;
-  fetchMethod: (...args: any[]) => Promise<Coordinate[]>;
+  fetchMethod: typeof fetchTakenLevelCoordinates;
 }>();
 
-const { data, isLoading, execute } = useDbFetch(props.fetchMethod);
+const { data, isLoading, execute } = useDbFetch<
+  Coordinate,
+  typeof props.fetchMethod
+>(props.fetchMethod);
 
 onMounted(async () => {
   await execute({ stockId: props.stockId });

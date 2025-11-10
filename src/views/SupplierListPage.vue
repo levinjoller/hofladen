@@ -47,9 +47,10 @@ const columnDefs: ColDef<SupplierList>[] = [
   },
 ];
 
-const { data, isLoading, errorMessage, execute } = useDbFetch(
-  fetchSuppliersWithPerson
-);
+const { data, isLoading, errorMessage, execute } = useDbFetch<
+  SupplierList,
+  typeof fetchSuppliersWithPerson
+>(fetchSuppliersWithPerson);
 
 onMounted(async () => {
   await execute();

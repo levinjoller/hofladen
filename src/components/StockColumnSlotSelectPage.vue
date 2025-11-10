@@ -67,6 +67,7 @@ import { presentToast } from "@/services/toast-service";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import type { SlotContent } from "@/types/schemas/slot-content-schema";
 import type { SlotSelectionStrategy } from "@/types/slot-selection-strategy";
+import { StockColumnSlotsByColumnView } from "@/types/generated/views/stock-column-slots-by-column-view";
 
 const props = defineProps<{
   modelValue: SlotContent[] | null;
@@ -78,9 +79,10 @@ const emit = defineEmits<{
   (e: "update:modelValue", val: SlotContent[] | null): void;
 }>();
 
-const { data, isLoading, errorMessage, execute } = useDbFetch(
-  fetchStockColumnSlotsByColumn
-);
+const { data, isLoading, errorMessage, execute } = useDbFetch<
+  StockColumnSlotsByColumnView,
+  typeof fetchStockColumnSlotsByColumn
+>(fetchStockColumnSlotsByColumn);
 
 watch(
   () => props.selectedStock.id,
@@ -166,9 +168,11 @@ ion-card-content {
   display: inline-block;
   margin-right: 6px;
 }
+
 .free-levels.free .dot {
   background-color: var(--ion-color-success, #2dd36f);
 }
+
 .free-levels.full .dot {
   background-color: var(--ion-color-danger, #eb445a);
 }

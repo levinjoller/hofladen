@@ -528,6 +528,10 @@ export type Database = {
           z_slot: number
         }[]
       }
+      remove_palox_and_shift_down: {
+        Args: { p_palox_id: number }
+        Returns: undefined
+      }
       swap_paloxes_between_slots_fnc: {
         Args: { p_slot_ids: number[] }
         Returns: undefined

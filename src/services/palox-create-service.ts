@@ -16,7 +16,7 @@ import {
 import { PaloxTypeNameArraySchema } from "@/types/schemas/palox-type-name-schema";
 import { PaloxNumberPerTypeArraySchema } from "@/types/schemas/palox-number-per-type-schema";
 
-export async function fetchPaloxes(
+export async function fetchStockedPaloxes(
   paloxNumber: number,
   paloxTypeId: number
 ): Promise<DropdownSearchItem[]> {
@@ -25,7 +25,7 @@ export async function fetchPaloxes(
     .select(`id, number_per_type`)
     .eq("fk_palox_type", paloxTypeId)
     .eq("number_per_type", paloxNumber)
-    .is("fk_stock_column_slot_level", null)
+    .not("fk_stock_column_slot_level", "is", null)
     .order("number_per_type", { ascending: true })
     .limit(5);
   const { data, error } = await query;

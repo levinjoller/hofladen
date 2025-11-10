@@ -108,6 +108,9 @@ const PaloxIntoStockStepperAsyncModal = createAsyncModal(
 const SlotSortAsyncModal = createAsyncModal(
   () => import("@/components/SlotSortModal.vue")
 );
+const PaloxExitAsyncModal = createAsyncModal(
+  () => import("@/components/PaloxExitModal.vue")
+);
 
 async function openModal<T>(
   component: any,
@@ -193,7 +196,14 @@ const openPaloxReorderModal = () =>
     SlotSortAsyncModal,
     "Paloxen sortieren"
   );
-const openPaloxExitModal = () => {};
+const openPaloxExitModal = async () => {
+  const requiresReload = await openModal<boolean>(PaloxExitAsyncModal, {
+    title: "Paloxe auslagern",
+  });
+  if (requiresReload) {
+    emit("refetch-parent-data");
+  }
+};
 
 const actions: ToolbarAction[] = [
   {

@@ -111,8 +111,10 @@ const columnDefs: ColDef<PaloxesInStockView>[] = [
   },
 ];
 
-const { data, isLoading, errorMessage, execute } =
-  useDbFetch(fetchPaloxesInStock);
+const { data, isLoading, errorMessage, execute } = useDbFetch<
+  PaloxesInStockView,
+  typeof fetchPaloxesInStock
+>(fetchPaloxesInStock);
 
 onMounted(async () => {
   await execute();

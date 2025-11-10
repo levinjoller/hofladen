@@ -7,10 +7,6 @@
       :inputmode="effectiveSearchType"
       :debounce="300"
       @ionInput="handleSearchInput"
-      @keydown.enter="handleEnter"
-      @keydown="
-        effectiveSearchType === SearchType.Numeric ? digitsOnly : undefined
-      "
       show-clear-button="always"
       animated
     />
@@ -58,13 +54,18 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{ (e: "select", value: DropdownSearchItem): void }>();
-
 const searchTerm = ref("");
 const selecting = ref(false);
 const searchbarRef: Ref<InstanceType<typeof IonSearchbar> | null> = ref(null);
-const { data, isLoading, errorMessage, execute } = useDbFetch(
-  props.fetchMethod
-);
+
+const { data, isLoading, errorMessage, execute } = useDbFetch<
+  DropdownSearchItem,
+  typeof props.fetchMethod
+>(props.fetchMethod);
+
+watch(errorMessage, (newError) => {
+  if (newError) presentToast(newError, "danger", 10000);
+});
 
 let lastRequestId = 0;
 
@@ -78,15 +79,43 @@ onMounted(async () => {
   if (!props.isSearchable) {
     await execute();
   } else {
-    await nextTick(() => {
-      setTimeout(() => searchbarRef.value?.$el.setFocus(), 100);
-    });
+    await initSearchbarFocusAndEvents();
   }
 });
 
-watch(errorMessage, (newError) => {
-  if (newError) presentToast(newError, "danger", 10000);
-});
+async function initSearchbarFocusAndEvents() {
+  await nextTick();
+  setTimeout(() => {
+    focusSearchbar();
+    const input = searchbarRef.value?.$el?.querySelector("input");
+    if (input) {
+      input.removeEventListener("keydown", handleSearchbarKeydown);
+      input.addEventListener("keydown", handleSearchbarKeydown);
+    }
+  }, 100);
+}
+
+function focusSearchbar() {
+  const searchbarEl = searchbarRef.value?.$el as
+    | HTMLIonSearchbarElement
+    | undefined;
+  searchbarEl?.setFocus?.();
+}
+
+function handleSearchbarKeydown(e: KeyboardEvent) {
+  if (e.key === "Enter") {
+    handleEnter();
+  } else if (
+    effectiveSearchType.value === SearchType.Numeric &&
+    !isNumericKey(e)
+  ) {
+    e.preventDefault();
+  }
+}
+
+const handleEnter = () => {
+  if (data.value.length > 0) selectOption(data.value[0]);
+};
 
 const handleSearchInput = async (event: Event) => {
   const raw = (event.target as HTMLInputElement).value;
@@ -101,21 +130,14 @@ const handleSearchInput = async (event: Event) => {
     data.value = [];
     return;
   }
-  await execute(term as string | number);
-  if (requestId !== lastRequestId) return;
-};
-
-function digitsOnly(event: KeyboardEvent) {
-  if (
-    effectiveSearchType.value === SearchType.Numeric &&
-    !isNumericKey(event)
-  ) {
-    event.preventDefault();
+  if (effectiveSearchType.value === SearchType.Numeric) {
+    await (execute as ConditionalFetchMethod<SearchType.Numeric>)(
+      term as number
+    );
+  } else {
+    await (execute as ConditionalFetchMethod<SearchType.Text>)(term as string);
   }
-}
-
-const handleEnter = () => {
-  if (data.value.length > 0) selectOption(data.value[0]);
+  if (requestId !== lastRequestId) return;
 };
 
 const selectOption = async (option: DropdownSearchItem) => {

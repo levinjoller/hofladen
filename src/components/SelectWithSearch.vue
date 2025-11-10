@@ -1,6 +1,6 @@
 <template>
   <ion-item button :disabled="!!isParentLoading" @click="toggleDropdown">
-    <ion-label position="fixed">{{ title }}</ion-label>
+    <ion-label>{{ title }}</ion-label>
     <ion-label slot="end" class="ion-text-wrap">
       {{ modelValue?.display_name ?? placeholder }}
     </ion-label>

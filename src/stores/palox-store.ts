@@ -82,7 +82,7 @@ export const usePaloxStore = defineStore("paloxIntoStock", {
       );
       await execute({
         paloxTypeId: this.selectedPaloxType!.id,
-        paloxNumber: this.selectedPaloxNumber,
+        paloxNumber: this.selectedPaloxNumber!,
         stockColumnSlotId: this.selectedStockColumnSlot!.slot_id,
         productId: this.selectedProduct!.id,
         supplierId: this.selectedSupplier!.id,

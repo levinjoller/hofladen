@@ -27,6 +27,7 @@ export function getUserFriendlyErrorMessage(err: unknown): string {
       YY012: "Einer der angegebenen Lagerplätze wurde nicht gefunden.",
       YY013:
         "Der angegebene Lagerplatz konnte nicht alle zugewiesenen Paloxen aufnehmen.",
+      YY014: "Die angegebene Paloxe wurde in keinem Lager gefunden.",
     };
     if (err.hint) console.debug("DB-Hint:", err.hint);
     return map[err.code] || defaultMessage;

@@ -115,7 +115,7 @@ import {
   IonLabel,
   IonInput,
 } from "@ionic/vue";
-import { closeOutline, chevronBackOutline, warning } from "ionicons/icons";
+import { closeOutline, chevronBackOutline } from "ionicons/icons";
 import { computed, defineAsyncComponent, onMounted, watch } from "vue";
 import {
   fetchCustomers,
@@ -214,7 +214,10 @@ function closeStepperModal(requiresReload: boolean) {
   modalController.dismiss(requiresReload);
 }
 
-const { data, isLoading, execute } = useDbFetch(fetchPaloxTypes);
+const { data, isLoading, execute } = useDbFetch<
+  DropdownSearchItem,
+  typeof fetchPaloxTypes
+>(fetchPaloxTypes);
 
 onMounted(async () => {
   paloxStore.initializeState(props.currentStock);
@@ -224,7 +227,7 @@ onMounted(async () => {
   } else {
     presentToast(
       "Es wurde keinen Standardwert für die Paloxenart gefunden.",
-      warning
+      "warning"
     );
   }
 });
