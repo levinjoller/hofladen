@@ -45,9 +45,10 @@ const emit = defineEmits<{
   (e: "changed-order", payload: SlotPaloxOrderData): void;
 }>();
 
-const { data, isLoading, execute } = useDbFetch<PaloxesNameBySlotView>(
-  fetchPaloxesNameBySlot
-);
+const { data, isLoading, execute } = useDbFetch<
+  PaloxesNameBySlotView,
+  typeof fetchPaloxesNameBySlot
+>(fetchPaloxesNameBySlot);
 const localData = ref<PaloxesNameBySlotView[]>([]);
 
 onMounted(async () => {

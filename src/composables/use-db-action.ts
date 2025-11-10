@@ -56,10 +56,12 @@ function useDbBase<T, Args extends unknown[]>(
     error.value = null;
   };
 
-  const stop = watchEffect(() => {
-    onStatusChange?.(isLoading.value, errorMessage.value || null);
-  });
-  onScopeDispose(() => stop());
+  if (onStatusChange) {
+    const stop = watchEffect(() => {
+      onStatusChange(isLoading.value, errorMessage.value || null);
+    });
+    onScopeDispose(() => stop());
+  }
 
   return { data, isLoading, error, errorMessage, execute, reset };
 }

@@ -38,6 +38,7 @@
               min="1"
               max="9999"
               @keydown="digitsOnly"
+              @keydown.enter="confirmPaloxNumber"
               @paste.prevent
               @drop.prevent
               :maxlength="4"
@@ -155,6 +156,11 @@ const props = defineProps<{
 
 function digitsOnly(event: KeyboardEvent) {
   !isNumericKey(event) && event.preventDefault();
+}
+
+function confirmPaloxNumber(event: KeyboardEvent) {
+  const input = event.target as HTMLInputElement;
+  input.blur();
 }
 
 const paloxStore = usePaloxStore();

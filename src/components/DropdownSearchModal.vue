@@ -33,7 +33,7 @@
       <div
         v-else-if="
           !isLoading &&
-          data.length === 0 &&
+          typedData.length === 0 &&
           (searchType === 'numeric'
             ? searchTerm.length > 0
             : searchTerm.length >= 3)
@@ -42,9 +42,9 @@
         <p class="ion-text-center">Kein/e {{ title }} gefunden.</p>
       </div>
 
-      <ion-list v-else-if="data.length > 0">
+      <ion-list v-else-if="typedData.length > 0">
         <ion-item
-          v-for="option in data"
+          v-for="option in typedData"
           :key="option.id"
           button
           @click="selectOption(option)"
@@ -79,14 +79,22 @@ import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import { useDbFetch } from "@/composables/use-db-action";
 import { isNumericKey } from "@/utils/is-numeric-key";
 
+type SearchFetcher = (
+  searchTerm?: number | string
+) => Promise<DropdownSearchItem[]>;
+
 const props = defineProps<{
   title: string;
-  fetchMethod: (searchTerm?: number | string) => Promise<DropdownSearchItem[]>;
+  fetchMethod: SearchFetcher;
   isSearchable?: boolean;
   searchType?: "numeric" | "text";
 }>();
 
-const { data, isLoading, execute } = useDbFetch(props.fetchMethod);
+const { data, isLoading, execute } = useDbFetch<
+  DropdownSearchItem,
+  SearchFetcher
+>(props.fetchMethod);
+const typedData: Ref<DropdownSearchItem[]> = data as Ref<DropdownSearchItem[]>;
 const searchbarRef: Ref<InstanceType<typeof IonSearchbar> | null> = ref(null);
 const searchTerm = ref("");
 
