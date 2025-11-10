@@ -1,0 +1,1 @@
+System.register(["./use-db-action-legacy-DImLRa6_.js"],function(e,t){"use strict";var n,s,a,i,r,c;return{setters:[e=>{n=e.o,s=e.fB,a=e.fo,i=e.fh,r=e.eD,c=e.a}],execute:function(){const t=e("P",n({id:i().int(),created_at:a(e=>"string"==typeof e?new Date(e):e,r()),display_name:s()}));c(t)}}});

@@ -1,0 +1,1 @@
+import{o as s,fh as a,fo as o,eD as m,a as r}from"./use-db-action-D1D3Xzmm.js";import{P as n}from"./persons-D3yaeLCU.js";const t=s({id:a().int(),created_at:o(e=>typeof e=="string"?new Date(e):e,m()),fk_person:a().int()});r(t);const p=s({...t.omit({fk_person:!0}).shape,person:s({...n.pick({display_name:!0}).shape})}),f=r(p);export{f as C,p as a};

@@ -1,0 +1,1 @@
+import{o as e,fB as s,fo as r,fh as t,eD as o,a as n}from"./use-db-action-D1D3Xzmm.js";const i=e({id:t().int(),created_at:r(a=>typeof a=="string"?new Date(a):a,o()),display_name:s()});n(i);export{i as P};

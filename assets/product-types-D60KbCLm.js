@@ -1,0 +1,1 @@
+import{o as s,fh as e,fB as a,fo as r,eD as o,a as n}from"./use-db-action-D1D3Xzmm.js";const i=s({id:e().int(),created_at:r(t=>typeof t=="string"?new Date(t):t,o()),display_name:a(),fk_product_type:e().int()});n(i);const c=s({id:e().int(),created_at:r(t=>typeof t=="string"?new Date(t):t,o()),display_name:a(),emoji:a()});n(c);export{i as P,c as a};
