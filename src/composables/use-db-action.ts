@@ -3,6 +3,7 @@ import {
   computed,
   watchEffect,
   onScopeDispose,
+  getCurrentScope,
   type Ref,
   type UnwrapRef,
 } from "vue";
@@ -56,7 +57,7 @@ function useDbBase<T, Args extends unknown[]>(
     error.value = null;
   };
 
-  if (onStatusChange) {
+  if (onStatusChange && getCurrentScope()) {
     const stop = watchEffect(() => {
       onStatusChange(isLoading.value, errorMessage.value || null);
     });
