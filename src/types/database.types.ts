@@ -63,23 +63,45 @@ export type Database = {
       palox_histories: {
         Row: {
           created_at: string
+          exit_at: string | null
+          fk_customer: number | null
           fk_palox: number
+          fk_product: number
           fk_stock_column_slot_level: number
+          fk_supplier: number
           id: number
+          stored_at: string | null
         }
         Insert: {
           created_at?: string
+          exit_at?: string | null
+          fk_customer?: number | null
           fk_palox: number
+          fk_product: number
           fk_stock_column_slot_level: number
+          fk_supplier: number
           id?: number
+          stored_at?: string | null
         }
         Update: {
           created_at?: string
+          exit_at?: string | null
+          fk_customer?: number | null
           fk_palox?: number
+          fk_product?: number
           fk_stock_column_slot_level?: number
+          fk_supplier?: number
           id?: number
+          stored_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "palox_histories_fk_customer_fkey"
+            columns: ["fk_customer"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "palox_histories_fk_palox_fkey"
             columns: ["fk_palox"]
@@ -95,6 +117,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "palox_histories_fk_product_fkey"
+            columns: ["fk_product"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "palox_histories_fk_stock_column_slot_level_fkey"
             columns: ["fk_stock_column_slot_level"]
             isOneToOne: false
@@ -106,6 +135,13 @@ export type Database = {
             columns: ["fk_stock_column_slot_level"]
             isOneToOne: false
             referencedRelation: "stock_column_slot_levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "palox_histories_fk_supplier_fkey"
+            columns: ["fk_supplier"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
         ]

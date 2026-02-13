@@ -15,10 +15,6 @@ SELECT TO anon USING (false);
 CREATE POLICY "Allow read access for authenticated users" ON public.product_types AS PERMISSIVE FOR
 SELECT TO authenticated USING (TRUE);
 
-INSERT INTO "public"."product_types" (display_name, emoji)
-VALUES ('Apfel', '🍎'),
-    ('Birne', '🍐');
-
 ALTER TABLE "public"."products"
 ADD COLUMN "fk_product_type" smallint NOT NULL DEFAULT '1'::smallint;
 

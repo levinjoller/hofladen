@@ -9,7 +9,6 @@ import { PaloxesInStockView } from "@/types/generated/views/paloxes-in-stock-vie
 
 const loadFonts = async () => {
   const { pdfVFS } = await import("@/assets/vfs_fonts");
-
   const FONTS = {
     NotoSans: {
       normal: "NotoSans.ttf",
@@ -19,9 +18,8 @@ const loadFonts = async () => {
       normal: "NotoEmoji.ttf",
     },
   };
-
-  pdfMake.vfs = pdfVFS;
-  pdfMake.fonts = FONTS;
+  pdfMake.setFonts(FONTS);
+  pdfMake.addVirtualFileSystem(pdfVFS);
 };
 
 function getNestedValue<T extends object>(row: T, field?: string) {
@@ -53,7 +51,7 @@ function splitTextByEmoji(text: string) {
 export async function exportDataAsPDF(
   data: PaloxesInStockView[],
   columnDefs: ColDef<PaloxesInStockView>[],
-  fileNamePrefix: string
+  fileNamePrefix: string,
 ) {
   await loadFonts();
   const now = new Date();
@@ -83,7 +81,7 @@ export async function exportDataAsPDF(
             : rawValue ?? "";
       }
       return { text: splitTextByEmoji(cellValue), noWrap: false };
-    })
+    }),
   );
 
   const docDefinition: TDocumentDefinitions = {
@@ -113,6 +111,6 @@ export async function exportDataAsPDF(
     .download(
       `${fileNamePrefix}_${now
         .toLocaleDateString("de-CH")
-        .replace(/\./g, "-")}.pdf`
+        .replace(/\./g, "-")}.pdf`,
     );
 }
