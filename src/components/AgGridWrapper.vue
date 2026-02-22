@@ -1,11 +1,11 @@
 <template>
   <div class="grid-container">
     <ag-grid-vue
-      class="ag-theme-alpine ag-grid full-screen"
+      class="ag-theme-alpine ag-grid"
       :rowData="rowData"
       :columnDefs="columnDefs"
       :defaultColDef="defaultColDef"
-      :gridOptions="gridOptions"
+      :gridOptions="optimizedGridOptions"
       :loading="isParentLoading"
       @grid-ready="onGridReady"
     />
@@ -23,7 +23,6 @@ import {
 } from "@/types/ag-grid-wrapper";
 
 const props = defineProps<AgGridWrapperProps<T>>();
-
 const gridApi = ref<GridApi | null>(null);
 
 const defaultColDef: ColDef<T> = {
@@ -34,13 +33,18 @@ const defaultColDef: ColDef<T> = {
   minWidth: 100,
 };
 
-const gridOptions: GridOptions = {
+const optimizedGridOptions: GridOptions = {
   localeText: AG_GRID_LOCALE_DE,
   pagination: true,
   paginationPageSize: 20,
   paginationPageSizeSelector: false,
   suppressMovableColumns: true,
   components: props.customComponents,
+  rowBuffer: 2,
+  rowHeight: 45,
+  suppressColumnVirtualisation: true,
+  animateRows: false,
+  domLayout: "normal",
 };
 
 function onGridReady(params: { api: GridApi }) {
@@ -56,12 +60,17 @@ defineExpose<AgGridWrapperExposed<T>>({
 .grid-container {
   height: 100%;
   width: 100%;
-  overflow: auto;
+  position: relative;
+  overflow: hidden;
 }
 
-.ag-grid.full-screen {
+.ag-grid {
   height: 100%;
   width: 100%;
+}
+
+:deep(.ag-overlay-loading-wrapper) {
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 :deep(.ag-paging-row-summary-panel) {

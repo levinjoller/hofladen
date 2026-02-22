@@ -147,7 +147,7 @@ async function onExportClick() {
     await exportDataAsPDF(rows, exportColumnDefs, "Paloxen");
     presentToast(
       "Pdf erfolgreich generiert und zum Download bereit.",
-      "success"
+      "success",
     );
   } catch (error) {
     presentToast(`Pdf-Export fehlgeschlagen: ${error}`, "danger", 10000);
