@@ -1,12 +1,4 @@
-import {
-  ref,
-  computed,
-  watchEffect,
-  onScopeDispose,
-  getCurrentScope,
-  type Ref,
-  type UnwrapRef,
-} from "vue";
+import { ref, computed, type Ref, type UnwrapRef } from "vue";
 import { getUserFriendlyErrorMessage } from "@/utils/get-user-friendly-error-message";
 
 export type Fetcher<T, Args extends unknown[] = any[]> = (
@@ -29,54 +21,61 @@ export interface UseDbResult<T, Args extends unknown[] = any[]> {
 function useDbBase<T, Args extends unknown[]>(
   executor: Fetcher<T, Args>,
   initialValue: T,
-  onStatusChange?: (loading: boolean, errorMessage: string | null) => void
+  onStatusChange?: (loading: boolean, errorMessage: string | null) => void,
 ): UseDbResult<T, Args> {
   const data = ref<T>(initialValue) as Ref<UnwrapRef<T>>;
   const isLoading = ref(false);
   const error = ref<unknown | null>(null);
   const errorMessage = computed(() =>
-    error.value ? getUserFriendlyErrorMessage(error.value) : ""
+    error.value ? getUserFriendlyErrorMessage(error.value) : "",
   );
+
+  function setError(err: Error | string | null) {
+    error.value = err instanceof Error ? err : err ? new Error(err) : null;
+    onStatusChange?.(
+      isLoading.value,
+      err ? getUserFriendlyErrorMessage(err) : null,
+    );
+  }
+
   const execute = async (...args: Args): Promise<T | null> => {
     isLoading.value = true;
-    error.value = null;
+    setError(null);
     try {
       const result = await executor(...args);
       data.value = (result ?? initialValue) as UnwrapRef<T>;
       return result ?? null;
     } catch (err: unknown) {
-      error.value = err;
+      setError(err instanceof Error ? err : new Error(String(err)));
       return null;
     } finally {
       isLoading.value = false;
+      onStatusChange?.(
+        false,
+        error.value ? getUserFriendlyErrorMessage(error.value) : null,
+      );
     }
   };
 
   const reset = () => {
     data.value = initialValue as UnwrapRef<T>;
-    error.value = null;
+    setError(null);
+    isLoading.value = false;
   };
-
-  if (onStatusChange && getCurrentScope()) {
-    const stop = watchEffect(() => {
-      onStatusChange(isLoading.value, errorMessage.value || null);
-    });
-    onScopeDispose(() => stop());
-  }
 
   return { data, isLoading, error, errorMessage, execute, reset };
 }
 
 export function useDbFetch<T, F extends FetcherArray<T>>(
   fetcher: F,
-  onStatusChange?: (loading: boolean, errorMessage: string | null) => void
+  onStatusChange?: (loading: boolean, errorMessage: string | null) => void,
 ): UseDbResult<T[], Parameters<F>> {
   return useDbBase<T[], Parameters<F>>(fetcher, [], onStatusChange);
 }
 
 export function useDbAction<T = void, A extends Fetcher<T> = Fetcher<T>>(
   action: A,
-  onStatusChange?: (loading: boolean, errorMessage: string | null) => void
+  onStatusChange?: (loading: boolean, errorMessage: string | null) => void,
 ): UseDbResult<T | null, Parameters<A>> {
   return useDbBase<T | null, Parameters<A>>(action, null, onStatusChange);
 }
