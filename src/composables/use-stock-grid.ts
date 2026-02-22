@@ -3,52 +3,39 @@ import type { PaloxesNameBySlotView } from "@/types/generated/views/paloxes-name
 
 const DEFAULT_GRID_VALUE = 1;
 
-interface GridBounds {
-  minC: number;
-  maxC: number;
-  minR: number;
-  maxR: number;
-}
-
 export function useStockGrid(getSlots: () => PaloxesNameBySlotView[]) {
-  const gridBounds = computed(() => {
+  const gridMetadata = computed(() => {
     const slots = getSlots();
-    if (!slots.length) {
-      return {
-        minC: DEFAULT_GRID_VALUE,
-        maxC: DEFAULT_GRID_VALUE,
-        minR: DEFAULT_GRID_VALUE,
-        maxR: DEFAULT_GRID_VALUE,
-      };
+    const uniqueCols = new Set<number>();
+    const uniqueRows = new Set<number>();
+
+    for (const s of slots) {
+      uniqueCols.add(s.column ?? DEFAULT_GRID_VALUE);
+      uniqueRows.add(s.slot ?? DEFAULT_GRID_VALUE);
     }
 
-    return slots.reduce(
-      (acc: GridBounds, s: PaloxesNameBySlotView) => ({
-        minC: Math.min(acc.minC, s.column ?? DEFAULT_GRID_VALUE),
-        maxC: Math.max(acc.maxC, s.column ?? DEFAULT_GRID_VALUE),
-        minR: Math.min(acc.minR, s.slot ?? DEFAULT_GRID_VALUE),
-        maxR: Math.max(acc.maxR, s.slot ?? DEFAULT_GRID_VALUE),
-      }),
-      {
-        minC: Infinity,
-        maxC: -Infinity,
-        minR: Infinity,
-        maxR: -Infinity,
-      },
-    );
+    const sortedCols = [...uniqueCols].sort((a, b) => a - b);
+    const sortedRows = [...uniqueRows].sort((a, b) => a - b);
+
+    return {
+      columnMap: new Map(sortedCols.map((col, idx) => [col, idx + 1])),
+      rowMap: new Map(sortedRows.map((row, idx) => [row, idx + 1])),
+      totalColumns: sortedCols.length,
+      totalRows: sortedRows.length,
+    };
   });
 
-  const totalColumns = computed(
-    () => gridBounds.value.maxC - gridBounds.value.minC + 1,
-  );
-  const totalRows = computed(
-    () => gridBounds.value.maxR - gridBounds.value.minR + 1,
-  );
+  const getGridItemStyle = (slot: PaloxesNameBySlotView) => {
+    const { columnMap, rowMap } = gridMetadata.value;
+    return {
+      gridColumnStart: columnMap.get(slot.column ?? DEFAULT_GRID_VALUE) ?? 1,
+      gridRowStart: rowMap.get(slot.slot ?? DEFAULT_GRID_VALUE) ?? 1,
+    };
+  };
 
-  const getGridItemStyle = (slot: PaloxesNameBySlotView) => ({
-    gridColumnStart: (slot.column ?? 1) - gridBounds.value.minC + 1,
-    gridRowStart: (slot.slot ?? 1) - gridBounds.value.minR + 1,
-  });
-
-  return { totalColumns, totalRows, getGridItemStyle };
+  return {
+    totalColumns: computed(() => gridMetadata.value.totalColumns),
+    totalRows: computed(() => gridMetadata.value.totalRows),
+    getGridItemStyle,
+  };
 }
