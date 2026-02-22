@@ -8,7 +8,7 @@ import { StepResult } from "@/types/step-result";
 
 export function findSlotOrder(
   orderArray: SlotPaloxOrderData[],
-  slotId: number
+  slotId: number,
 ): SlotPaloxOrderData | undefined {
   return orderArray.find((item) => item.slotId === slotId);
 }
@@ -16,7 +16,7 @@ export function findSlotOrder(
 export function upsertSlotOrder(
   orderArray: SlotPaloxOrderData[],
   slotId: number,
-  paloxIds: number[]
+  paloxIds: number[],
 ): SlotPaloxOrderData[] {
   const existing = orderArray.find((item) => item.slotId === slotId);
   if (existing) {
@@ -28,7 +28,7 @@ export function upsertSlotOrder(
 }
 
 export async function executeMovePaloxesToDifferentLevel(
-  store: SlotReorderStoreInstance
+  store: SlotReorderStoreInstance,
 ): Promise<StepResult> {
   if (!store.hasChanges) {
     return {
@@ -40,7 +40,7 @@ export async function executeMovePaloxesToDifferentLevel(
   }
   const { execute } = useDbAction(
     movePaloxesToDifferentLevel,
-    (loading, error) => store.setStrategyActionStatus(loading, error)
+    (loading, error) => store.setStrategyActionStatus(loading, error),
   );
   const dbPayloadArray: DbSlotPaloxOrderData[] = store.newOrder.map((item) => ({
     slot_id: item.slotId,
@@ -48,7 +48,7 @@ export async function executeMovePaloxesToDifferentLevel(
   }));
   const payload = { p_slot_orders: dbPayloadArray };
   await execute(payload);
-  const success = !store.actionErrorMessage;
+  const success = !store.getActionErrorMessage;
   return {
     success,
     parentReloadRequired: success,

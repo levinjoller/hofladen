@@ -506,6 +506,7 @@ export type Database = {
       }
       paloxes_name_by_slot_view: {
         Row: {
+          column: number | null
           levels: Json | null
           max_level: number | null
           slot: number | null

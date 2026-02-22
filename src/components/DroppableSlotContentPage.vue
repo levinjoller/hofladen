@@ -3,15 +3,24 @@
     <ion-spinner name="crescent" />
   </div>
 
-  <div v-else-if="localData.length">
-    <h2>Lager {{ selectedStock.display_name }} - Zuordnung ändern</h2>
-    <div class="container">
-      <SlotDraggableAsync
-        v-for="slotData in localData"
-        :key="slotData.slot_id"
-        :slotData="slotData"
-        @slot-change="handleSlotChange"
-      />
+  <div v-else-if="slots.length" class="stock-fixed-viewport">
+    <h2 class="header-fix">
+      Lager {{ selectedStock.display_name }} - Zuordnung ändern
+    </h2>
+
+    <div class="stock-scroll-area">
+      <div
+        class="stock-grid"
+        :style="{ '--cols': totalColumns, '--rows': totalRows }"
+      >
+        <SlotDraggableAsync
+          v-for="slotData in slots"
+          :key="slotData.slot_id"
+          :slotData="slotData"
+          :style="getGridItemStyle(slotData)"
+          @slot-change="updateSlot"
+        />
+      </div>
     </div>
   </div>
 
@@ -19,10 +28,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, defineAsyncComponent } from "vue";
+import { onMounted, defineAsyncComponent } from "vue";
 import { IonSpinner, IonText } from "@ionic/vue";
 import { useDbFetch } from "@/composables/use-db-action";
 import { fetchPaloxesNameBySlot } from "@/services/palox-create-service";
+import { useStockSlots } from "@/composables/use-stock-slots";
+import { useStockGrid } from "@/composables/use-stock-grid";
 import type { SlotContent } from "@/types/schemas/slot-content-schema";
 import type { DropdownSearchItem } from "@/types/dropdown-search-item";
 import type { PaloxesNameBySlotView } from "@/types/generated/views/paloxes-name-by-slot-view";
@@ -49,46 +60,65 @@ const { data, isLoading, execute } = useDbFetch<
   PaloxesNameBySlotView,
   typeof fetchPaloxesNameBySlot
 >(fetchPaloxesNameBySlot);
-const localData = ref<PaloxesNameBySlotView[]>([]);
 
 onMounted(async () => {
   const slotIds = props.slot.map((s) => s.slot_id).filter(Boolean);
-  if (!slotIds.length) return;
-  await execute(slotIds);
+  if (slotIds.length) await execute(slotIds);
 });
 
-watch(data, (newData) => {
-  if (!newData) return;
-  const processedData = newData.map((slot) => ({
-    ...slot,
-    levels: [...slot.levels].reverse(),
-  })) as PaloxesNameBySlotView[];
-  processedData.forEach((slot) => emitSlotChange(slot, "initial-order"));
-  localData.value = processedData;
-});
-
-function emitSlotChange(
-  slotData: PaloxesNameBySlotView,
-  event: "initial-order" | "changed-order"
-) {
-  const slotId = slotData.slot_id;
-  const paloxIds = [...slotData.levels].reverse().map((l) => l.palox_id);
-  if (event === "initial-order") {
-    emit("initial-order", { slotId, paloxIds });
-  } else {
-    emit("changed-order", { slotId, paloxIds });
-  }
+function emitInitialOrder(payload: SlotPaloxOrderData) {
+  emit("initial-order", payload);
 }
 
-function handleSlotChange(slotData: PaloxesNameBySlotView) {
-  emitSlotChange(slotData, "changed-order");
+function emitChangedOrder(payload: SlotPaloxOrderData) {
+  emit("changed-order", payload);
 }
+
+const { slots, updateSlot } = useStockSlots(
+  () => data.value,
+  emitInitialOrder,
+  emitChangedOrder,
+);
+
+const { totalColumns, totalRows, getGridItemStyle } = useStockGrid(
+  () => slots.value,
+);
 </script>
 
 <style scoped>
-.container {
+.stock-fixed-viewport {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.header-fix {
+  flex-shrink: 0;
+  padding: 1rem;
+  z-index: 20;
+  margin: 0;
+}
+
+.stock-scroll-area {
+  flex-grow: 1;
+  overflow: auto;
+  position: relative;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stock-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(160px, 1fr));
+  grid-template-rows: repeat(var(--rows), auto);
+  gap: 2rem;
+  padding: 2rem;
+  width: max-content;
+  min-height: 100%;
 }
 </style>
