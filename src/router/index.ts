@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "@ionic/vue-router";
 import { RouteRecordRaw } from "vue-router";
 import { supabase } from "@/supabase";
+import { useAuthStore } from "@/stores/auth-store";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -55,17 +56,17 @@ supabase.auth.onAuthStateChange((event, session) => {
   }
 });
 
-router.beforeEach(async (to, from, next) => {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (to.meta.requiresAuth && !session) {
-    next("/login");
-  } else if (to.path === "/login" && session) {
-    next("/home");
-  } else {
-    next();
+router.beforeEach(async (to) => {
+  const authStore = useAuthStore();
+  if (!authStore.isInitialized) {
+    await authStore.initialize();
+  }
+  const isAuthenticated = !!authStore.user;
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    return "/login";
+  }
+  if (to.path === "/login" && isAuthenticated) {
+    return "/home";
   }
 });
 

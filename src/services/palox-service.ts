@@ -41,7 +41,7 @@ export async function fetchTakenLevelCoordinates(params: {
   }
   const { data, error } = await supabase.rpc(
     "get_taken_level_coordinates_fnc",
-    validatedParams.data
+    validatedParams.data,
   );
   if (error) {
     throw error;
@@ -66,7 +66,7 @@ export async function movePaloxesToDifferentLevel(payload: {
   }
   const { error } = await supabase.rpc(
     "update_palox_order_batch_fnc",
-    validatedParams.data
+    validatedParams.data,
   );
   if (error) {
     throw error;
