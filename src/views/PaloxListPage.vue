@@ -15,7 +15,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <AgGridWrapper
+      <AgGridWrapperAsync
         ref="gridRef"
         :rowData="data"
         :columnDefs="columnDefs"
@@ -31,13 +31,13 @@
         </ion-content>
       </ion-popover>
     </ion-content>
-    <PaloxTabsAsync @refetchParentData="refetchData" />
+    <PaloxTabs @refetchParentData="refetchData" />
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch, defineAsyncComponent } from "vue";
-import { ColDef, ValueGetterParams } from "ag-grid-community";
+import type { ColDef, ValueGetterParams } from "ag-grid-community";
 import { ellipsisHorizontal, ellipsisVertical } from "ionicons/icons";
 import { isPlatform } from "@ionic/vue";
 import {
@@ -58,25 +58,19 @@ import { useDbFetch } from "@/composables/use-db-action";
 import { PaloxesInStockView } from "@/types/generated/views/paloxes-in-stock-view";
 import { toLocaleDate } from "@/utils/date-formatters";
 import { presentToast } from "@/services/toast-service";
-import { exportDataAsPDF } from "@/utils/ag-grid-export";
-import { AgGridWrapperExposed } from "@/types/ag-grid-wrapper";
-import AgGridWrapper from "@/components/AgGridWrapper.vue";
+import type { AgGridWrapperExposed } from "@/types/ag-grid-wrapper";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import PaloxTabs from "@/components/PaloxTabs.vue";
+import StockMapButton from "@/components/StockMapButton.vue";
 
-const PaloxTabsAsync = defineAsyncComponent({
-  loader: () => import("@/components/PaloxTabs.vue"),
-  loadingComponent: LoadingSpinner,
-  delay: 200,
-});
-
-const StockMapButtonAsync = defineAsyncComponent({
-  loader: () => import("@/components/StockMapButton.vue"),
+const AgGridWrapperAsync = defineAsyncComponent({
+  loader: () => import("@/components/AgGridWrapper.vue"),
   loadingComponent: LoadingSpinner,
   delay: 200,
 });
 
 const customComponents = {
-  StockMapButton: StockMapButtonAsync,
+  StockMapButton,
 };
 
 const getProductCellValue = (params: ValueGetterParams<PaloxesInStockView>) => {
@@ -144,6 +138,7 @@ async function onExportClick() {
     return colDef.headerName !== "Info";
   });
   try {
+    const { exportDataAsPDF } = await import("@/utils/ag-grid-export");
     await exportDataAsPDF(rows, exportColumnDefs, "Paloxen");
     presentToast(
       "Pdf erfolgreich generiert und zum Download bereit.",

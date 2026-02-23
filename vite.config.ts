@@ -1,8 +1,8 @@
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
-import legacy from "@vitejs/plugin-legacy";
 import { fileURLToPath, URL } from "node:url";
 import { templateCompilerOptions } from "@tresjs/core";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -12,10 +12,14 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       vue({ ...templateCompilerOptions }),
-      legacy({
-        targets: ["defaults", "not IE 11"],
-      }),
-    ],
+      !isProd &&
+        visualizer({
+          open: true,
+          filename: "stats.html",
+          gzipSize: true,
+          brotliSize: true,
+        }),
+    ].filter(Boolean),
     base: isProd ? (isDevBranch ? "/hofladen/dev/" : "/hofladen/") : "/",
     resolve: {
       alias: {
@@ -23,7 +27,19 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
+      minify: "esbuild",
       sourcemap: !isProd,
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            "vendor-grid": ["ag-grid-community", "ag-grid-vue3"],
+            "vendor-pdf": ["pdfmake"],
+            "vendor-three": ["three", "@tresjs/core"],
+            "vendor-ionic": ["@ionic/vue", "@ionic/core", "ionicons"],
+          },
+        },
+      },
     },
     test: {
       globals: true,

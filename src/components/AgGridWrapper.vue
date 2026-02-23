@@ -5,7 +5,10 @@
       :rowData="rowData"
       :columnDefs="columnDefs"
       :defaultColDef="defaultColDef"
-      :gridOptions="optimizedGridOptions"
+      :gridOptions="{
+        ...optimizedGridOptions,
+        components: { ...props.customComponents },
+      }"
       :loading="isParentLoading"
       @grid-ready="onGridReady"
     />
@@ -15,12 +18,15 @@
 <script setup lang="ts" generic="T extends object">
 import { ref } from "vue";
 import { AgGridVue } from "ag-grid-vue3";
-import { ColDef, GridApi, GridOptions } from "ag-grid-community";
-import { AG_GRID_LOCALE_DE } from "@ag-grid-community/locale";
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import type { ColDef, GridApi, GridOptions } from "ag-grid-community";
+import { AG_GRID_LOCALE_DE } from "@/utils/ag-grid-locale-de";
 import {
   AgGridWrapperExposed,
   AgGridWrapperProps,
 } from "@/types/ag-grid-wrapper";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const props = defineProps<AgGridWrapperProps<T>>();
 const gridApi = ref<GridApi | null>(null);
@@ -57,6 +63,9 @@ defineExpose<AgGridWrapperExposed<T>>({
 </script>
 
 <style scoped>
+@import "ag-grid-community/styles/ag-grid.css";
+@import "ag-grid-community/styles/ag-theme-alpine.css";
+
 .grid-container {
   height: 100%;
   width: 100%;

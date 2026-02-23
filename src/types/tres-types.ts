@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { Vector3 } from "three";
 
 export type Vector3Tuple = [x: number, y: number, z: number];
 
@@ -8,7 +8,7 @@ export type BoxArgsTuple = [
   depth: number,
   widthSegments?: number,
   heightSegments?: number,
-  depthSegments?: number
+  depthSegments?: number,
 ];
 
-export type TresVector3Like = Vector3Tuple | THREE.Vector3;
+export type TresVector3Like = Vector3Tuple | Vector3;

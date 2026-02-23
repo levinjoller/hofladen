@@ -34,11 +34,8 @@ import "@ionic/vue/css/palettes/dark.system.css";
 /* Theme variables */
 import "./theme/variables.css";
 
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
-
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 const app = createApp(App);
 const pinia = createPinia();

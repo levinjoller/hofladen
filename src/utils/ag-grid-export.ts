@@ -1,4 +1,3 @@
-import pdfMake from "pdfmake/build/pdfmake";
 import type {
   ColDef,
   ValueFormatterParams,
@@ -7,8 +6,12 @@ import type {
 import { TDocumentDefinitions } from "pdfmake/interfaces";
 import { PaloxesInStockView } from "@/types/generated/views/paloxes-in-stock-view";
 
-const loadFonts = async () => {
-  const { pdfVFS } = await import("@/assets/vfs_fonts");
+const getPdfMake = async () => {
+  const [pdfMakeModule, { pdfVFS }] = await Promise.all([
+    import("pdfmake/build/pdfmake"),
+    import("@/assets/vfs_fonts"),
+  ]);
+  const pdfInstance = pdfMakeModule.default;
   const FONTS = {
     NotoSans: {
       normal: "NotoSans.ttf",
@@ -18,8 +21,9 @@ const loadFonts = async () => {
       normal: "NotoEmoji.ttf",
     },
   };
-  pdfMake.setFonts(FONTS);
-  pdfMake.addVirtualFileSystem(pdfVFS);
+  pdfInstance.setFonts(FONTS);
+  pdfInstance.addVirtualFileSystem(pdfVFS);
+  return pdfInstance;
 };
 
 function getNestedValue<T extends object>(row: T, field?: string) {
@@ -53,7 +57,7 @@ export async function exportDataAsPDF(
   columnDefs: ColDef<PaloxesInStockView>[],
   fileNamePrefix: string,
 ) {
-  await loadFonts();
+  const pdfMake = await getPdfMake();
   const now = new Date();
   const headers = columnDefs.map((col) => ({
     text: col.headerName ?? col.field ?? "",

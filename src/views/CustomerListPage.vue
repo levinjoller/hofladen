@@ -10,7 +10,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <AgGridWrapper
+      <AgGridWrapperAsync
         :rowData="data"
         :columnDefs="columnDefs"
         :isParentLoading="isLoading"
@@ -29,14 +29,20 @@ import {
   IonButtons,
   IonMenuButton,
 } from "@ionic/vue";
-import { onMounted, watch } from "vue";
-import { ColDef } from "ag-grid-community";
+import { defineAsyncComponent, onMounted, watch } from "vue";
+import type { ColDef } from "ag-grid-community";
 import { useDbFetch } from "@/composables/use-db-action";
 import { presentToast } from "@/services/toast-service";
 import { CustomerList } from "@/types/schemas/customer-list-schema";
 import { fetchCustomersWithPerson } from "@/services/customer-service";
-import AgGridWrapper from "@/components/AgGridWrapper.vue";
 import { toLocaleDate } from "@/utils/date-formatters";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+
+const AgGridWrapperAsync = defineAsyncComponent({
+  loader: () => import("@/components/AgGridWrapper.vue"),
+  loadingComponent: LoadingSpinner,
+  delay: 200,
+});
 
 const columnDefs: ColDef<CustomerList>[] = [
   { headerName: "Name", field: "person.display_name" },

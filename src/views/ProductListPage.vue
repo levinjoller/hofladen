@@ -10,7 +10,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <AgGridWrapper
+      <AgGridWrapperAsync
         :rowData="data"
         :columnDefs="columnDefs"
         :isParentLoading="isLoading"
@@ -29,14 +29,20 @@ import {
   IonButtons,
   IonMenuButton,
 } from "@ionic/vue";
-import { onMounted, watch } from "vue";
-import AgGridWrapper from "@/components/AgGridWrapper.vue";
-import { ColDef, ValueGetterParams } from "ag-grid-community";
+import { defineAsyncComponent, onMounted, watch } from "vue";
+import type { ColDef, ValueGetterParams } from "ag-grid-community";
 import { toLocaleDate } from "@/utils/date-formatters";
 import { useDbFetch } from "@/composables/use-db-action";
 import { presentToast } from "@/services/toast-service";
 import { fetchProducts } from "@/services/product-service";
 import { ProductList } from "@/types/schemas/product-list-schema";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+
+const AgGridWrapperAsync = defineAsyncComponent({
+  loader: () => import("@/components/AgGridWrapper.vue"),
+  loadingComponent: LoadingSpinner,
+  delay: 200,
+});
 
 const getProductCellValue = (params: ValueGetterParams<ProductList>) => {
   const emoji = params.data?.type?.emoji ?? "";
