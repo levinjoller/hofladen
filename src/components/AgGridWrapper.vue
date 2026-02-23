@@ -18,7 +18,17 @@
 <script setup lang="ts" generic="T extends object">
 import { ref } from "vue";
 import { AgGridVue } from "ag-grid-vue3";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import {
+  ModuleRegistry,
+  ClientSideRowModelModule,
+  TextFilterModule,
+  NumberFilterModule,
+  DateFilterModule,
+  ValidationModule,
+  LocaleModule,
+  PaginationModule,
+  RowSelectionModule,
+} from "ag-grid-community";
 import type { ColDef, GridApi, GridOptions } from "ag-grid-community";
 import { AG_GRID_LOCALE_DE } from "@/utils/ag-grid-locale-de";
 import {
@@ -26,11 +36,18 @@ import {
   AgGridWrapperProps,
 } from "@/types/ag-grid-wrapper";
 
-ModuleRegistry.registerModules([AllCommunityModule]);
-
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  TextFilterModule,
+  NumberFilterModule,
+  DateFilterModule,
+  ValidationModule,
+  LocaleModule,
+  PaginationModule,
+  RowSelectionModule,
+]);
 const props = defineProps<AgGridWrapperProps<T>>();
 const gridApi = ref<GridApi | null>(null);
-
 const defaultColDef: ColDef<T> = {
   sortable: true,
   filter: true,
@@ -38,19 +55,23 @@ const defaultColDef: ColDef<T> = {
   flex: 1,
   minWidth: 100,
 };
-
 const optimizedGridOptions: GridOptions = {
   localeText: AG_GRID_LOCALE_DE,
   pagination: true,
   paginationPageSize: 20,
-  paginationPageSizeSelector: false,
+  rowSelection: {
+    mode: "singleRow",
+    enableClickSelection: false,
+    checkboxes: false,
+  },
   suppressMovableColumns: true,
-  components: props.customComponents,
-  rowBuffer: 2,
-  rowHeight: 45,
-  suppressColumnVirtualisation: true,
+  suppressContextMenu: true,
+  suppressDragLeaveHidesColumns: true,
+  debounceVerticalScrollbar: true,
   animateRows: false,
-  domLayout: "normal",
+  rowBuffer: 0,
+  suppressTouch: false,
+  components: props.customComponents,
 };
 
 function onGridReady(params: { api: GridApi }) {
