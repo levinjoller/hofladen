@@ -37,18 +37,19 @@ function getNestedValue<T extends object>(row: T, field?: string) {
 
 function splitTextByEmoji(text: string) {
   const result: Array<{ text: string; font?: string }> = [];
-  const emojiRegex = /[\u{1F300}-\u{1F6FF}]/gu;
+  const emojiRegex = /\p{Emoji_Presentation}/gu;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
-
   while ((match = emojiRegex.exec(text)) !== null) {
-    if (match.index > lastIndex)
+    if (match.index > lastIndex) {
       result.push({ text: text.slice(lastIndex, match.index) });
+    }
     result.push({ text: match[0], font: "NotoEmoji" });
     lastIndex = match.index + match[0].length;
   }
-
-  if (lastIndex < text.length) result.push({ text: text.slice(lastIndex) });
+  if (lastIndex < text.length) {
+    result.push({ text: text.slice(lastIndex) });
+  }
   return result;
 }
 
