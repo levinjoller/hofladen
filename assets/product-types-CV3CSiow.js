@@ -1,0 +1,1 @@
+import{o as s,fG as e,fN as o,f_ as a,eY as r}from"./LoadingSpinner-DgHZcYJm.js";const i=s({id:e().int(),created_at:o(t=>typeof t=="string"?new Date(t):t,r()),display_name:a(),fk_product_type:e().int()}),c=s({id:e().int(),created_at:o(t=>typeof t=="string"?new Date(t):t,r()),display_name:a(),emoji:a()});export{i as P,c as a};

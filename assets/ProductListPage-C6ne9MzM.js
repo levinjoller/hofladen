@@ -1,0 +1,10 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/AgGridWrapper-BoIPiCLw.js","assets/vendor-grid-Bad8I008.js","assets/index-YNPHqK-K.js","assets/vendor-ionic-DL3WDV-g.js","assets/index-CfmnWJvu.css","assets/AgGridWrapper-CBYO6srd.css"])))=>i.map(i=>d[i]);
+import{a as f,b as y,w as P,x as h,c as g,d as w,v as L,_ as I}from"./vendor-ionic-DL3WDV-g.js";import{o as u,a as b,u as k,t as x,L as C}from"./LoadingSpinner-DgHZcYJm.js";import{s as D,p as v}from"./index-YNPHqK-K.js";import{P as N,a as T}from"./product-types-CV3CSiow.js";import{k as j,b as A,w as B,q as S,x as o,u as e,m as V,Q as a,R as E,Y as M}from"./vendor-grid-Bad8I008.js";const R=u({...N.omit({fk_product_type:!0}).shape,type:u({...T.pick({display_name:!0,emoji:!0}).shape})}),F=b(R);async function G(){const{data:d,error:r}=await D.from("products").select(`
+      id, 
+      display_name,
+      created_at,
+      type:fk_product_type (
+        display_name,  
+        emoji
+      )
+      `).order("display_name",{ascending:!0});if(r)throw r;if(!d)return[];const s=F.safeParse(d);if(!s.success)throw s.error;return s.data}const O=j({__name:"ProductListPage",setup(d){const r=M({loader:()=>I(()=>import("./AgGridWrapper-BoIPiCLw.js"),__vite__mapDeps([0,1,2,3,4,5])),loadingComponent:C,delay:200}),c=[{headerName:"Bezeichnung",field:"display_name"},{headerName:"Kategorie",valueGetter:t=>{const n=t.data?.type?.emoji??"",_=t.data?.type?.display_name??"";return`${n} ${_}`}},{headerName:"Erstellt am",field:"created_at",valueFormatter:x}],{data:i,isLoading:l,errorMessage:p,execute:m}=k(G);return A(async()=>{await m()}),B(p,t=>{t&&v(t,"danger",1e4)}),(t,n)=>(V(),S(e(L),null,{default:o(()=>[a(e(f),{translucent:!0},{default:o(()=>[a(e(y),null,{default:o(()=>[a(e(P),{slot:"start"},{default:o(()=>[a(e(h))]),_:1}),a(e(g),null,{default:o(()=>[...n[0]||(n[0]=[E("Produkte Übersicht",-1)])]),_:1})]),_:1})]),_:1}),a(e(w),{fullscreen:!0},{default:o(()=>[a(e(r),{rowData:e(i),columnDefs:c,isParentLoading:e(l)},null,8,["rowData","isParentLoading"])]),_:1})]),_:1}))}});export{O as default};

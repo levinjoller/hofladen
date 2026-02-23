@@ -1,0 +1,1 @@
+import{o as s,fG as a,fN as r,eY as t,a as o}from"./LoadingSpinner-DgHZcYJm.js";import{P as m}from"./persons-CQb0edLH.js";const n=s({id:a().int(),created_at:r(e=>typeof e=="string"?new Date(e):e,t()),fk_person:a().int()}),p=s({...n.omit({fk_person:!0}).shape,person:s({...m.pick({display_name:!0}).shape})}),f=o(p);export{f as C,p as a};
