@@ -30,36 +30,35 @@ function useDbBase<T, Args extends unknown[]>(
     error.value ? getUserFriendlyErrorMessage(error.value) : "",
   );
 
-  function setError(err: Error | string | null) {
-    error.value = err instanceof Error ? err : err ? new Error(err) : null;
-    onStatusChange?.(
-      isLoading.value,
-      err ? getUserFriendlyErrorMessage(err) : null,
-    );
+  function updateError(err: unknown | null) {
+    error.value = err;
+    if (onStatusChange) {
+      onStatusChange(
+        isLoading.value,
+        err ? getUserFriendlyErrorMessage(err) : null,
+      );
+    }
   }
 
   const execute = async (...args: Args): Promise<T | null> => {
     isLoading.value = true;
-    setError(null);
+    updateError(null);
     try {
       const result = await executor(...args);
       data.value = (result ?? initialValue) as UnwrapRef<T>;
       return result ?? null;
     } catch (err: unknown) {
-      setError(err instanceof Error ? err : new Error(String(err)));
+      updateError(err);
       return null;
     } finally {
       isLoading.value = false;
-      onStatusChange?.(
-        false,
-        error.value ? getUserFriendlyErrorMessage(error.value) : null,
-      );
+      onStatusChange?.(false, error.value ? errorMessage.value : null);
     }
   };
 
   const reset = () => {
     data.value = initialValue as UnwrapRef<T>;
-    setError(null);
+    updateError(null);
     isLoading.value = false;
   };
 
