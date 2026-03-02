@@ -3,8 +3,7 @@ import type {
   ValueFormatterParams,
   ValueGetterParams,
 } from "ag-grid-community";
-import { TDocumentDefinitions } from "pdfmake/interfaces";
-import { PaloxesInStockView } from "@/types/generated/views/paloxes-in-stock-view";
+import type { TDocumentDefinitions } from "pdfmake/interfaces";
 
 const getPdfMake = async () => {
   const [pdfMakeModule, { pdfVFS }] = await Promise.all([
@@ -12,7 +11,7 @@ const getPdfMake = async () => {
     import("@/assets/vfs_fonts"),
   ]);
   const pdfInstance = pdfMakeModule.default;
-  const FONTS = {
+  pdfInstance.setFonts({
     NotoSans: {
       normal: "NotoSans.ttf",
       bold: "NotoSans.ttf",
@@ -20,19 +19,51 @@ const getPdfMake = async () => {
     NotoEmoji: {
       normal: "NotoEmoji.ttf",
     },
-  };
-  pdfInstance.setFonts(FONTS);
+  });
   pdfInstance.addVirtualFileSystem(pdfVFS);
   return pdfInstance;
 };
 
-function getNestedValue<T extends object>(row: T, field?: string) {
-  if (!field) return "";
-  return (
-    field
-      .split(".")
-      .reduce<any>((obj, key) => (obj ? obj[key] : undefined), row) ?? ""
-  );
+type ExportableValue = string | number | boolean | Date | null | undefined;
+
+function getNestedValue<T extends object>(
+  row: T,
+  field?: string,
+): ExportableValue {
+  if (!field) return null;
+  return field
+    .split(".")
+    .reduce<any>((obj, key) => (obj ? obj[key] : undefined), row);
+}
+
+function resolveColDefValue<T extends object>(
+  col: ColDef<T>,
+  row: T,
+): ExportableValue {
+  if (typeof col.valueGetter === "function") {
+    return col.valueGetter({
+      data: row,
+      colDef: col,
+    } as ValueGetterParams<T>);
+  }
+  if (!col.field) return null;
+  const rawValue = getNestedValue(row, col.field);
+  if (typeof col.valueFormatter === "function") {
+    return col.valueFormatter({
+      value: rawValue,
+      data: row,
+      colDef: col,
+    } as ValueFormatterParams<T>);
+  }
+  return rawValue;
+}
+
+function normalizeForPdf(value: ExportableValue): string {
+  if (value == null) return "";
+  if (value instanceof Date) {
+    return value.toLocaleDateString("de-CH");
+  }
+  return String(value);
 }
 
 function splitTextByEmoji(text: string) {
@@ -53,44 +84,28 @@ function splitTextByEmoji(text: string) {
   return result;
 }
 
-export async function exportDataAsPDF(
-  data: PaloxesInStockView[],
-  columnDefs: ColDef<PaloxesInStockView>[],
+export async function exportDataAsPDF<T extends object>(
+  data: T[],
+  columnDefs: ColDef<T>[],
   fileNamePrefix: string,
 ) {
   const pdfMake = await getPdfMake();
   const now = new Date();
   const headers = columnDefs.map((col) => ({
-    text: col.headerName ?? col.field ?? "",
+    text: col.headerName ?? (typeof col.field === "string" ? col.field : ""),
     style: "tableHeader",
   }));
-
   const body = data.map((row) =>
-    columnDefs.map((col) => {
-      let cellValue: string;
-      if (typeof col.valueGetter === "function") {
-        cellValue =
-          col.valueGetter({
-            data: row,
-            colDef: col,
-          } as ValueGetterParams<PaloxesInStockView>) ?? "";
-      } else {
-        const rawValue = col.field ? getNestedValue(row, col.field) : "";
-        cellValue =
-          typeof col.valueFormatter === "function"
-            ? col.valueFormatter({
-                value: rawValue,
-                data: row,
-                colDef: col,
-              } as ValueFormatterParams<PaloxesInStockView>) ?? ""
-            : rawValue ?? "";
-      }
-      return { text: splitTextByEmoji(cellValue), noWrap: false };
-    }),
+    columnDefs.map((col) => ({
+      text: splitTextByEmoji(normalizeForPdf(resolveColDefValue(col, row))),
+      noWrap: false,
+    })),
   );
-
   const docDefinition: TDocumentDefinitions = {
-    defaultStyle: { fontSize: 10, font: "NotoSans" },
+    defaultStyle: {
+      font: "NotoSans",
+      fontSize: 10,
+    },
     content: [
       {
         text: `${fileNamePrefix}übersicht vom ${now.toLocaleString("de-CH")}`,
@@ -107,10 +122,13 @@ export async function exportDataAsPDF(
       },
     ],
     styles: {
-      tableHeader: { bold: true, fillColor: "#eeeeee", alignment: "center" },
+      tableHeader: {
+        bold: true,
+        fillColor: "#eeeeee",
+        alignment: "center",
+      },
     },
   };
-
   pdfMake
     .createPdf(docDefinition)
     .download(

@@ -134,9 +134,9 @@ async function onExportClick() {
   api.forEachNodeAfterFilterAndSort((node) => {
     if (node.data) rows.push(node.data);
   });
-  const exportColumnDefs = columnDefs.filter((colDef) => {
-    return colDef.headerName !== "Info";
-  });
+
+  const exportColumnDefs = columnDefs.filter((col) => !col.cellRenderer);
+
   try {
     const { exportDataAsPDF } = await import("@/utils/ag-grid-export");
     await exportDataAsPDF(rows, exportColumnDefs, "Paloxen");

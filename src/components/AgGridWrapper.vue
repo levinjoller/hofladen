@@ -21,6 +21,7 @@ import { AgGridVue } from "ag-grid-vue3";
 import {
   ModuleRegistry,
   ClientSideRowModelModule,
+  ClientSideRowModelApiModule,
   TextFilterModule,
   NumberFilterModule,
   DateFilterModule,
@@ -38,6 +39,7 @@ import {
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
+  ClientSideRowModelApiModule,
   TextFilterModule,
   NumberFilterModule,
   DateFilterModule,
